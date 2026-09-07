@@ -166,15 +166,15 @@ The project is structured into three dedicated GitHub repositories:
 
 | Repository | Tech Stack | Role & Link |
 | :--- | :--- | :--- |
-| **Backend Monorepo** (This repo) | NestJS 11, gRPC, PostgreSQL, Prisma, Inngest | RESTful API Gateway, gRPC microservices, Stripe & Clerk webhooks. <br>🔗 Repo: [`<backend-repo-url>`](<backend-repo-url>) |
-| **Customer Storefront** | Next.js 16, React 19, Tailwind v4, Three.js | Customer shop, 3D interactive hero canvas, cart, Stripe checkout. <br>🔗 Repo: [`<storefront-repo-url>`](<storefront-repo-url>) |
-| **Admin Dashboard** | React 19, Vite, TypeScript, Cloudflare Zero Trust | Backoffice management, real-time KPI metrics, orders & catalog CRUD. <br>🔗 Repo: [`<admin-dashboard-repo-url>`](<admin-dashboard-repo-url>) |
+| **Backend Monorepo** (This repo) | NestJS 11, gRPC, PostgreSQL, Prisma, Inngest | RESTful API Gateway, gRPC microservices, Stripe & Clerk webhooks. <br>🔗 Repo: [`https://github.com/Hieuej147/ecommerce-backend.git`](https://github.com/Hieuej147/ecommerce-backend.git) |
+| **Customer Storefront** | Next.js 16, React 19, Tailwind v4, Three.js | Customer shop, 3D interactive hero canvas, cart, Stripe checkout. <br>🔗 Repo: [`https://github.com/Hieuej147/-E-commerce.git`](https://github.com/Hieuej147/-E-commerce.git) |
+| **Admin Dashboard** | React 19, Vite, TypeScript, Cloudflare Zero Trust | Backoffice management, real-time KPI metrics, orders & catalog CRUD. <br>🔗 Repo: [`https://github.com/Hieuej147/dashboard-admin-ecommern.git`](https://github.com/Hieuej147/dashboard-admin-ecommern.git) |
 
 ```
 my-ecommerce/
-├── backend/          # Repo 1: <backend-repo-url>
-├── storefront/       # Repo 2: <storefront-repo-url>
-└── admin-dashboard/  # Repo 3: <admin-dashboard-repo-url>
+├── backend/          # Repo 1: https://github.com/Hieuej147/ecommerce-backend.git
+├── storefront/       # Repo 2: https://github.com/Hieuej147/-E-commerce.git
+└── admin-dashboard/  # Repo 3: https://github.com/Hieuej147/dashboard-admin-ecommern.git
 ```
 
 ---
@@ -222,13 +222,13 @@ Create a parent workspace directory and clone the 3 repositories side-by-side:
 mkdir my-ecommerce && cd my-ecommerce
 
 # Clone Repo 1: Backend Monorepo
-git clone <backend-repo-url> backend
+git clone https://github.com/Hieuej147/ecommerce-backend.git backend
 
 # Clone Repo 2: Customer Storefront
-git clone <storefront-repo-url> storefront
+git clone https://github.com/Hieuej147/-E-commerce.git storefront
 
 # Clone Repo 3: Admin Dashboard
-git clone <admin-dashboard-repo-url> admin-dashboard
+git clone https://github.com/Hieuej147/dashboard-admin-ecommern.git admin-dashboard
 ```
 
 ---
