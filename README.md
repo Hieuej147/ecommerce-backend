@@ -8,11 +8,11 @@
   - [1. Architecture Diagram](#1-architecture-diagram)
   - [2. Tech Stack](#2-tech-stack)
   - [3. Services Breakdown](#3-services-breakdown)
-  - [4. The 3 Repositories](#4-the-3-repositories)
+  - [4. The 4 Repositories](#4-the-4-repositories)
 - [III. Prerequisites](#iii-prerequisites)
   - [Local Development Tools](#local-development-tools)
   - [Third-Party Services (Free Tiers)](#third-party-services-free-tiers)
-- [IV. Step-by-Step Guide: Cloning & Running All 3 Projects Locally](#iv-step-by-step-guide-cloning--running-all-3-projects-locally)
+- [IV. Step-by-Step Guide: Cloning & Running All Projects Locally](#iv-step-by-step-guide-cloning--running-all-projects-locally)
   - [1. Clone all 3 Repositories](#1-clone-all-3-repositories)
   - [2. Setup and Run Backend Microservices](#2-setup-and-run-backend-microservices)
   - [3. Setup and Run Customer Storefront](#3-setup-and-run-customer-storefront)
@@ -49,7 +49,7 @@ This project is an enterprise-grade, full-stack **E-Commerce Microservices Platf
 
 ### Original Codebase & Architectural Enhancements
 
-> 🔗 **Original Reference Project:** [shopping-cart-project](/mnt/disk2/shopping-cart-project) (adapted from [sivaprasadreddy/spring-boot-microservices-series](https://github.com/sivaprasadreddy/spring-boot-microservices-series.git)).
+> 🔗 **Original Reference Project:** [Jayce-Anh/shopping-cart-project](https://github.com/Jayce-Anh/shopping-cart-project) (adapted from [sivaprasadreddy/spring-boot-microservices-series](https://github.com/sivaprasadreddy/spring-boot-microservices-series.git)).
 
 #### What was taken from the reference:
 - The domain-driven service boundaries: splitting e-commerce responsibilities into distinct modules for **Catalog**, **Orders**, **Payments**, **Users**, and an **API Gateway**.
@@ -160,21 +160,23 @@ This project is an enterprise-grade, full-stack **E-Commerce Microservices Platf
 
 ---
 
-### 4. The 3 Repositories
+### 4. The 4 Repositories
 
-The project is structured into three dedicated GitHub repositories:
+The project is structured into four dedicated GitHub repositories:
 
 | Repository | Tech Stack | Role & Link |
 | :--- | :--- | :--- |
 | **Backend Monorepo** (This repo) | NestJS 11, gRPC, PostgreSQL, Prisma, Inngest | RESTful API Gateway, gRPC microservices, Stripe & Clerk webhooks. <br>🔗 Repo: [`https://github.com/Hieuej147/ecommerce-backend.git`](https://github.com/Hieuej147/ecommerce-backend.git) |
 | **Customer Storefront** | Next.js 16, React 19, Tailwind v4, Three.js | Customer shop, 3D interactive hero canvas, cart, Stripe checkout. <br>🔗 Repo: [`https://github.com/Hieuej147/-E-commerce.git`](https://github.com/Hieuej147/-E-commerce.git) |
 | **Admin Dashboard** | React 19, Vite, TypeScript, Cloudflare Zero Trust | Backoffice management, real-time KPI metrics, orders & catalog CRUD. <br>🔗 Repo: [`https://github.com/Hieuej147/dashboard-admin-ecommern.git`](https://github.com/Hieuej147/dashboard-admin-ecommern.git) |
+| **DevOps & GitOps (IaC & Manifests)** | Terraform, Helm, ArgoCD, AWS EKS, AWS ECR | Infrastructure as Code, OIDC authentication, 9 ECR registries, ArgoCD GitOps manifests. <br>🔗 Repo: [`https://github.com/Hieuej147/ecommerce-devops.git`](https://github.com/Hieuej147/ecommerce-devops.git) |
 
 ```
 my-ecommerce/
 ├── backend/          # Repo 1: https://github.com/Hieuej147/ecommerce-backend.git
 ├── storefront/       # Repo 2: https://github.com/Hieuej147/-E-commerce.git
-└── admin-dashboard/  # Repo 3: https://github.com/Hieuej147/dashboard-admin-ecommern.git
+├── admin-dashboard/  # Repo 3: https://github.com/Hieuej147/dashboard-admin-ecommern.git
+└── devops/           # Repo 4: https://github.com/Hieuej147/ecommerce-devops.git
 ```
 
 ---
@@ -229,6 +231,9 @@ git clone https://github.com/Hieuej147/-E-commerce.git storefront
 
 # Clone Repo 3: Admin Dashboard
 git clone https://github.com/Hieuej147/dashboard-admin-ecommern.git admin-dashboard
+
+# Clone Repo 4: DevOps & GitOps Manifests
+git clone https://github.com/Hieuej147/ecommerce-devops.git devops
 ```
 
 ---
@@ -510,6 +515,78 @@ sequenceDiagram
     GitHub->>GitOps: Commit updated image tag to Helm values.yaml
     GitOps->>EKS: ArgoCD detects change & performs zero-downtime rolling update
 ```
+
+### Step-by-Step AWS Production Deployment
+
+Follow these 6 steps to deploy the complete platform to AWS using our dedicated DevOps repository ([`ecommerce-devops`](https://github.com/Hieuej147/ecommerce-devops.git)):
+
+#### Step 1: Clone the DevOps Repository & Configure Variables
+```bash
+git clone https://github.com/Hieuej147/ecommerce-devops.git devops
+cd devops/terraform
+cp terraform.tfvars.example terraform.tfvars
+```
+Open `terraform.tfvars` and provide your AWS and domain details:
+```hcl
+project = {
+  name       = "ecommerce"
+  env        = "prod"
+  region     = "ap-southeast-1"
+  account_id = "123456789012"      # Your 12-digit AWS Account ID
+  domain     = "yourdomain.com"    # Your purchased domain name
+  admin_user = "admin"             # Your AWS IAM username
+}
+```
+
+#### Step 2: Provision AWS Infrastructure via Terraform
+```bash
+terraform init
+terraform plan
+terraform apply
+```
+Type `yes` to confirm. Terraform automatically provisions:
+- **Networking**: Multi-AZ VPC with Public/Private subnets & NAT Gateway.
+- **Compute & Containers**: Amazon EKS v1.30 cluster, Managed Node Group, and 9 Amazon ECR repositories.
+- **Security & CI/CD**: AWS IAM OIDC Provider for GitHub Actions (no static keys needed, saving runner costs).
+- **Databases**: Amazon RDS PostgreSQL 16 (for Prisma) and Amazon ElastiCache Valkey/Redis 7.2.
+- **Traffic Routing**: Application Load Balancer (ALB) with HTTPS wildcard certificate and Host-based routing.
+- **GitOps**: ArgoCD Operator and AWS Load Balancer Controller.
+
+#### Step 3: Configure GitHub Actions Secrets
+In the Terraform terminal output, copy the `github_actions_role_arn`. In each of your GitHub repositories (`ecommerce-backend`, `-E-commerce`, `dashboard-admin-ecommern`), navigate to **Settings** > **Secrets and variables** > **Actions** > **New repository secret**:
+
+| Secret Name | Value | Required In |
+| :--- | :--- | :--- |
+| `AWS_ROLE_ARN` | The ARN from Terraform output `github_actions_role_arn` | All 3 repositories |
+| `AWS_REGION` | `ap-southeast-1` | All 3 repositories |
+| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Your Clerk Publishable Key (`pk_...`) | Storefront & Backend |
+| `VITE_CLERK_PUBLISHABLE_KEY` | Your Clerk Publishable Key (`pk_...`) | Admin Dashboard |
+| `STRIPE_SECRET_KEY` | Your Stripe Secret Key (`sk_...`) | Backend |
+| `STRIPE_WEBHOOK_SECRET` | Your Stripe Webhook Signing Secret (`whsec_...`) | Backend |
+
+#### Step 4: Configure Cloudflare Zero Trust (Edge Protection for Admin)
+1. Point your domain's NameServers to Cloudflare DNS (Free tier).
+2. In Cloudflare DNS, create CNAME records for `store.yourdomain.com`, `admin.yourdomain.com`, and `api.yourdomain.com` pointing to the ALB DNS name from Terraform output `alb_dns_name`.
+3. In Cloudflare Dashboard, navigate to **Zero Trust** > **Access** > **Applications** > **Add an application**:
+   - Type: **Self-hosted**
+   - Application Name: `Admin Backoffice`
+   - Domain: `admin.yourdomain.com`
+   - Policy: Action `Allow`, Rule: Include `Emails` -> your administrator email.
+   - *Result: Anyone browsing `admin.yourdomain.com` must pass a 6-digit email OTP check before any assets or data are served.*
+
+#### Step 5: Configure Webhooks
+- **Stripe Webhook**: On [dashboard.stripe.com](https://dashboard.stripe.com) > **Developers** > **Webhooks** > Add endpoint:
+  - URL: `https://api.yourdomain.com/v1/payments/webhook/stripe`
+  - Events: `checkout.session.completed`, `payment_intent.succeeded`, `payment_intent.payment_failed`, `charge.refunded`.
+- **Clerk Webhook**: On [dashboard.clerk.com](https://dashboard.clerk.com) > **Webhooks** > Add endpoint:
+  - URL: `https://api.yourdomain.com/v1/webhooks/clerk`
+  - Events: `user.created`, `user.updated`, `user.deleted`.
+  - Admin Role: In Clerk Dashboard > **Users** > Select your user > **Public metadata**: add `{"role": "admin"}`.
+
+#### Step 6: Go-Live via GitHub Actions & ArgoCD
+Push code to `main` branch on any repository:
+- GitHub Actions automatically authenticates to AWS via OIDC, builds Docker images, and pushes them to Amazon ECR.
+- ArgoCD automatically detects updated images and executes rolling zero-downtime Pod updates on the EKS cluster!
 
 ### How to Update Code & Deploy
 You don't need complex DevOps knowledge to update your application in production:
