@@ -36,7 +36,7 @@ export class ClerkAuthGuard implements CanActivate {
       .getRequest<AuthenticatedRequest>();
 
     // Support internal agent service authentication
-    const internalToken = this.config.get<string>('AGENT_INTERNAL_TOKEN');
+    const internalToken = this.config?.get<string>('AGENT_INTERNAL_TOKEN');
     const providedToken = request.header('x-internal-service-token');
     if (internalToken && providedToken === internalToken) {
       request.actor = {

@@ -37,7 +37,7 @@ describe('ClerkAuthGuard', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    guard = new ClerkAuthGuard(new Reflector());
+    guard = new ClerkAuthGuard(new Reflector(), { get: jest.fn() } as any);
   });
 
   it('allows a route marked public without consulting Clerk', () => {

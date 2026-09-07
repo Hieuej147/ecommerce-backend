@@ -49,7 +49,9 @@ describe('PaymentService', () => {
   });
 
   it('rejects payment reads from another user', async () => {
-    prisma.payment.findUnique.mockResolvedValue({ id: 'pay_1', userId: 'owner', amountMinor: 100, currency: 'USD', status: PaymentStatus.CREATED, provider: 'stripe', providerPaymentId: null, orderId: 'order_1', createdAt: new Date() });
+    const payment = { id: 'pay_1', userId: 'owner', amountMinor: 100, currency: 'USD', status: PaymentStatus.CREATED, provider: 'stripe', providerPaymentId: null, orderId: 'order_1', createdAt: new Date() };
+    prisma.payment.findUnique.mockResolvedValue(payment);
+    prisma.payment.findFirst.mockResolvedValue(payment);
     await expect(service.getPayment({ paymentId: 'pay_1' }, 'attacker')).rejects.toMatchObject({ error: { code: 'PERMISSION_DENIED' } });
   });
 

@@ -41,8 +41,8 @@ jobs:
           pnpm run db:users:generate
           pnpm run db:agent:generate
 
-      - name: Run Lint
-        run: pnpm run lint
+      - name: Build All Services
+        run: pnpm run build
 
       - name: Run Unit Tests
         run: pnpm test
