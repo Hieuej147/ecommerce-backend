@@ -1,0 +1,14 @@
+process.env.CLERK_PUBLISHABLE_KEY ??= 'pk_test_key';
+process.env.CLERK_SECRET_KEY ??= 'sk_test_key';
+process.env.CLERK_JWT_KEY ??= 'test-public-key';
+process.env.CLERK_AUTHORIZED_PARTIES ??= 'http://localhost:3001';
+process.env.PORT ??= '3000';
+process.env.USERS_GRPC_URL ??= 'localhost:5004';
+process.env.USERS_DATABASE_URL ??=
+  'postgresql://ecommerce:ecommerce@localhost:5438/ecommerce?schema=users';
+process.env.AGENT_DATABASE_URL ??=
+  'postgresql://ecommerce:ecommerce@localhost:5438/ecommerce?schema=agent_runtime';
+process.env.AGENT_SERVICE_URL ??= 'http://127.0.0.1:3010';
+process.env.AGENT_SERVICE_PORT ??= '3010';
+process.env.AGENT_INTERNAL_TOKEN ??= 'development-agent-token';
+process.env.AGENT_URL ??= 'http://127.0.0.1:8001/dashboard-agent';

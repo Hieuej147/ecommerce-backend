@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package common.v1;
+
+message Empty {}
+
+message PageRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+}
+
+message PageInfo {
+  string next_page_token = 1;
+  bool has_next_page = 2;
+}
+
+message Money {
+  int64 amount_minor = 1;
+  string currency = 2;
+}
+
+message Address {
+  string recipient_name = 1;
+  string phone = 2;
+  string line1 = 3;
+  string line2 = 4;
+  string city = 5;
+  string province = 6;
+  string postal_code = 7;
+  string country_code = 8;
+}

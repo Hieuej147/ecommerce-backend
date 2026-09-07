@@ -1,0 +1,138 @@
+name: Build and Deploy Backend Services
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  id-token: write   # Required for AWS OIDC authentication
+  contents: read
+
+jobs:
+  test:
+    name: Run Unit Tests & Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run Prisma Client Generations
+        run: |
+          pnpm run db:catalog:generate
+          pnpm run db:order:generate
+          pnpm run db:payment:generate
+          pnpm run db:users:generate
+          pnpm run db:agent:generate
+
+      - name: Run Lint
+        run: pnpm run lint
+
+      - name: Run Unit Tests
+        run: pnpm test
+
+  build-and-push:
+    name: Build & Push Service Images
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [api-gateway, catalog, order, payment, users, agent-service]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION || 'ap-southeast-1' }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and Push Docker Image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          SERVICE: ${{ matrix.service }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          REPO_NAME="${{ secrets.ECR_PREFIX || 'shopping-cart' }}-${SERVICE}"
+          docker build \
+            --build-arg APP_NAME=${SERVICE} \
+            -t $ECR_REGISTRY/$REPO_NAME:$IMAGE_TAG \
+            -t $ECR_REGISTRY/$REPO_NAME:latest .
+          docker push $ECR_REGISTRY/$REPO_NAME:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$REPO_NAME:latest
+
+  build-and-push-agent-python:
+    name: Build & Push Python AI Agent
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION || 'ap-southeast-1' }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and Push Agent Python Image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          REPO_NAME="${{ secrets.ECR_PREFIX || 'shopping-cart' }}-agent-python"
+          cd agent-python
+          docker build \
+            -t $ECR_REGISTRY/$REPO_NAME:$IMAGE_TAG \
+            -t $ECR_REGISTRY/$REPO_NAME:latest .
+          docker push $ECR_REGISTRY/$REPO_NAME:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$REPO_NAME:latest
+
+  update-gitops:
+    name: Update GitOps Helm Manifests (ArgoCD)
+    needs: [build-and-push, build-and-push-agent-python]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger GitOps Update
+        if: env.MANIFEST_REPO != ''
+        env:
+          MANIFEST_REPO: ${{ secrets.MANIFEST_REPO }}
+          GIT_TOKEN: ${{ secrets.GITOPS_GITHUB_TOKEN }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          git clone https://x-access-token:${GIT_TOKEN}@github.com/${MANIFEST_REPO}.git gitops-repo
+          cd gitops-repo
+          # Update values.yaml image tags
+          sed -i "s/tag: .*/tag: \"${IMAGE_TAG}\"/g" devops/shopping-cart-manifest/shopping-cart/values.yaml || true
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit -am "chore(backend): bump backend services to ${IMAGE_TAG}" || echo "No changes"
+          git push origin main

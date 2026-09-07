@@ -1,0 +1,20 @@
+services:
+  postgres-catalog:
+    image: postgres:16-alpine
+    container_name: microservice-catalog-postgres
+    environment:
+      POSTGRES_USER: ecommerce
+      POSTGRES_PASSWORD: ecommerce
+      POSTGRES_DB: ecommerce
+    ports:
+      - '5438:5432'
+    volumes:
+      - catalog-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ecommerce -d ecommerce']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  catalog-postgres-data:

@@ -1,0 +1,74 @@
+{
+  "info": {
+    "name": "E-commerce Order Payment",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "clerkToken", "value": "" },
+    { "key": "productId", "value": "" },
+    { "key": "orderId", "value": "" },
+    { "key": "paymentId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "request": { "method": "GET", "url": "{{baseUrl}}/v1/health" }
+    },
+    {
+      "name": "List products",
+      "request": { "method": "GET", "url": "{{baseUrl}}/v1/products" }
+    },
+    {
+      "name": "Create order",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{clerkToken}}" },
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Idempotency-Key", "value": "order-demo-001" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"items\": [{\"productId\": \"{{productId}}\", \"quantity\": 1}],\n  \"shippingAddress\": {\"recipientName\": \"Test User\", \"phone\": \"0900000000\", \"line1\": \"1 Demo Street\", \"city\": \"Ho Chi Minh City\", \"countryCode\": \"VN\"}\n}"
+        },
+        "url": "{{baseUrl}}/v1/orders"
+      }
+    },
+    {
+      "name": "Create checkout",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{clerkToken}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"orderId\":\"{{orderId}}\",\"successUrl\":\"http://localhost:3001/success\",\"cancelUrl\":\"http://localhost:3001/cancel\",\"idempotencyKey\":\"checkout-demo-001\"}"
+        },
+        "url": "{{baseUrl}}/v1/payments/checkout"
+      }
+    },
+    {
+      "name": "Get order",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{clerkToken}}" }
+        ],
+        "url": "{{baseUrl}}/v1/orders/{{orderId}}"
+      }
+    },
+    {
+      "name": "Cancel order",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{clerkToken}}" }
+        ],
+        "url": "{{baseUrl}}/v1/orders/{{orderId}}/cancel"
+      }
+    }
+  ]
+}

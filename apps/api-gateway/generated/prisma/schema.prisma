@@ -1,0 +1,74 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ConversationThreadStatus {
+  IDLE
+  RUNNING
+  DELETING
+}
+
+enum AgentRunStatus {
+  RUNNING
+  COMPLETED
+  ERROR
+  STOPPED
+}
+
+enum AgentRunKind {
+  ROOT
+  SUBAGENT
+}
+
+model ConversationThread {
+  id         String                   @id @default(cuid())
+  userId     String
+  agentId    String
+  title      String                   @default("New conversation")
+  status     ConversationThreadStatus @default(IDLE)
+  archivedAt DateTime?
+  createdAt  DateTime                 @default(now())
+  updatedAt  DateTime                 @updatedAt
+  runs       AgentRun[]
+
+  @@index([userId, updatedAt])
+  @@index([userId, agentId, status])
+}
+
+model AgentRun {
+  id          String             @id @default(cuid())
+  threadId    String
+  agentId     String
+  parentRunId String?
+  rootRunId   String
+  depth       Int                @default(0)
+  kind        AgentRunKind       @default(ROOT)
+  status      AgentRunStatus     @default(RUNNING)
+  input       Json
+  startedAt   DateTime           @default(now())
+  finishedAt  DateTime?
+  errorCode   String?
+  thread      ConversationThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  events      AgentEvent[]
+
+  @@index([threadId, startedAt])
+  @@index([threadId, status])
+  @@index([rootRunId])
+}
+
+model AgentEvent {
+  runId     String
+  threadId  String
+  sequence  Int
+  event     Json
+  createdAt DateTime @default(now())
+  run       AgentRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  @@id([runId, sequence])
+  @@index([threadId, createdAt])
+}

@@ -1,0 +1,32 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum PaymentStatus {
+  CREATED
+  PROCESSING
+  PAID
+  FAILED
+}
+
+model Payment {
+  id                String        @id @default(cuid())
+  orderId           String        @unique
+  userId            String
+  amountMinor       BigInt
+  currency          String
+  provider          String        @default("stripe")
+  providerSessionId String?       @unique
+  providerPaymentId String?
+  status            PaymentStatus @default(CREATED)
+  processedEventId  String?       @unique
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  @@index([userId, createdAt])
+}

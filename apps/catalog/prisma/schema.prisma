@@ -1,0 +1,227 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ProductStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+enum ReservationStatus {
+  RESERVED
+  RELEASED
+}
+
+model Product {
+  id              String        @id @default(cuid())
+  externalId      String?       @unique
+  sku             String?       @unique
+  slug            String        @unique
+  name            String
+  categorySlug    String        @default("uncategorized")
+  description     String        @default("")
+  colors          String[]      @default([])
+  sizes           String[]      @default([])
+  images          Json?
+  reorderPoint    Int           @default(20)
+  priceAmountMinor BigInt
+  currency        String        @default("VND")
+  stockQuantity   Int           @default(0)
+  status          ProductStatus @default(ACTIVE)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  reservationItems StockReservationItem[]
+
+  @@index([status, createdAt])
+  @@index([name])
+}
+
+model StockReservation {
+  reservationId String             @id
+  status        ReservationStatus  @default(RESERVED)
+  createdAt     DateTime           @default(now())
+  releasedAt    DateTime?
+  items         StockReservationItem[]
+}
+
+model StockReservationItem {
+  reservationId String
+  productId     String
+  quantity      Int
+  reservation   StockReservation @relation(fields: [reservationId], references: [reservationId], onDelete: Cascade)
+  product       Product           @relation(fields: [productId], references: [id])
+
+  @@id([reservationId, productId])
+  @@index([productId])
+}
+
+enum OrderStatus {
+  PENDING_PAYMENT
+  PAID
+  CANCELLED
+  PAYMENT_FAILED
+}
+enum OrderPaymentStatus {
+  UNPAID
+  PROCESSING
+  PAID
+  FAILED
+  REFUNDED
+}
+model Order {
+  id String @id @default(cuid())
+  userId String
+  customerName String @default("")
+  customerEmail String @default("")
+  externalId String? @unique
+  status OrderStatus @default(PENDING_PAYMENT)
+  paymentStatus OrderPaymentStatus @default(UNPAID)
+  subtotalAmountMinor BigInt
+  totalAmountMinor BigInt
+  currency String @default("USD")
+  recipientName String
+  phone String
+  line1 String
+  line2 String @default("")
+  city String
+  province String @default("")
+  postalCode String @default("")
+  countryCode String
+  idempotencyKey String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  items OrderItem[]
+  @@unique([userId, idempotencyKey])
+}
+model OrderItem {
+  id String @id @default(cuid())
+  orderId String
+  productId String
+  productName String
+  quantity Int
+  unitPriceAmountMinor BigInt
+  lineTotalAmountMinor BigInt
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+enum PaymentStatus {
+  CREATED
+  PROCESSING
+  PAID
+  FAILED
+}
+model Payment {
+  id String @id @default(cuid())
+  orderId String @unique
+  userId String
+  amountMinor BigInt
+  currency String
+  provider String @default("stripe")
+  providerSessionId String? @unique
+  providerPaymentId String?
+  status PaymentStatus @default(CREATED)
+  processedEventId String? @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum ConversationThreadStatus {
+  IDLE
+  RUNNING
+  DELETING
+}
+
+enum AgentRunStatus {
+  RUNNING
+  COMPLETED
+  ERROR
+  STOPPED
+}
+
+enum AgentRunKind {
+  ROOT
+  SUBAGENT
+}
+
+model ConversationThread {
+  id         String                  @id @default(cuid())
+  userId     String
+  agentId    String
+  title      String                  @default("New conversation")
+  status     ConversationThreadStatus @default(IDLE)
+  archivedAt DateTime?
+  createdAt  DateTime                @default(now())
+  updatedAt  DateTime                @updatedAt
+  runs       AgentRun[]
+
+  @@index([userId, updatedAt])
+  @@index([userId, agentId, status])
+}
+
+model AgentRun {
+  id          String        @id @default(cuid())
+  threadId    String
+  agentId     String
+  parentRunId String?
+  rootRunId   String
+  depth       Int           @default(0)
+  kind        AgentRunKind  @default(ROOT)
+  status      AgentRunStatus @default(RUNNING)
+  input       Json
+  startedAt   DateTime      @default(now())
+  finishedAt  DateTime?
+  errorCode   String?
+  thread      ConversationThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  events      AgentEvent[]
+
+  @@index([threadId, startedAt])
+  @@index([threadId, status])
+  @@index([rootRunId])
+}
+
+model AgentEvent {
+  runId     String
+  threadId  String
+  sequence  Int
+  event     Json
+  createdAt DateTime @default(now())
+  run       AgentRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  @@id([runId, sequence])
+  @@index([threadId, createdAt])
+}
+
+enum NotificationType {
+  ORDER_CREATED
+  ORDER_SHIPPED
+  ORDER_CANCELLED
+  PAYMENT_SUCCESS
+  PAYMENT_FAILED
+  PRODUCT_LOW_STOCK
+  NEW_CUSTOMER
+  SYSTEM_ALERT
+}
+
+model Notification {
+  id          String            @id @default(uuid())
+  userId      String?
+  targetRole  String?
+  type        NotificationType
+  title       String
+  message     String
+  data        Json?
+  href        String?
+  read        Boolean           @default(false)
+  readAt      DateTime?
+  dedupeKey   String?           @unique
+  createdAt   DateTime          @default(now())
+  expiresAt   DateTime?
+
+  @@index([userId, read])
+  @@index([targetRole, read])
+  @@index([createdAt])
+}
+

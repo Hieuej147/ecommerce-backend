@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+package payment.v1;
+
+import "common.proto";
+
+service PaymentService {
+  rpc CreateCheckoutSession(CreateCheckoutSessionRequest)
+      returns (CheckoutSession);
+  rpc GetPayment(GetPaymentRequest) returns (Payment);
+  rpc ProcessWebhook(ProcessWebhookRequest) returns (ProcessWebhookResponse);
+  rpc GetPaymentMetrics(GetPaymentMetricsRequest) returns (PaymentMetrics);
+}
+
+message CheckoutSession {
+  string payment_id = 1;
+  string order_id = 2;
+  string checkout_url = 3;
+  string provider_session_id = 4;
+  string status = 5;
+}
+
+message Payment {
+  string id = 1;
+  string order_id = 2;
+  string user_id = 3;
+  common.v1.Money amount = 4;
+  string status = 5;
+  string provider = 6;
+  string provider_payment_id = 7;
+  string created_at = 8;
+}
+
+message CreateCheckoutSessionRequest {
+  string order_id = 1;
+  string success_url = 2;
+  string cancel_url = 3;
+  string idempotency_key = 4;
+}
+
+message GetPaymentRequest {
+  string payment_id = 1;
+}
+
+message ProcessWebhookRequest {
+  bytes raw_body = 1;
+  string stripe_signature = 2;
+}
+
+message ProcessWebhookResponse {
+  string order_id = 1;
+  string payment_id = 2;
+  string payment_status = 3;
+  string provider_event_id = 4;
+}
+
+message GetPaymentMetricsRequest {
+  string from_at = 1;
+  string to_at = 2;
+}
+
+message PaymentMetrics {
+  int64 total_count = 1;
+  int64 paid_count = 2;
+  int64 failed_count = 3;
+  int64 pending_count = 4;
+  string currency = 5;
+}

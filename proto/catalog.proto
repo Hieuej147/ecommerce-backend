@@ -1,0 +1,103 @@
+syntax = "proto3";
+
+package catalog.v1;
+
+import "common.proto";
+
+service CatalogService {
+  rpc GetProduct(GetProductRequest) returns (Product);
+  rpc ListProducts(ListProductsRequest) returns (ListProductsResponse);
+  rpc CreateProduct(CreateProductRequest) returns (Product);
+  rpc UpdateProduct(UpdateProductRequest) returns (Product);
+  rpc ArchiveProduct(ArchiveProductRequest) returns (common.v1.Empty);
+  rpc ReserveStock(ReserveStockRequest) returns (ReserveStockResponse);
+  rpc ReleaseStock(ReleaseStockRequest) returns (common.v1.Empty);
+  rpc GetInventoryMetrics(GetInventoryMetricsRequest) returns (InventoryMetrics);
+}
+
+message Product {
+  string id = 1;
+  string slug = 2;
+  string name = 3;
+  string description = 4;
+  common.v1.Money price = 5;
+  int32 stock_quantity = 6;
+  string status = 7;
+  string created_at = 8;
+  string updated_at = 9;
+  string sku = 10;
+  string category_slug = 11;
+  int32 reorder_point = 12;
+  map<string, string> images = 13;
+  repeated string colors = 14;
+  repeated string sizes = 15;
+}
+
+message GetProductRequest {
+  string product_id = 1;
+}
+
+message ListProductsRequest {
+  common.v1.PageRequest page = 1;
+  string search = 2;
+  string status = 3;
+}
+
+message ListProductsResponse {
+  repeated Product products = 1;
+  common.v1.PageInfo page_info = 2;
+}
+
+message CreateProductRequest {
+  string slug = 1;
+  string name = 2;
+  string description = 3;
+  common.v1.Money price = 4;
+  int32 stock_quantity = 5;
+  map<string, string> images = 6;
+  repeated string colors = 7;
+  repeated string sizes = 8;
+}
+
+message UpdateProductRequest {
+  string product_id = 1;
+  string name = 2;
+  string description = 3;
+  common.v1.Money price = 4;
+  optional int32 stock_quantity = 5;
+  map<string, string> images = 6;
+  repeated string colors = 7;
+  repeated string sizes = 8;
+}
+
+message ArchiveProductRequest {
+  string product_id = 1;
+}
+
+message ReserveStockRequest {
+  string reservation_id = 1;
+  repeated StockLine lines = 2;
+}
+
+message ReleaseStockRequest {
+  string reservation_id = 1;
+}
+
+message StockLine {
+  string product_id = 1;
+  int32 quantity = 2;
+}
+
+message ReserveStockResponse {
+  string reservation_id = 1;
+  bool reserved = 2;
+}
+
+message GetInventoryMetricsRequest {}
+
+message InventoryMetrics {
+  int64 total_products = 1;
+  int64 active_products = 2;
+  int64 low_stock_products = 3;
+  int64 out_of_stock_products = 4;
+}

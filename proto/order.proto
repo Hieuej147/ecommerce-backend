@@ -1,0 +1,100 @@
+syntax = "proto3";
+
+package order.v1;
+
+import "common.proto";
+
+service OrderService {
+  rpc CreateOrder(CreateOrderRequest) returns (Order);
+  rpc GetOrder(GetOrderRequest) returns (Order);
+  rpc ListMyOrders(ListMyOrdersRequest) returns (ListMyOrdersResponse);
+  rpc CancelOrder(CancelOrderRequest) returns (Order);
+  rpc MarkPaymentStatus(MarkPaymentStatusRequest) returns (Order);
+  rpc GetOrderMetrics(GetOrderMetricsRequest) returns (OrderMetrics);
+  rpc ListAdminOrders(ListAdminOrdersRequest) returns (ListAdminOrdersResponse);
+}
+
+message Order {
+  string id = 1;
+  string user_id = 2;
+  repeated OrderItem items = 3;
+  common.v1.Money subtotal = 4;
+  common.v1.Money total = 5;
+  common.v1.Address shipping_address = 6;
+  string status = 7;
+  string payment_status = 8;
+  string created_at = 9;
+  string updated_at = 10;
+  string customer_name = 11;
+  string customer_email = 12;
+}
+
+message OrderItem {
+  string product_id = 1;
+  string product_name = 2;
+  int32 quantity = 3;
+  common.v1.Money unit_price = 4;
+  common.v1.Money line_total = 5;
+}
+
+message CreateOrderRequest {
+  repeated CreateOrderItem items = 1;
+  common.v1.Address shipping_address = 2;
+  string idempotency_key = 3;
+}
+
+message CreateOrderItem {
+  string product_id = 1;
+  int32 quantity = 2;
+}
+
+message GetOrderRequest {
+  string order_id = 1;
+}
+
+message ListMyOrdersRequest {
+  common.v1.PageRequest page = 1;
+}
+
+message ListMyOrdersResponse {
+  repeated Order orders = 1;
+  common.v1.PageInfo page_info = 2;
+}
+
+message CancelOrderRequest {
+  string order_id = 1;
+}
+
+message MarkPaymentStatusRequest {
+  string order_id = 1;
+  string payment_id = 2;
+  string payment_status = 3;
+  string provider_event_id = 4;
+}
+
+message GetOrderMetricsRequest {
+  string from_at = 1;
+  string to_at = 2;
+}
+
+message OrderMetrics {
+  int64 order_count = 1;
+  int64 revenue_amount_minor = 2;
+  string currency = 3;
+  int64 paid_order_count = 4;
+  int64 pending_order_count = 5;
+}
+
+message ListAdminOrdersRequest {
+  common.v1.PageRequest page = 1;
+  string status = 2;
+  string payment_status = 3;
+  string search = 4;
+  string from_at = 5;
+  string to_at = 6;
+}
+
+message ListAdminOrdersResponse {
+  repeated Order orders = 1;
+  common.v1.PageInfo page_info = 2;
+}

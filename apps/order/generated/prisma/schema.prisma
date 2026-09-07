@@ -1,0 +1,64 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum OrderStatus {
+  PENDING_PAYMENT
+  PAID
+  CANCELLED
+  PAYMENT_FAILED
+}
+
+enum OrderPaymentStatus {
+  UNPAID
+  PROCESSING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+model Order {
+  id                  String             @id @default(cuid())
+  userId              String
+  customerName        String             @default("")
+  customerEmail       String             @default("")
+  externalId          String?            @unique
+  status              OrderStatus        @default(PENDING_PAYMENT)
+  paymentStatus       OrderPaymentStatus @default(UNPAID)
+  subtotalAmountMinor BigInt
+  totalAmountMinor    BigInt
+  currency            String             @default("USD")
+  recipientName       String
+  phone               String
+  line1               String
+  line2               String             @default("")
+  city                String
+  province            String             @default("")
+  postalCode          String             @default("")
+  countryCode         String
+  idempotencyKey      String
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+  items               OrderItem[]
+
+  @@unique([userId, idempotencyKey])
+  @@index([userId, createdAt])
+}
+
+model OrderItem {
+  id                   String @id @default(cuid())
+  orderId              String
+  productId            String
+  productName          String
+  quantity             Int
+  unitPriceAmountMinor BigInt
+  lineTotalAmountMinor BigInt
+  order                Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+}

@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package users.v1;
+
+import "common.proto";
+
+service UsersService {
+  rpc GetUserByClerkId(GetUserByClerkIdRequest) returns (User);
+  rpc UpsertClerkUser(UpsertClerkUserRequest) returns (User);
+  rpc DeleteClerkUser(DeleteClerkUserRequest) returns (common.v1.Empty);
+  rpc ListUsers(ListUsersRequest) returns (ListUsersResponse);
+}
+
+message User {
+  string id = 1;
+  string clerk_id = 2;
+  string email = 3;
+  string first_name = 4;
+  string last_name = 5;
+  string display_name = 6;
+  string image_url = 7;
+  string role = 8;
+  string status = 9;
+  string created_at = 10;
+  string updated_at = 11;
+}
+
+message GetUserByClerkIdRequest {
+  string clerk_id = 1;
+}
+
+message UpsertClerkUserRequest {
+  string event_id = 1;
+  string event_type = 2;
+  string clerk_id = 3;
+  string email = 4;
+  string first_name = 5;
+  string last_name = 6;
+  string display_name = 7;
+  string image_url = 8;
+  string role = 9;
+  string payload_json = 10;
+  string clerk_created_at = 11;
+}
+
+message DeleteClerkUserRequest {
+  string event_id = 1;
+  string clerk_id = 2;
+  string payload_json = 3;
+}
+
+message ListUsersRequest {
+  common.v1.PageRequest page = 1;
+  string search = 2;
+  string role = 3;
+  string status = 4;
+}
+
+message ListUsersResponse {
+  repeated User users = 1;
+  common.v1.PageInfo page_info = 2;
+}

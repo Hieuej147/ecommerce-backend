@@ -1,0 +1,54 @@
+generator client {
+  provider        = "prisma-client-js"
+  output          = "../generated/prisma"
+  previewFeatures = ["multiSchema"]
+}
+
+datasource db {
+  provider = "postgresql"
+  schemas  = ["users"]
+}
+
+enum UserRole {
+  CUSTOMER
+  ADMIN
+
+  @@schema("users")
+}
+
+enum UserStatus {
+  ACTIVE
+  DELETED
+
+  @@schema("users")
+}
+
+model User {
+  id             String     @id @default(cuid())
+  clerkId        String     @unique
+  email          String?
+  firstName      String?
+  lastName       String?
+  displayName    String?
+  imageUrl       String?
+  role           UserRole   @default(CUSTOMER)
+  status         UserStatus @default(ACTIVE)
+  clerkCreatedAt DateTime?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  deletedAt      DateTime?
+
+  @@index([email])
+  @@index([role, status])
+  @@schema("users")
+}
+
+model ClerkWebhookEvent {
+  eventId     String    @id
+  eventType   String
+  payload     Json
+  receivedAt  DateTime  @default(now())
+  processedAt DateTime?
+
+  @@schema("users")
+}
