@@ -135,10 +135,8 @@ jobs:
         run: |
           SERVICES="api-gateway catalog order payment users agent-service agent-python"
           for svc in $SERVICES; do
-            echo "--> Rolling restart deployment/$svc..."
+            echo "--> Rolling restart & verifying deployment/$svc..."
             kubectl rollout restart deployment/$svc -n ecommerce
+            kubectl rollout status deployment/$svc -n ecommerce --timeout=300s
           done
-          for svc in $SERVICES; do
-            echo "--> Verifying rollout deployment/$svc..."
-            kubectl rollout status deployment/$svc -n ecommerce --timeout=180s
-          done
+
