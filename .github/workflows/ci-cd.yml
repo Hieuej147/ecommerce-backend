@@ -75,7 +75,7 @@ jobs:
           SERVICE: ${{ matrix.service }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          REPO_NAME="${{ secrets.ECR_PREFIX || 'shopping-cart' }}-${SERVICE}"
+          REPO_NAME="${{ secrets.ECR_PREFIX || 'prod-ecommerce' }}-${SERVICE}"
           docker build \
             --build-arg APP_NAME=${SERVICE} \
             -t $ECR_REGISTRY/$REPO_NAME:$IMAGE_TAG \
@@ -107,7 +107,7 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          REPO_NAME="${{ secrets.ECR_PREFIX || 'shopping-cart' }}-agent-python"
+          REPO_NAME="${{ secrets.ECR_PREFIX || 'prod-ecommerce' }}-agent-python"
           cd agent-python
           docker build \
             -t $ECR_REGISTRY/$REPO_NAME:$IMAGE_TAG \
