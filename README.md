@@ -549,7 +549,7 @@ Type `yes` to confirm. Terraform automatically provisions:
 - **Security & CI/CD**: AWS IAM OIDC Provider for GitHub Actions (no static keys needed, saving runner costs).
 - **Databases & Cache**: Amazon RDS PostgreSQL 16 (for Prisma) and In-Cluster Redis 7 Alpine Pod ($0 cost).
 - **Traffic Routing**: Application Load Balancer (ALB) with HTTPS wildcard certificate and Host-based routing.
-- **GitOps**: ArgoCD Operator and AWS Load Balancer Controller.
+- **Traffic & CI/CD**: AWS Load Balancer Controller, GitHub Actions OIDC with `kubectl rollout restart`.
 
 #### Step 3: Configure GitHub Actions Secrets
 In the Terraform terminal output, copy the `github_actions_role_arn`. In each of your GitHub repositories (`ecommerce-backend`, `-E-commerce`, `dashboard-admin-ecommern`), navigate to **Settings** > **Secrets and variables** > **Actions** > **New repository secret**:
