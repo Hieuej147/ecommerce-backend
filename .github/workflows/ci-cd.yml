@@ -136,6 +136,7 @@ jobs:
           SERVICES="api-gateway catalog order payment users agent-service agent-python"
           for svc in $SERVICES; do
             echo "--> Rolling restart & verifying deployment/$svc..."
+            kubectl scale deployment/$svc --replicas=1 -n ecommerce
             kubectl rollout restart deployment/$svc -n ecommerce
             kubectl rollout status deployment/$svc -n ecommerce --timeout=300s
           done
