@@ -632,4 +632,4 @@ npx kill-port 3000 3001 5173 5001 5002 5003 5004 8123 5438 6379
 ---
 
 ## Thanks for reading!
-For questions or issues, please consult the respective documentation files in each sub-repository or review the [Master Architecture Plan](file:///home/hieubc/.gemini/antigravity-cli/brain/28ba762e-88c6-4793-b15b-8cd23a09d9d6/aws-deployment-and-admin-security-plan.md).
+For questions or issues, please consult the respective documentation files in each sub-repository or review the [DevOps Repository](https://github.com/Hieuej147/ecommerce-devops.git).
