@@ -140,7 +140,7 @@ This project is an enterprise-grade, full-stack **E-Commerce Microservices Platf
 | **Authentication & RBAC** | Clerk Authentication (`@clerk/express`, `@clerk/nextjs`, `@clerk/clerk-react`) |
 | **Payments** | Stripe API & Stripe Elements (Webhooks, PaymentIntents) |
 | **Security Perimeter** | Cloudflare Zero Trust (Access Application with Email OTP verification) |
-| **Container & CI/CD** | Docker (Multi-stage builds), GitHub Actions (OIDC to AWS ECR), ArgoCD GitOps |
+| **Container & CI/CD** | Docker (Multi-stage builds), GitHub Actions (OIDC to AWS ECR & EKS Zero-Downtime Rollout) |
 
 ---
 
@@ -169,7 +169,7 @@ The project is structured into four dedicated GitHub repositories:
 | **Backend Monorepo** (This repo) | NestJS 11, gRPC, PostgreSQL, Prisma, Inngest | RESTful API Gateway, gRPC microservices, Stripe & Clerk webhooks. <br>🔗 Repo: [`https://github.com/Hieuej147/ecommerce-backend.git`](https://github.com/Hieuej147/ecommerce-backend.git) |
 | **Customer Storefront** | Next.js 16, React 19, Tailwind v4, Three.js | Customer shop, 3D interactive hero canvas, cart, Stripe checkout. <br>🔗 Repo: [`https://github.com/Hieuej147/-E-commerce.git`](https://github.com/Hieuej147/-E-commerce.git) |
 | **Admin Dashboard** | React 19, Vite, TypeScript, Cloudflare Zero Trust | Backoffice management, real-time KPI metrics, orders & catalog CRUD. <br>🔗 Repo: [`https://github.com/Hieuej147/dashboard-admin-ecommern.git`](https://github.com/Hieuej147/dashboard-admin-ecommern.git) |
-| **DevOps & GitOps (IaC & Manifests)** | Terraform, Helm, ArgoCD, AWS EKS, AWS ECR | Infrastructure as Code, OIDC authentication, 9 ECR registries, ArgoCD GitOps manifests. <br>🔗 Repo: [`https://github.com/Hieuej147/ecommerce-devops.git`](https://github.com/Hieuej147/ecommerce-devops.git) |
+| **DevOps & GitOps (IaC & Manifests)** | Terraform, Helm, AWS EKS, AWS ECR, OIDC | Infrastructure as Code, OIDC authentication, 9 ECR registries, Kubernetes manifests. <br>🔗 Repo: [`https://github.com/Hieuej147/ecommerce-devops.git`](https://github.com/Hieuej147/ecommerce-devops.git) |
 
 ```
 my-ecommerce/
@@ -505,15 +505,14 @@ sequenceDiagram
     actor Developer
     participant GitHub as GitHub Actions (OIDC)
     participant ECR as AWS ECR Image Registry
-    participant GitOps as ArgoCD GitOps Repository
-    participant EKS as AWS EKS Cluster
+    participant EKS as Amazon EKS Cluster (Kubernetes)
 
     Developer->>GitHub: git push origin main
-    GitHub->>GitHub: Run Linter & Unit Tests
-    GitHub->>GitHub: Assume AWS IAM Role (OIDC - No static keys)
-    GitHub->>ECR: Build multi-stage Docker image & Push (tag: git-sha)
-    GitHub->>GitOps: Commit updated image tag to Helm values.yaml
-    GitOps->>EKS: ArgoCD detects change & performs zero-downtime rolling update
+    GitHub->>GitHub: Run Linter & Prisma Generator & Unit Tests
+    GitHub->>GitHub: Assume AWS IAM Role (OIDC - Zero static keys)
+    GitHub->>ECR: Build multi-stage Docker image & Push (tag: git-sha & latest)
+    GitHub->>EKS: Authenticate via EKS Access Entry & trigger rolling update
+    EKS->>ECR: Pull updated image & execute zero-downtime rolling restart
 ```
 
 ### Step-by-Step AWS Production Deployment
@@ -583,10 +582,11 @@ In the Terraform terminal output, copy the `github_actions_role_arn`. In each of
   - Events: `user.created`, `user.updated`, `user.deleted`.
   - Admin Role: In Clerk Dashboard > **Users** > Select your user > **Public metadata**: add `{"role": "admin"}`.
 
-#### Step 6: Go-Live via GitHub Actions & ArgoCD
+#### Step 6: Go-Live via GitHub Actions OIDC CI/CD
 Push code to `main` branch on any repository:
-- GitHub Actions automatically authenticates to AWS via OIDC, builds Docker images, and pushes them to Amazon ECR.
-- ArgoCD automatically detects updated images and executes rolling zero-downtime Pod updates on the EKS cluster!
+- GitHub Actions automatically authenticates to AWS via OIDC, runs type checks and unit tests.
+- Builds optimized multi-stage Docker images and pushes to Amazon ECR.
+- Automatically connects to Amazon EKS via IAM OIDC Access Entry and executes a rolling zero-downtime rollout (`kubectl rollout restart`)!
 
 ### How to Update Code & Deploy
 You don't need complex DevOps knowledge to update your application in production:
@@ -598,7 +598,7 @@ You don't need complex DevOps knowledge to update your application in production
    git commit -m "feat: enhance product catalog filters"
    git push origin main
    ```
-4. GitHub Actions automatically builds the optimized Docker container, pushes to AWS ECR, and ArgoCD deploys the update to your cluster with zero downtime.
+4. GitHub Actions automatically builds the Docker container, pushes to AWS ECR, and executes a zero-downtime rolling update on the Amazon EKS cluster.
 
 ---
 

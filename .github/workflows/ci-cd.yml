@@ -115,24 +115,30 @@ jobs:
           docker push $ECR_REGISTRY/$REPO_NAME:$IMAGE_TAG
           docker push $ECR_REGISTRY/$REPO_NAME:latest
 
-  update-gitops:
-    name: Update GitOps Helm Manifests (ArgoCD)
+  deploy-to-eks:
+    name: Deploy to Amazon EKS (Rolling Restart)
     needs: [build-and-push, build-and-push-agent-python]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
-      - name: Trigger GitOps Update
-        if: env.MANIFEST_REPO != ''
-        env:
-          MANIFEST_REPO: ${{ secrets.MANIFEST_REPO }}
-          GIT_TOKEN: ${{ secrets.GITOPS_GITHUB_TOKEN }}
-          IMAGE_TAG: ${{ github.sha }}
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION || 'ap-southeast-1' }}
+
+      - name: Update Kubeconfig
         run: |
-          git clone https://x-access-token:${GIT_TOKEN}@github.com/${MANIFEST_REPO}.git gitops-repo
-          cd gitops-repo
-          # Update values.yaml image tags
-          sed -i "s/tag: .*/tag: \"${IMAGE_TAG}\"/g" devops/shopping-cart-manifest/shopping-cart/values.yaml || true
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git commit -am "chore(backend): bump backend services to ${IMAGE_TAG}" || echo "No changes"
-          git push origin main
+          aws eks update-kubeconfig --region ${{ secrets.AWS_REGION || 'ap-southeast-1' }} --name ${{ secrets.EKS_CLUSTER_NAME || 'ecommerce' }}
+
+      - name: Rolling Restart Backend Deployments
+        run: |
+          SERVICES="api-gateway catalog order payment users agent-service agent-python"
+          for svc in $SERVICES; do
+            echo "--> Rolling restart deployment/$svc..."
+            kubectl rollout restart deployment/$svc -n ecommerce
+          done
+          for svc in $SERVICES; do
+            echo "--> Verifying rollout deployment/$svc..."
+            kubectl rollout status deployment/$svc -n ecommerce --timeout=180s
+          done

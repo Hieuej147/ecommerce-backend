@@ -7,5 +7,5 @@ export default defineConfig({
   // do not run independent migrations against the same database.
   schema: 'apps/catalog/prisma/schema.prisma',
   migrations: { path: 'apps/catalog/prisma/migrations' },
-  datasource: { url: env('DATABASE_URL') },
+  datasource: { url: process.env.DATABASE_URL || 'postgresql://placeholder:placeholder@localhost:5432/ecommerce' },
 });

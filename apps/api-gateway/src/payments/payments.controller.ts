@@ -63,7 +63,7 @@ export class PaymentsController {
     return this.payments.get(id, createActorMetadata(actor));
   }
   @Public()
-  @Post('webhook/stripe')
+  @Post(['webhook', 'webhook/stripe'])
   @ApiExcludeEndpoint()
   async webhook(
     @Req() req: Request & { rawBody?: Buffer },
