@@ -548,7 +548,7 @@ Type `yes` to confirm. Terraform automatically provisions:
 - **Networking**: Multi-AZ VPC with Public/Private subnets & NAT Gateway.
 - **Compute & Containers**: Amazon EKS v1.30 cluster, Managed Node Group, and 9 Amazon ECR repositories.
 - **Security & CI/CD**: AWS IAM OIDC Provider for GitHub Actions (no static keys needed, saving runner costs).
-- **Databases**: Amazon RDS PostgreSQL 16 (for Prisma) and Amazon ElastiCache Valkey/Redis 7.2.
+- **Databases & Cache**: Amazon RDS PostgreSQL 16 (for Prisma) and In-Cluster Redis 7 Alpine Pod ($0 cost).
 - **Traffic Routing**: Application Load Balancer (ALB) with HTTPS wildcard certificate and Host-based routing.
 - **GitOps**: ArgoCD Operator and AWS Load Balancer Controller.
 
