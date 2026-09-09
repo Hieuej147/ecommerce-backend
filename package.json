@@ -1,10 +1,9 @@
 {
   "name": "Microservice-E-Commerce",
   "version": "0.0.1",
-  "description": "",
-  "author": "",
-  "private": true,
-  "license": "UNLICENSED",
+  "description": "Production-ready Event-Driven Microservices E-Commerce Platform",
+  "author": "Danh Minh Hieu (@Hieuej147)",
+  "license": "MIT",
   "scripts": {
     "build": "nest build api-gateway && nest build users && nest build agent-service && nest build catalog && nest build order && nest build payment",
     "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
