@@ -40,7 +40,7 @@
 ### About this project
 This project is an enterprise-grade, full-stack **E-Commerce Microservices Platform** consisting of:
 - **Event-driven Backend Microservices** built with **NestJS 11**, **gRPC (HTTP/2 Protocol Buffers)**, **PostgreSQL (Prisma ORM)**, and **Inngest**.
-- **Customer Storefront** built with **Next.js 16 (App Router)**, **React 19**, **Tailwind CSS**, and **Three.js** interactive 3D hero canvas.
+- **Customer Storefront** built with **Next.js 16 (App Router)**, **React 19**, **Tailwind CSS**, and **TanStack Query** with responsive product showcases.
 - **Admin Dashboard** built with **React 19**, **Vite**, **TypeScript**, and **TanStack Query** for real-time order/catalog management and KPI analytics.
 - **AI Agent System** with a dedicated NestJS thread manager and Python FastAPI / LangGraph intelligent agent runtime.
 - **Perimeter Edge Security** via **Cloudflare Zero Trust** preventing unauthorized public access to the admin portal at $0 cost.
@@ -135,7 +135,7 @@ This project is an enterprise-grade, full-stack **E-Commerce Microservices Platf
 | :--- | :--- |
 | **Backend Monorepo** | NestJS 11, TypeScript, gRPC (@grpc/grpc-js), Prisma ORM, PostgreSQL, Redis, Inngest |
 | **AI Agent Layer** | Python 3.12, FastAPI, LangGraph, LangChain, CopilotKit, AG-UI protocol |
-| **Customer Storefront** | Next.js 16.2 (App Router, Turbopack), React 19, Tailwind CSS v4, Three.js, TanStack Query |
+| **Customer Storefront** | Next.js 16.2 (App Router, Turbopack), React 19, Tailwind CSS v4, TanStack Query |
 | **Admin Dashboard** | React 19, Vite, TypeScript, Tailwind CSS, Radix UI / Shadcn, TanStack Query |
 | **Authentication & RBAC** | Clerk Authentication (`@clerk/express`, `@clerk/nextjs`, `@clerk/clerk-react`) |
 | **Payments** | Stripe API & Stripe Elements (Webhooks, PaymentIntents) |
@@ -155,7 +155,7 @@ This project is an enterprise-grade, full-stack **E-Commerce Microservices Platf
 | **`users-service`** | gRPC `5004` | `localhost:5004` | Synchronizes and manages customer accounts and administrator roles. |
 | **`agent-service`** | HTTP `3010` | `http://localhost:3010` | NestJS AI thread manager, AG-UI protocol and session persistence. |
 | **`agent-python`**  | HTTP `8123` | `http://localhost:8123` | Python FastAPI + LangGraph AI agent execution runtime. |
-| **Customer Store** | HTTP `3001` | `http://localhost:3001` | Next.js 16 customer-facing shop with 3D canvas and online checkout. |
+| **Customer Store** | HTTP `3001` | `http://localhost:3001` | Next.js 16 customer-facing shop with responsive hero banner and online checkout. |
 | **Admin Dashboard** | HTTP `5173` | `http://localhost:5173` | Backoffice portal with real-time KPI metrics, products CRUD, and order management. |
 
 ---
@@ -167,7 +167,7 @@ The project is structured into four dedicated GitHub repositories:
 | Repository | Tech Stack | Role & Link |
 | :--- | :--- | :--- |
 | **Backend Monorepo** (This repo) | NestJS 11, gRPC, PostgreSQL, Prisma, Inngest | RESTful API Gateway, gRPC microservices, Stripe & Clerk webhooks. <br>🔗 Repo: [`https://github.com/Hieuej147/ecommerce-backend.git`](https://github.com/Hieuej147/ecommerce-backend.git) |
-| **Customer Storefront** | Next.js 16, React 19, Tailwind v4, Three.js | Customer shop, 3D interactive hero canvas, cart, Stripe checkout. <br>🔗 Repo: [`https://github.com/Hieuej147/-E-commerce.git`](https://github.com/Hieuej147/-E-commerce.git) |
+| **Customer Storefront** | Next.js 16, React 19, Tailwind v4 | Customer shop, responsive featured hero banner, cart, Stripe checkout. <br>🔗 Repo: [`https://github.com/Hieuej147/-E-commerce.git`](https://github.com/Hieuej147/-E-commerce.git) |
 | **Admin Dashboard** | React 19, Vite, TypeScript, Cloudflare Zero Trust | Backoffice management, real-time KPI metrics, orders & catalog CRUD. <br>🔗 Repo: [`https://github.com/Hieuej147/dashboard-admin-ecommern.git`](https://github.com/Hieuej147/dashboard-admin-ecommern.git) |
 | **DevOps & GitOps (IaC & Manifests)** | Terraform, Helm, AWS EKS, AWS ECR, OIDC | Infrastructure as Code, OIDC authentication, 9 ECR registries, Kubernetes manifests. <br>🔗 Repo: [`https://github.com/Hieuej147/ecommerce-devops.git`](https://github.com/Hieuej147/ecommerce-devops.git) |
 
@@ -291,7 +291,7 @@ pnpm run dev
 
 ✅ **Verification**:
 - Customer Storefront is live at: [http://localhost:3001](http://localhost:3001)
-- You can browse products, interact with the 3D banner, add items to cart, and test checkout.
+- You can browse products, interact with the featured banner, add items to cart, and test checkout.
 
 ---
 
