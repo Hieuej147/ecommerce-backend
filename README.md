@@ -1,6 +1,7 @@
 # Project: E-Commerce Microservices Platform (Backend, Customer Storefront & Admin Dashboard)
 
 ## Table of Contents
+
 - [I. Introduction](#i-introduction)
   - [About this project](#about-this-project)
   - [Original Codebase & Architectural Enhancements](#original-codebase--architectural-enhancements)
@@ -38,7 +39,9 @@
 ## I. Introduction
 
 ### About this project
+
 This project is an enterprise-grade, full-stack **E-Commerce Microservices Platform** consisting of:
+
 - **Event-driven Backend Microservices** built with **NestJS 11**, **gRPC (HTTP/2 Protocol Buffers)**, **PostgreSQL (Prisma ORM)**, and **Inngest**.
 - **Customer Storefront** built with **Next.js 16 (App Router)**, **React 19**, **Tailwind CSS**, and **TanStack Query** with responsive product showcases.
 - **Admin Dashboard** built with **React 19**, **Vite**, **TypeScript**, and **TanStack Query** for real-time order/catalog management and KPI analytics.
@@ -52,10 +55,12 @@ This project is an enterprise-grade, full-stack **E-Commerce Microservices Platf
 > 🔗 **Original Reference Project:** [Jayce-Anh/shopping-cart-project](https://github.com/Jayce-Anh/shopping-cart-project) (adapted from [sivaprasadreddy/spring-boot-microservices-series](https://github.com/sivaprasadreddy/spring-boot-microservices-series.git)).
 
 #### What was taken from the reference:
+
 - The domain-driven service boundaries: splitting e-commerce responsibilities into distinct modules for **Catalog**, **Orders**, **Payments**, **Users**, and an **API Gateway**.
 - The GitOps delivery philosophy utilizing container registries and continuous automated deployment.
 
 #### What was improved and customized for this project:
+
 1. **Modern High-Performance Stack**:
    - Replaced legacy Java 8 / Spring Boot with **NestJS 11 (TypeScript)**.
    - Replaced internal HTTP/REST calls with **gRPC (Protocol Buffers over HTTP/2)**, reducing inter-service latency to < 5ms and strictly enforcing type-safe contracts.
@@ -131,32 +136,32 @@ This project is an enterprise-grade, full-stack **E-Commerce Microservices Platf
 
 ### 2. Tech Stack
 
-| Component | Technologies |
-| :--- | :--- |
-| **Backend Monorepo** | NestJS 11, TypeScript, gRPC (@grpc/grpc-js), Prisma ORM, PostgreSQL, Redis, Inngest |
-| **AI Agent Layer** | Python 3.12, FastAPI, LangGraph, LangChain, CopilotKit, AG-UI protocol |
-| **Customer Storefront** | Next.js 16.2 (App Router, Turbopack), React 19, Tailwind CSS v4, TanStack Query |
-| **Admin Dashboard** | React 19, Vite, TypeScript, Tailwind CSS, Radix UI / Shadcn, TanStack Query |
-| **Authentication & RBAC** | Clerk Authentication (`@clerk/express`, `@clerk/nextjs`, `@clerk/clerk-react`) |
-| **Payments** | Stripe API & Stripe Elements (Webhooks, PaymentIntents) |
-| **Security Perimeter** | Cloudflare Zero Trust (Access Application with Email OTP verification) |
-| **Container & CI/CD** | Docker (Multi-stage builds), GitHub Actions (OIDC to AWS ECR & EKS Zero-Downtime Rollout) |
+| Component                 | Technologies                                                                              |
+| :------------------------ | :---------------------------------------------------------------------------------------- |
+| **Backend Monorepo**      | NestJS 11, TypeScript, gRPC (@grpc/grpc-js), Prisma ORM, PostgreSQL, Redis, Inngest       |
+| **AI Agent Layer**        | Python 3.12, FastAPI, LangGraph, LangChain, CopilotKit, AG-UI protocol                    |
+| **Customer Storefront**   | Next.js 16.2 (App Router, Turbopack), React 19, Tailwind CSS v4, TanStack Query           |
+| **Admin Dashboard**       | React 19, Vite, TypeScript, Tailwind CSS, Radix UI / Shadcn, TanStack Query               |
+| **Authentication & RBAC** | Clerk Authentication (`@clerk/express`, `@clerk/nextjs`, `@clerk/clerk-react`)            |
+| **Payments**              | Stripe API & Stripe Elements (Webhooks, PaymentIntents)                                   |
+| **Security Perimeter**    | Cloudflare Zero Trust (Access Application with Email OTP verification)                    |
+| **Container & CI/CD**     | Docker (Multi-stage builds), GitHub Actions (OIDC to AWS ECR & EKS Zero-Downtime Rollout) |
 
 ---
 
 ### 3. Services Breakdown
 
-| Service | Protocol / Port | Local URL | Role & Description |
-| :--- | :--- | :--- | :--- |
-| **`api-gateway`** | HTTP `3000` | `http://localhost:3000` | REST API gateway, Clerk JWT verification, RBAC `AdminGuard`, Swagger docs at `/docs`. |
-| **`catalog-service`**| gRPC `5001` | `localhost:5001` | Manages products, categories, stock counts, and pricing via Prisma. |
-| **`order-service`** | gRPC `5002` | `localhost:5002` | Manages order creation, lifecycle state changes, and aggregated order KPI metrics. |
-| **`payment-service`**| gRPC `5003` | `localhost:5003` | Interfaces with Stripe, manages transaction records, refunds, and revenue KPI metrics. |
-| **`users-service`** | gRPC `5004` | `localhost:5004` | Synchronizes and manages customer accounts and administrator roles. |
-| **`agent-service`** | HTTP `3010` | `http://localhost:3010` | NestJS AI thread manager, AG-UI protocol and session persistence. |
-| **`agent-python`**  | HTTP `8123` | `http://localhost:8123` | Python FastAPI + LangGraph AI agent execution runtime. |
-| **Customer Store** | HTTP `3001` | `http://localhost:3001` | Next.js 16 customer-facing shop with responsive hero banner and online checkout. |
-| **Admin Dashboard** | HTTP `5173` | `http://localhost:5173` | Backoffice portal with real-time KPI metrics, products CRUD, and order management. |
+| Service               | Protocol / Port | Local URL               | Role & Description                                                                     |
+| :-------------------- | :-------------- | :---------------------- | :------------------------------------------------------------------------------------- |
+| **`api-gateway`**     | HTTP `3000`     | `http://localhost:3000` | REST API gateway, Clerk JWT verification, RBAC `AdminGuard`, Swagger docs at `/docs`.  |
+| **`catalog-service`** | gRPC `5001`     | `localhost:5001`        | Manages products, categories, stock counts, and pricing via Prisma.                    |
+| **`order-service`**   | gRPC `5002`     | `localhost:5002`        | Manages order creation, lifecycle state changes, and aggregated order KPI metrics.     |
+| **`payment-service`** | gRPC `5003`     | `localhost:5003`        | Interfaces with Stripe, manages transaction records, refunds, and revenue KPI metrics. |
+| **`users-service`**   | gRPC `5004`     | `localhost:5004`        | Synchronizes and manages customer accounts and administrator roles.                    |
+| **`agent-service`**   | HTTP `3010`     | `http://localhost:3010` | NestJS AI thread manager, AG-UI protocol and session persistence.                      |
+| **`agent-python`**    | HTTP `8123`     | `http://localhost:8123` | Python FastAPI + LangGraph AI agent execution runtime.                                 |
+| **Customer Store**    | HTTP `3001`     | `http://localhost:3001` | Next.js 16 customer-facing shop with responsive hero banner and online checkout.       |
+| **Admin Dashboard**   | HTTP `5173`     | `http://localhost:5173` | Backoffice portal with real-time KPI metrics, products CRUD, and order management.     |
 
 ---
 
@@ -164,17 +169,17 @@ This project is an enterprise-grade, full-stack **E-Commerce Microservices Platf
 
 The project is structured into four dedicated GitHub repositories:
 
-| Repository | Tech Stack | Role & Link |
-| :--- | :--- | :--- |
-| **Backend Monorepo** (This repo) | NestJS 11, gRPC, PostgreSQL, Prisma, Inngest | RESTful API Gateway, gRPC microservices, Stripe & Clerk webhooks. <br>🔗 Repo: [`https://github.com/Hieuej147/ecommerce-backend.git`](https://github.com/Hieuej147/ecommerce-backend.git) |
-| **Customer Storefront** | Next.js 16, React 19, Tailwind v4 | Customer shop, responsive featured hero banner, cart, Stripe checkout. <br>🔗 Repo: [`https://github.com/Hieuej147/-E-commerce.git`](https://github.com/Hieuej147/-E-commerce.git) |
-| **Admin Dashboard** | React 19, Vite, TypeScript, Cloudflare Zero Trust | Backoffice management, real-time KPI metrics, orders & catalog CRUD. <br>🔗 Repo: [`https://github.com/Hieuej147/dashboard-admin-ecommern.git`](https://github.com/Hieuej147/dashboard-admin-ecommern.git) |
-| **DevOps & GitOps (IaC & Manifests)** | Terraform, Helm, AWS EKS, AWS ECR, OIDC | Infrastructure as Code, OIDC authentication, 9 ECR registries, Kubernetes manifests. <br>🔗 Repo: [`https://github.com/Hieuej147/ecommerce-devops.git`](https://github.com/Hieuej147/ecommerce-devops.git) |
+| Repository                            | Tech Stack                                        | Role & Link                                                                                                                                                                                                |
+| :------------------------------------ | :------------------------------------------------ | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Backend Monorepo** (This repo)      | NestJS 11, gRPC, PostgreSQL, Prisma, Inngest      | RESTful API Gateway, gRPC microservices, Stripe & Clerk webhooks. <br>🔗 Repo: [`https://github.com/Hieuej147/ecommerce-backend.git`](https://github.com/Hieuej147/ecommerce-backend.git)                  |
+| **Customer Storefront**               | Next.js 16, React 19, Tailwind v4                 | Customer shop, responsive featured hero banner, cart, Stripe checkout. <br>🔗 Repo: [`https://github.com/Hieuej147/E-commerce`](https://github.com/Hieuej147/E-commerce)                                   |
+| **Admin Dashboard**                   | React 19, Vite, TypeScript, Cloudflare Zero Trust | Backoffice management, real-time KPI metrics, orders & catalog CRUD. <br>🔗 Repo: [`https://github.com/Hieuej147/dashboard-admin-ecommern.git`](https://github.com/Hieuej147/dashboard-admin-ecommern.git) |
+| **DevOps & GitOps (IaC & Manifests)** | Terraform, Helm, AWS EKS, AWS ECR, OIDC           | Infrastructure as Code, OIDC authentication, 9 ECR registries, Kubernetes manifests. <br>🔗 Repo: [`https://github.com/Hieuej147/ecommerce-devops.git`](https://github.com/Hieuej147/ecommerce-devops.git) |
 
 ```
 my-ecommerce/
 ├── backend/          # Repo 1: https://github.com/Hieuej147/ecommerce-backend.git
-├── storefront/       # Repo 2: https://github.com/Hieuej147/-E-commerce.git
+├── storefront/       # Repo 2: https://github.com/Hieuej147/E-commerce
 ├── admin-dashboard/  # Repo 3: https://github.com/Hieuej147/dashboard-admin-ecommern.git
 └── devops/           # Repo 4: https://github.com/Hieuej147/ecommerce-devops.git
 ```
@@ -184,7 +189,9 @@ my-ecommerce/
 ## III. Prerequisites
 
 ### Local Development Tools
+
 Make sure the following tools are installed on your machine:
+
 - **Node.js**: `v20.x` or `v22.x` ([nodejs.org](https://nodejs.org/))
 - **pnpm**: `v9.x` or `v10.x` (`npm install -g pnpm`)
 - **Bun**: (Recommended for Admin Dashboard) (`curl -fsSL https://bun.sh/install | bash`)
@@ -193,6 +200,7 @@ Make sure the following tools are installed on your machine:
 - **Git**: For cloning repositories ([git-scm.com](https://git-scm.com/))
 
 ### Third-Party Services (Free Tiers)
+
 - **Clerk Account**: Free authentication provider ([clerk.com](https://clerk.com)). Provides your publishable key and secret key.
 - **Stripe Account**: Free sandbox/test mode for payments ([stripe.com](https://stripe.com)).
 - **Cloudflare Account**: (For production) Free tier includes Zero Trust protection for up to 50 users ([cloudflare.com](https://cloudflare.com)).
@@ -217,6 +225,7 @@ flowchart TD
 ---
 
 ### 1. Clone all 3 Repositories
+
 Create a parent workspace directory and clone the 3 repositories side-by-side:
 
 ```bash
@@ -227,7 +236,7 @@ mkdir my-ecommerce && cd my-ecommerce
 git clone https://github.com/Hieuej147/ecommerce-backend.git backend
 
 # Clone Repo 2: Customer Storefront
-git clone https://github.com/Hieuej147/-E-commerce.git storefront
+git clone https://github.com/Hieuej147/E-commerce storefront
 
 # Clone Repo 3: Admin Dashboard
 git clone https://github.com/Hieuej147/dashboard-admin-ecommern.git admin-dashboard
@@ -241,6 +250,7 @@ git clone https://github.com/Hieuej147/ecommerce-devops.git devops
 ### 2. Setup and Run Backend Microservices
 
 Open **Terminal 1**:
+
 ```bash
 cd backend
 
@@ -267,6 +277,7 @@ pnpm run dev:all
 ```
 
 ✅ **Verification**:
+
 - API Gateway is live at: `http://localhost:3000`
 - Interactive Swagger API Documentation: [http://localhost:3000/docs](http://localhost:3000/docs)
 - Catalog gRPC (`5001`), Order gRPC (`5002`), Payment gRPC (`5003`), Users gRPC (`5004`) are all operational.
@@ -276,6 +287,7 @@ pnpm run dev:all
 ### 3. Setup and Run Customer Storefront
 
 Open **Terminal 2**:
+
 ```bash
 cd storefront
 
@@ -290,6 +302,7 @@ pnpm run dev
 ```
 
 ✅ **Verification**:
+
 - Customer Storefront is live at: [http://localhost:3001](http://localhost:3001)
 - You can browse products, interact with the featured banner, add items to cart, and test checkout.
 
@@ -298,6 +311,7 @@ pnpm run dev
 ### 4. Setup and Run Admin Dashboard
 
 Open **Terminal 3**:
+
 ```bash
 cd admin-dashboard
 
@@ -314,6 +328,7 @@ bun run dev
 ```
 
 ✅ **Verification**:
+
 - Admin Dashboard is live at: [http://localhost:5173](http://localhost:5173)
 - Log in with your Clerk account. Real-time KPI cards for orders, payments, and product tables will render automatically.
 
@@ -326,6 +341,7 @@ bun run dev
 The payment flow uses Stripe Checkout and PaymentIntents. When a payment succeeds, Stripe notifies the API Gateway via an asynchronous webhook to update the order fulfillment state.
 
 #### A. Obtain Stripe API Keys
+
 1. Sign up or log into [dashboard.stripe.com](https://dashboard.stripe.com) and switch to **Test mode**.
 2. Go to **Developers** -> **API keys**.
 3. Copy the **Secret key** (`sk_test_...`) and paste into `backend/.env`:
@@ -335,12 +351,15 @@ The payment flow uses Stripe Checkout and PaymentIntents. When a payment succeed
    ```
 
 #### B. Setup Stripe Webhook Endpoint
+
 The backend listens for Stripe webhooks at endpoint:
+
 ```
 POST /v1/payments/webhook/stripe
 ```
 
 **For Production:**
+
 1. In the Stripe Dashboard, go to **Developers** -> **Webhooks** -> click **Add an endpoint**.
 2. **Endpoint URL**: `https://api.yourdomain.com/v1/payments/webhook/stripe`
 3. **Events to listen to**:
@@ -356,6 +375,7 @@ POST /v1/payments/webhook/stripe
 
 **For Local Development Testing:**
 Use the official [Stripe CLI](https://stripe.com/docs/stripe-cli) to forward events locally:
+
 ```bash
 # Login to Stripe CLI
 stripe login
@@ -363,6 +383,7 @@ stripe login
 # Forward webhook events to your local NestJS API Gateway
 stripe listen --forward-to localhost:3000/v1/payments/webhook/stripe
 ```
+
 The CLI will output: `> Ready! Your webhook signing secret is whsec_...`. Copy this secret into `backend/.env` under `STRIPE_WEBHOOK_SECRET`.
 
 ---
@@ -372,6 +393,7 @@ The CLI will output: `> Ready! Your webhook signing secret is whsec_...`. Copy t
 User accounts are authenticated via Clerk. To ensure that customer profiles and administrator accounts exist in the internal PostgreSQL database, Clerk sends webhook notifications on user lifecycle events.
 
 #### A. Obtain Clerk API Keys
+
 1. In the [Clerk Dashboard](https://dashboard.clerk.com), select your application.
 2. Go to **Configure** -> **API Keys**.
 3. Copy **Publishable Key**, **Secret Key**, and the **JWT Verification Key** into `backend/.env`:
@@ -383,7 +405,9 @@ User accounts are authenticated via Clerk. To ensure that customer profiles and 
    ```
 
 #### B. Setup Clerk Webhook for User Synchronization
+
 The backend listens for Clerk webhooks at endpoint:
+
 ```
 POST /v1/webhooks/clerk
 ```
@@ -403,7 +427,9 @@ POST /v1/webhooks/clerk
    ```
 
 #### C. Designating Administrator Roles
+
 All newly registered users default to the `CUSTOMER` role. To grant an administrator access to the Admin Dashboard:
+
 - **Method 1 (Clerk Dashboard)**: In Clerk Dashboard -> **Users** -> click on the user -> edit **Public metadata** -> enter `{"role": "admin"}`.
 - **Method 2 (Database Seeder)**: Run `pnpm run db:seed:demo` in `backend/`, which automatically provisions demo admin accounts and catalog inventory in your local PostgreSQL database.
 
@@ -420,7 +446,9 @@ The AI Assistant is divided into two layers:
    - Hosts the LangGraph graph with autonomous tools for querying products, checking orders, and answering customer questions.
 
 #### Required Agent Configuration:
+
 In `backend/.env` or `backend/agent-python/.env`:
+
 ```env
 # AI Model Provider API Key
 OPENAI_API_KEY=sk-proj-your_openai_api_key
@@ -435,6 +463,7 @@ AGENT_INTERNAL_TOKEN=replace-with-a-secure-random-secret
 ```
 
 #### Running the AI Agent:
+
 ```bash
 # To run the entire backend including both AI Agent services concurrently:
 pnpm run dev:all:with-agent
@@ -445,14 +474,17 @@ pnpm run dev:all:with-agent
 ## VI. Admin Portal Security (Cloudflare Zero Trust - Option 1)
 
 ### Why Cloudflare Zero Trust?
+
 When deploying to production with a custom domain (e.g. `yourdomain.com`), leaving `admin.yourdomain.com` directly exposed to the public internet poses severe security risks (brute-force attacks, scanner probes, leaking JavaScript bundle logic).
 
 **Cloudflare Zero Trust (Option 1)** acts as an impenetrable shield at the global edge:
+
 - **Cost**: **$0** (Free tier covers up to 50 users).
 - **Zero Software Requirement**: No complex VPN software required on your mobile or laptop.
 - **Absolute Blocking**: Unauthorized requests are stopped at Cloudflare's nearest edge server. Bots cannot download even a single line of your admin code.
 
 ### Step-by-Step Edge Protection Setup
+
 1. **Connect Domain to Cloudflare**:
    - Register your domain (e.g. Namecheap, GoDaddy).
    - In Cloudflare Dashboard, add your site and update the domain's NameServers to Cloudflare.
@@ -497,6 +529,7 @@ cd agent-python && docker build -t ecommerce-agent-python:latest .
 ## VIII. CI/CD & Cloud Deployment Overview
 
 ### Automated Pipeline Workflow
+
 Each of the 3 repositories contains a fully automated GitHub Actions pipeline in `.github/workflows/ci-cd.yml`:
 
 ```mermaid
@@ -520,12 +553,15 @@ sequenceDiagram
 Follow these 6 steps to deploy the complete platform to AWS using our dedicated DevOps repository ([`ecommerce-devops`](https://github.com/Hieuej147/ecommerce-devops.git)):
 
 #### Step 1: Clone the DevOps Repository & Configure Variables
+
 ```bash
 git clone https://github.com/Hieuej147/ecommerce-devops.git devops
 cd devops/terraform
 cp terraform.tfvars.example terraform.tfvars
 ```
+
 Open `terraform.tfvars` and provide your AWS and domain details:
+
 ```hcl
 project = {
   name       = "ecommerce"
@@ -538,12 +574,15 @@ project = {
 ```
 
 #### Step 2: Provision AWS Infrastructure via Terraform
+
 ```bash
 terraform init
 terraform plan
 terraform apply
 ```
+
 Type `yes` to confirm. Terraform automatically provisions:
+
 - **Networking**: Multi-AZ VPC with Public/Private subnets & NAT Gateway.
 - **Compute & Containers**: Amazon EKS v1.30 cluster, Managed Node Group, and 9 Amazon ECR repositories.
 - **Security & CI/CD**: AWS IAM OIDC Provider for GitHub Actions (no static keys needed, saving runner costs).
@@ -552,18 +591,20 @@ Type `yes` to confirm. Terraform automatically provisions:
 - **Traffic & CI/CD**: AWS Load Balancer Controller, GitHub Actions OIDC with `kubectl rollout restart`.
 
 #### Step 3: Configure GitHub Actions Secrets
+
 In the Terraform terminal output, copy the `github_actions_role_arn`. In each of your GitHub repositories (`ecommerce-backend`, `-E-commerce`, `dashboard-admin-ecommern`), navigate to **Settings** > **Secrets and variables** > **Actions** > **New repository secret**:
 
-| Secret Name | Value | Required In |
-| :--- | :--- | :--- |
-| `AWS_ROLE_ARN` | The ARN from Terraform output `github_actions_role_arn` | All 3 repositories |
-| `AWS_REGION` | `ap-southeast-1` | All 3 repositories |
-| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Your Clerk Publishable Key (`pk_...`) | Storefront & Backend |
-| `VITE_CLERK_PUBLISHABLE_KEY` | Your Clerk Publishable Key (`pk_...`) | Admin Dashboard |
-| `STRIPE_SECRET_KEY` | Your Stripe Secret Key (`sk_...`) | Backend |
-| `STRIPE_WEBHOOK_SECRET` | Your Stripe Webhook Signing Secret (`whsec_...`) | Backend |
+| Secret Name                         | Value                                                   | Required In          |
+| :---------------------------------- | :------------------------------------------------------ | :------------------- |
+| `AWS_ROLE_ARN`                      | The ARN from Terraform output `github_actions_role_arn` | All 3 repositories   |
+| `AWS_REGION`                        | `ap-southeast-1`                                        | All 3 repositories   |
+| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Your Clerk Publishable Key (`pk_...`)                   | Storefront & Backend |
+| `VITE_CLERK_PUBLISHABLE_KEY`        | Your Clerk Publishable Key (`pk_...`)                   | Admin Dashboard      |
+| `STRIPE_SECRET_KEY`                 | Your Stripe Secret Key (`sk_...`)                       | Backend              |
+| `STRIPE_WEBHOOK_SECRET`             | Your Stripe Webhook Signing Secret (`whsec_...`)        | Backend              |
 
 #### Step 4: Configure Cloudflare Zero Trust (Edge Protection for Admin)
+
 1. Point your domain's NameServers to Cloudflare DNS (Free tier).
 2. In Cloudflare DNS, create CNAME records for `store.yourdomain.com`, `admin.yourdomain.com`, and `api.yourdomain.com` pointing to the ALB DNS name from Terraform output `alb_dns_name`.
 3. In Cloudflare Dashboard, navigate to **Zero Trust** > **Access** > **Applications** > **Add an application**:
@@ -571,9 +612,10 @@ In the Terraform terminal output, copy the `github_actions_role_arn`. In each of
    - Application Name: `Admin Backoffice`
    - Domain: `admin.yourdomain.com`
    - Policy: Action `Allow`, Rule: Include `Emails` -> your administrator email.
-   - *Result: Anyone browsing `admin.yourdomain.com` must pass a 6-digit email OTP check before any assets or data are served.*
+   - _Result: Anyone browsing `admin.yourdomain.com` must pass a 6-digit email OTP check before any assets or data are served._
 
 #### Step 5: Configure Webhooks
+
 - **Stripe Webhook**: On [dashboard.stripe.com](https://dashboard.stripe.com) > **Developers** > **Webhooks** > Add endpoint:
   - URL: `https://api.yourdomain.com/v1/payments/webhook/stripe`
   - Events: `checkout.session.completed`, `payment_intent.succeeded`, `payment_intent.payment_failed`, `charge.refunded`.
@@ -583,13 +625,17 @@ In the Terraform terminal output, copy the `github_actions_role_arn`. In each of
   - Admin Role: In Clerk Dashboard > **Users** > Select your user > **Public metadata**: add `{"role": "admin"}`.
 
 #### Step 6: Go-Live via GitHub Actions OIDC CI/CD
+
 Push code to `main` branch on any repository:
+
 - GitHub Actions automatically authenticates to AWS via OIDC, runs type checks and unit tests.
 - Builds optimized multi-stage Docker images and pushes to Amazon ECR.
 - Automatically connects to Amazon EKS via IAM OIDC Access Entry and executes a rolling zero-downtime rollout (`kubectl rollout restart`)!
 
 ### How to Update Code & Deploy
+
 You don't need complex DevOps knowledge to update your application in production:
+
 1. Make your code modifications locally in any of the 3 repositories.
 2. Test locally using `pnpm run dev:all`, `pnpm run dev`, or `bun run dev`.
 3. Commit and push to GitHub:
@@ -607,12 +653,16 @@ You don't need complex DevOps knowledge to update your application in production
 When you are finished testing or want to shut down all running services cleanly:
 
 ### 1. Stop Dev Servers
+
 In each of the three terminal windows running the services:
+
 - Press **`Ctrl + C`**.
 - Because the backend runner uses `concurrently -k`, pressing `Ctrl + C` in Terminal 1 automatically halts all 5 microservices and the API Gateway simultaneously.
 
 ### 2. Stop Local Database Containers
+
 In the `backend` directory:
+
 ```bash
 # Stop containers while preserving your database data for next time:
 pnpm run stop:db
@@ -624,7 +674,9 @@ pnpm run stop:db:clean
 ```
 
 ### 3. Free Hanging Ports (Emergency Cleanup)
+
 If any background process was left dangling and occupies the project ports (`3000`, `3001`, `5173`, `5001-5004`, `8123`, `5438`, `6379`), free all ports instantly with:
+
 ```bash
 npx kill-port 3000 3001 5173 5001 5002 5003 5004 8123 5438 6379
 ```
@@ -632,4 +684,5 @@ npx kill-port 3000 3001 5173 5001 5002 5003 5004 8123 5438 6379
 ---
 
 ## Thanks for reading!
+
 For questions or issues, please consult the respective documentation files in each sub-repository or review the [DevOps Repository](https://github.com/Hieuej147/ecommerce-devops.git).
