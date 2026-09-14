@@ -24,15 +24,17 @@ const tones = ['#e9e3d3', '#dce6e2', '#e1d8f5', '#f5d9c3'];
 const customers = ['Nguyễn Minh Anh', 'Trần Quốc Bảo', 'Lê Hoàng Yến', 'Phạm Gia Huy', 'Võ Khánh Linh', 'Đỗ Nhật Nam', 'Bùi Thanh Hà', 'Hoàng Gia Khang', 'Mai Thảo Vy', 'Ngô Đức Anh', 'Phan Ngọc Mai', 'Đặng Khôi'];
 const cities = ['Hồ Chí Minh', 'Đà Nẵng', 'Hà Nội', 'Cần Thơ', 'Hải Phòng'];
 
+const storageBase = (process.env.STORAGE_PUBLIC_URL || 'http://localhost:9002/ecommerce-products').replace(/\/+$/, '') + '/demo';
+
 const colorMapping = [
-  { colors: ['#000000', '#FFFFFF', '#FFC0CB'], images: { '#000000': '/products/1g.png', '#FFFFFF': '/products/1gr.png', '#FFC0CB': '/products/1p.png' } },
-  { colors: ['#000000', '#FFFFFF'], images: { '#000000': '/products/2g.png', '#FFFFFF': '/products/2gr.png' } },
-  { colors: ['#0000FF', '#000000', '#808080'], images: { '#0000FF': '/products/3bl.png', '#000000': '/products/3b.png', '#808080': '/products/3gr.png' } },
-  { colors: ['#FFC0CB', '#FFFFFF'], images: { '#FFC0CB': '/products/4p.png', '#FFFFFF': '/products/4w.png' } },
-  { colors: ['#0000FF', '#FFA500', '#FF0000'], images: { '#0000FF': '/products/5bl.png', '#FFA500': '/products/5o.png', '#FF0000': '/products/5r.png' } },
-  { colors: ['#008000', '#FFFFFF'], images: { '#008000': '/products/6g.png', '#FFFFFF': '/products/6w.png' } },
-  { colors: ['#008000', '#FFC0CB'], images: { '#008000': '/products/7g.png', '#FFC0CB': '/products/7p.png' } },
-  { colors: ['#000000', '#808080'], images: { '#000000': '/products/8b.png', '#808080': '/products/8gr.png' } },
+  { colors: ['#000000', '#FFFFFF', '#FFC0CB'], images: { '#000000': `${storageBase}/1g.png`, '#FFFFFF': `${storageBase}/1gr.png`, '#FFC0CB': `${storageBase}/1p.png` } },
+  { colors: ['#000000', '#FFFFFF'], images: { '#000000': `${storageBase}/2g.png`, '#FFFFFF': `${storageBase}/2gr.png` } },
+  { colors: ['#0000FF', '#000000', '#808080'], images: { '#0000FF': `${storageBase}/3bl.png`, '#000000': `${storageBase}/3b.png`, '#808080': `${storageBase}/3gr.png` } },
+  { colors: ['#FFC0CB', '#FFFFFF'], images: { '#FFC0CB': `${storageBase}/4p.png`, '#FFFFFF': `${storageBase}/4w.png` } },
+  { colors: ['#0000FF', '#FFA500', '#FF0000'], images: { '#0000FF': `${storageBase}/5bl.png`, '#FFA500': `${storageBase}/5o.png`, '#FF0000': `${storageBase}/5r.png` } },
+  { colors: ['#008000', '#FFFFFF'], images: { '#008000': `${storageBase}/6g.png`, '#FFFFFF': `${storageBase}/6w.png` } },
+  { colors: ['#008000', '#FFC0CB'], images: { '#008000': `${storageBase}/7g.png`, '#FFC0CB': `${storageBase}/7p.png` } },
+  { colors: ['#000000', '#808080'], images: { '#000000': `${storageBase}/8b.png`, '#808080': `${storageBase}/8gr.png` } },
 ];
 const PRODUCT_COUNT = 100;
 
@@ -41,36 +43,36 @@ async function main() {
   for (let i = 0; i < PRODUCT_COUNT; i += 1) {
     const [name, category, price, badge] = base[i % base.length];
     const number = String(i + 1).padStart(2, '0');
-    const colorInfo = colorMapping[i % 8];
-    const product = await prisma.product.upsert({
-      where: { externalId: `ui-product-${number}` },
-      create: {
-        externalId: `ui-product-${number}`,
-        sku: `NMD-${String(100 + i).padStart(3, '0')}`,
-        slug: `${name.toLowerCase().replaceAll(' ', '-')}-${number}`,
-        name: i < 12 ? name : `${name} / ${['Sand', 'Ink', 'Moss', 'Cherry'][i % 4]}`,
-        categorySlug: category.toLowerCase(),
-        description: 'Phom dáng thoải mái, chất liệu mềm và đủ bền cho mọi lịch trình.',
-        colors: colorInfo.colors,
-        sizes: ['S', 'M', 'L', 'XL'],
-        images: colorInfo.images,
-        reorderPoint: 20,
-        priceAmountMinor: BigInt(price),
-        currency: 'VND',
-        stockQuantity: [84, 32, 18, 7, 46, 12, 55, 26, 9, 4, 38, 21][i % 12],
-      },
-      update: {
-        sku: `NMD-${String(100 + i).padStart(3, '0')}`,
-        name: i < 12 ? name : `${name} / ${['Sand', 'Ink', 'Moss', 'Cherry'][i % 4]}`,
-        categorySlug: category.toLowerCase(),
-        priceAmountMinor: BigInt(price),
-        currency: 'VND',
-        stockQuantity: [84, 32, 18, 7, 46, 12, 55, 26, 9, 4, 38, 21][i % 12],
-        colors: colorInfo.colors,
-        sizes: ['S', 'M', 'L', 'XL'],
-        images: colorInfo.images,
-      },
-    });
+        const seedImages = { main: Object.values(colorInfo.images)[0], ...colorInfo.images };
+        const product = await prisma.product.upsert({
+          where: { externalId: `ui-product-${number}` },
+          create: {
+            externalId: `ui-product-${number}`,
+            sku: `NMD-${String(100 + i).padStart(3, '0')}`,
+            slug: `${name.toLowerCase().replaceAll(' ', '-')}-${number}`,
+            name: i < 12 ? name : `${name} / ${['Sand', 'Ink', 'Moss', 'Cherry'][i % 4]}`,
+            categorySlug: category.toLowerCase(),
+            description: 'Phom dáng thoải mái, chất liệu mềm và đủ bền cho mọi lịch trình.',
+            colors: colorInfo.colors,
+            sizes: ['S', 'M', 'L', 'XL'],
+            images: seedImages,
+            reorderPoint: 20,
+            priceAmountMinor: BigInt(price),
+            currency: 'VND',
+            stockQuantity: [84, 32, 18, 7, 46, 12, 55, 26, 9, 4, 38, 21][i % 12],
+          },
+          update: {
+            sku: `NMD-${String(100 + i).padStart(3, '0')}`,
+            name: i < 12 ? name : `${name} / ${['Sand', 'Ink', 'Moss', 'Cherry'][i % 4]}`,
+            categorySlug: category.toLowerCase(),
+            priceAmountMinor: BigInt(price),
+            currency: 'VND',
+            stockQuantity: [84, 32, 18, 7, 46, 12, 55, 26, 9, 4, 38, 21][i % 12],
+            colors: colorInfo.colors,
+            sizes: ['S', 'M', 'L', 'XL'],
+            images: seedImages,
+          },
+        });
     products.push(product);
   }
 

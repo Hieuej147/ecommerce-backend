@@ -18,10 +18,11 @@
   - [2. Setup and Run Backend Microservices](#2-setup-and-run-backend-microservices)
   - [3. Setup and Run Customer Storefront](#3-setup-and-run-customer-storefront)
   - [4. Setup and Run Admin Dashboard](#4-setup-and-run-admin-dashboard)
-- [V. External Integrations: Stripe, Clerk & AI Agent Setup](#v-external-integrations-stripe-clerk--ai-agent-setup)
+- [V. External Integrations: Stripe, Clerk, MinIO/S3 Storage & AI Agent Setup](#v-external-integrations-stripe-clerk-minios3-storage--ai-agent-setup)
   - [1. Stripe Payment Gateway & Webhook Setup](#1-stripe-payment-gateway--webhook-setup)
   - [2. User Management & Clerk Webhook Synchronization](#2-user-management--clerk-webhook-synchronization)
   - [3. AI Agent Architecture & Configuration](#3-ai-agent-architecture--configuration)
+  - [4. Object Storage & Media Upload Pipeline (MinIO / S3 / Cloudflare R2)](#4-object-storage--media-upload-pipeline-minio--s3--cloudflare-r2)
 - [VI. Admin Portal Security (Cloudflare Zero Trust - Option 1)](#vi-admin-portal-security-cloudflare-zero-trust---option-1)
   - [Why Cloudflare Zero Trust?](#why-cloudflare-zero-trust)
   - [Step-by-Step Edge Protection Setup](#step-by-step-edge-protection-setup)
@@ -86,82 +87,89 @@ This project is an enterprise-grade, full-stack **E-Commerce Microservices Platf
 ### 1. Architecture Diagram
 
 ```
-                                [ Public Internet ]
-                                         │
-                 ┌───────────────────────┴───────────────────────┐
-                 │                                               │
-      [ Customer Storefront ]                         [ Admin Dashboard ]
-     (Next.js 16 - Port 3001)                      (React 19 / Vite - Port 5173)
-                 │                                               │
-                 │                                               ▼
-                 │                                  ┌─────────────────────────┐
-                 │                                  │  Cloudflare Zero Trust  │
-                 │                                  │ (Email OTP / Secret Key)│
-                 │                                  └────────────┬────────────┘
-                 │                                               │
-                 └───────────────────────┬───────────────────────┘
-                                         │ HTTPS / REST
-                                         ▼
-                           ┌───────────────────────────┐
-                           │    NestJS API Gateway     │
-                           │  - Port 3000 (REST/JSON)  │
-                           │  - Clerk Auth & RBAC Guard│
-                           │  - Swagger at /docs       │
-                           │  - Stripe & Clerk Webhooks│
-                           └─────────────┬─────────────┘
-                                         │
-       ┌───────────────────┬─────────────┼─────────────┬───────────────────┐
-       │ gRPC (5001)       │ gRPC (5002) │ gRPC (5003) │ gRPC (5004)       │ HTTP (3010)
-       ▼                   ▼             ▼             ▼                   ▼
-┌───────────────┐   ┌───────────────┐ ┌──────────────┐ ┌──────────────┐ ┌───────────────┐
-│Catalog Service│   │ Order Service │ │Payment Serv. │ │Users Service │ │ Agent Service │
-│  (Port 5001)  │   │  (Port 5002)  │ │ (Port 5003)  │ │ (Port 5004)  │ │  (Port 3010)  │
-└───────┬───────┘   └───────┬───────┘ └──────┬───────┘ └──────┬───────┘ └───────┬───────┘
-        │                   │                │                │                 │ HTTP
-        │                   │                │                │                 ▼
-        │                   │                │                │         ┌───────────────┐
-        │                   │                │                │         │ Agent Python  │
-        │                   │                │                │         │  (Port 8123)  │
-        │                   │                │                │         │  (LangGraph)  │
-        └───────────────────┴────────────────┼────────────────┘         └───────────────┘
-                                             │
-                                             ▼
-                                ┌─────────────────────────┐
-                                │  PostgreSQL (Port 5438) │
-                                │   Redis (Port 6379)     │
-                                └─────────────────────────┘
+                                 [ Public Internet ]
+                                          │
+                  ┌───────────────────────┴───────────────────────┐
+                  │                                               │
+       [ Customer Storefront ]                         [ Admin Dashboard ]
+      (Next.js 16 - Port 3001)                      (React 19 / Vite - Port 5173)
+                  │                                               │
+                  │                                               ▼
+                  │                                  ┌─────────────────────────┐
+                  │                                  │  Cloudflare Zero Trust  │
+                  │                                  │ (Email OTP / Secret Key)│
+                  │                                  └────────────┬────────────┘
+                  │                                               │
+                  │ Direct Media Fetch (CDN/Public URL)           │ Presigned S3 Upload PUT
+                  ▼                                               ▼
+          ┌───────────────────────────────────────────────────────────────┐
+          │     Object Storage: MinIO (Port 9002/9001) / S3 / R2          │
+          │     Bucket: ecommerce-products (Direct-to-Client Upload)      │
+          └───────────────────────────────▲───────────────────────────────┘
+                                          │ Presigned URL Generation
+                  ┌───────────────────────┴───────────────────────┐
+                  │                                               │
+                  ▼                                               ▼
+    ┌───────────────────────────┐                   ┌───────────────────────────┐
+    │    NestJS API Gateway     │                   │      Catalog Service      │
+    │  - Port 3000 (REST/JSON)  │──gRPC (Port 5001)─│   - StorageService (S3)   │
+    │  - Presigned URL Endpoint │                   │   - Product Assets Matrix │
+    └───────────────────────────┘                   └───────────────────────────┘
+                  │
+        ┌─────────┴─────────┬───────────────────┬───────────────────┐
+        │ gRPC (5002)       │ gRPC (5003)       │ gRPC (5004)       │ HTTP (3010)
+        ▼                   ▼                   ▼                   ▼
+┌───────────────┐   ┌──────────────┐    ┌──────────────┐    ┌───────────────┐
+│ Order Service │   │Payment Serv. │    │Users Service │    │ Agent Service │
+│  (Port 5002)  │   │ (Port 5003)  │    │ (Port 5004)  │    │  (Port 3010)  │
+└───────┬───────┘   └──────┬───────┘    └──────┬───────┘    └───────┬───────┘
+        │                  │                   │                    │ HTTP
+        │                  │                   │                    ▼
+        │                  │                   │            ┌───────────────┐
+        │                  │                   │            │ Agent Python  │
+        │                  │                   │            │  (Port 8123)  │
+        │                  │                   │            │  (LangGraph)  │
+        └──────────────────┼───────────────────┘            └───────────────┘
+                           │
+                           ▼
+              ┌─────────────────────────┐
+              │  PostgreSQL (Port 5438) │
+              │   Redis (Port 6379)     │
+              └─────────────────────────┘
 ```
 
 ---
 
 ### 2. Tech Stack
 
-| Component                 | Technologies                                                                              |
-| :------------------------ | :---------------------------------------------------------------------------------------- |
-| **Backend Monorepo**      | NestJS 11, TypeScript, gRPC (@grpc/grpc-js), Prisma ORM, PostgreSQL, Redis, Inngest       |
-| **AI Agent Layer**        | Python 3.12, FastAPI, LangGraph, LangChain, CopilotKit, AG-UI protocol                    |
-| **Customer Storefront**   | Next.js 16.2 (App Router, Turbopack), React 19, Tailwind CSS v4, TanStack Query           |
-| **Admin Dashboard**       | React 19, Vite, TypeScript, Tailwind CSS, Radix UI / Shadcn, TanStack Query               |
-| **Authentication & RBAC** | Clerk Authentication (`@clerk/express`, `@clerk/nextjs`, `@clerk/clerk-react`)            |
-| **Payments**              | Stripe API & Stripe Elements (Webhooks, PaymentIntents)                                   |
-| **Security Perimeter**    | Cloudflare Zero Trust (Access Application with Email OTP verification)                    |
-| **Container & CI/CD**     | Docker (Multi-stage builds), GitHub Actions (OIDC to AWS ECR & EKS Zero-Downtime Rollout) |
+| Component                  | Technologies                                                                              |
+| :------------------------- | :---------------------------------------------------------------------------------------- |
+| **Backend Monorepo**       | NestJS 11, TypeScript, gRPC (@grpc/grpc-js), Prisma ORM, PostgreSQL, Redis, Inngest       |
+| **Object Storage & Media** | MinIO (S3-compatible), AWS SDK v3 (`@aws-sdk/client-s3`, presigned direct client uploads)  |
+| **AI Agent Layer**         | Python 3.12, FastAPI, LangGraph, LangChain, CopilotKit, AG-UI protocol                    |
+| **Customer Storefront**    | Next.js 16.2 (App Router, Turbopack), React 19, Tailwind CSS v4, TanStack Query           |
+| **Admin Dashboard**        | React 19, Vite, TypeScript, Tailwind CSS, Radix UI / Shadcn, TanStack Query               |
+| **Authentication & RBAC**  | Clerk Authentication (`@clerk/express`, `@clerk/nextjs`, `@clerk/clerk-react`)            |
+| **Payments**               | Stripe API & Stripe Elements (Webhooks, PaymentIntents)                                   |
+| **Security Perimeter**     | Cloudflare Zero Trust (Access Application with Email OTP verification)                    |
+| **Container & CI/CD**      | Docker (Multi-stage builds), GitHub Actions (OIDC to AWS ECR & EKS Zero-Downtime Rollout) |
 
 ---
 
 ### 3. Services Breakdown
 
-| Service               | Protocol / Port | Local URL               | Role & Description                                                                     |
-| :-------------------- | :-------------- | :---------------------- | :------------------------------------------------------------------------------------- |
-| **`api-gateway`**     | HTTP `3000`     | `http://localhost:3000` | REST API gateway, Clerk JWT verification, RBAC `AdminGuard`, Swagger docs at `/docs`.  |
-| **`catalog-service`** | gRPC `5001`     | `localhost:5001`        | Manages products, categories, stock counts, and pricing via Prisma.                    |
-| **`order-service`**   | gRPC `5002`     | `localhost:5002`        | Manages order creation, lifecycle state changes, and aggregated order KPI metrics.     |
-| **`payment-service`** | gRPC `5003`     | `localhost:5003`        | Interfaces with Stripe, manages transaction records, refunds, and revenue KPI metrics. |
-| **`users-service`**   | gRPC `5004`     | `localhost:5004`        | Synchronizes and manages customer accounts and administrator roles.                    |
-| **`agent-service`**   | HTTP `3010`     | `http://localhost:3010` | NestJS AI thread manager, AG-UI protocol and session persistence.                      |
-| **`agent-python`**    | HTTP `8123`     | `http://localhost:8123` | Python FastAPI + LangGraph AI agent execution runtime.                                 |
-| **Customer Store**    | HTTP `3001`     | `http://localhost:3001` | Next.js 16 customer-facing shop with responsive hero banner and online checkout.       |
-| **Admin Dashboard**   | HTTP `5173`     | `http://localhost:5173` | Backoffice portal with real-time KPI metrics, products CRUD, and order management.     |
+| Service               | Protocol / Port      | Local URL                                                             | Role & Description                                                                     |
+| :-------------------- | :------------------- | :-------------------------------------------------------------------- | :------------------------------------------------------------------------------------- |
+| **`api-gateway`**     | HTTP `3000`          | `http://localhost:3000`                                               | REST API gateway, Clerk JWT verification, RBAC `AdminGuard`, Swagger docs at `/docs`.  |
+| **`catalog-service`** | gRPC `5001`          | `localhost:5001`                                                      | Manages products, categories, stock counts, and S3 media storage via Prisma.           |
+| **`order-service`**   | gRPC `5002`          | `localhost:5002`                                                      | Manages order creation, lifecycle state changes, and aggregated order KPI metrics.     |
+| **`payment-service`** | gRPC `5003`          | `localhost:5003`                                                      | Interfaces with Stripe, manages transaction records, refunds, and revenue KPI metrics. |
+| **`users-service`**   | gRPC `5004`          | `localhost:5004`                                                      | Synchronizes and manages customer accounts and administrator roles.                    |
+| **`ecommerce-minio`** | HTTP `9002` / `9001` | `http://localhost:9002` (API)<br>`http://localhost:9001` (Console)   | S3-compatible asset repository for multi-angle product photos, bucket auto-init.       |
+| **`agent-service`**   | HTTP `3010`          | `http://localhost:3010`                                               | NestJS AI thread manager, AG-UI protocol and session persistence.                      |
+| **`agent-python`**    | HTTP `8123`          | `http://localhost:8123`                                               | Python FastAPI + LangGraph AI agent execution runtime.                                 |
+| **Customer Store**    | HTTP `3001`          | `http://localhost:3001`                                               | Next.js 16 customer-facing shop with responsive hero banner and online checkout.       |
+| **Admin Dashboard**   | HTTP `5173`          | `http://localhost:5173`                                               | Backoffice portal with real-time KPI metrics, products CRUD, and order management.     |
 
 ---
 
@@ -260,13 +268,14 @@ pnpm install
 # 2. Configure environment variables
 cp .env.example .env
 
-# 3. Start PostgreSQL (port 5438) and Redis (port 6379) via Docker
+# 3. Start PostgreSQL (5438), Redis (6379), and MinIO S3 Object Storage (9002/9001) via Docker
 docker compose up -d
 
-# 4. Generate Prisma clients and run database migrations
+# 4. Generate Protocol Buffer gRPC contracts and Prisma clients
+pnpm run proto:generate
 pnpm run db:setup
 
-# 5. (Optional) Seed demo products and admin user
+# 5. (Optional) Seed demo products with multi-angle color assets and admin user
 pnpm run db:seed:demo
 
 # 6. Launch all 5 microservices & API Gateway concurrently:
@@ -280,6 +289,8 @@ pnpm run dev:all
 
 - API Gateway is live at: `http://localhost:3000`
 - Interactive Swagger API Documentation: [http://localhost:3000/docs](http://localhost:3000/docs)
+- MinIO Object Storage Console: [http://localhost:9001](http://localhost:9001) (User: `minioadmin`, Pass: `minioadmin123`)
+- MinIO S3 API Endpoint: `http://localhost:9002/ecommerce-products`
 - Catalog gRPC (`5001`), Order gRPC (`5002`), Payment gRPC (`5003`), Users gRPC (`5004`) are all operational.
 
 ---
@@ -468,6 +479,62 @@ AGENT_INTERNAL_TOKEN=replace-with-a-secure-random-secret
 # To run the entire backend including both AI Agent services concurrently:
 pnpm run dev:all:with-agent
 ```
+
+---
+
+### 4. Object Storage & Media Upload Pipeline (MinIO / S3 / Cloudflare R2)
+
+The platform features a high-performance **Presigned Direct Upload Architecture** for product assets (multi-angle photography, color-variant mappings):
+
+#### A. Presigned URL Architecture Flow
+Rather than piping multi-megabyte binary images through the API Gateway, file uploads bypass the backend servers completely:
+
+```
+[ Admin Dashboard Browser ]
+         │ 1. POST /products/upload-url { fileName, contentType, folder: "products" }
+         ▼
+[ API Gateway (Port 3000) ]
+         │ 2. gRPC getUploadPresignedUrl()
+         ▼
+[ Catalog Service (Port 5001) ]
+         │ 3. AWS SDK v3 generates time-limited presigned S3 PUT URL (valid 10 mins)
+         ▼
+[ Admin Dashboard Browser ]
+         │ 4. Direct HTTP PUT binary stream to MinIO / S3 Storage (Zero server memory overhead)
+         ▼
+[ MinIO / S3 Storage (Port 9002) ]
+         │ 5. File stored at: ecommerce-products/products/<uuid>.<ext>
+         ▼
+[ Admin Form Submit: POST /products ]
+         │ 6. Storefront / Admin reads from publicUrl (http://localhost:9002/ecommerce-products/...)
+```
+
+#### B. Supported Storage Drivers
+The backend uses a modular storage abstraction (`apps/catalog/src/storage/`):
+- **`minio`**: Default for local development. Spun up automatically via Docker Compose (`quay.io/minio/minio`).
+- **`s3`**: Enterprise production deployment with Amazon S3.
+- **`r2`**: Zero-egress fee production deployment with Cloudflare R2.
+
+#### C. Storage Environment Variables
+
+Configure these keys in `backend/.env`:
+
+| Variable                   | Local Development (MinIO)                  | Production (AWS S3)                    | Production (Cloudflare R2)                       |
+| :------------------------- | :----------------------------------------- | :------------------------------------- | :----------------------------------------------- |
+| `STORAGE_DRIVER`           | `minio`                                    | `s3`                                   | `r2`                                             |
+| `STORAGE_ENDPOINT`         | `http://localhost:9002`                    | *(leave blank)*                        | `https://<account_id>.r2.cloudflarestorage.com` |
+| `STORAGE_REGION`           | `us-east-1`                                | `ap-southeast-1`                       | `auto`                                           |
+| `STORAGE_BUCKET`           | `ecommerce-products`                       | `your-prod-bucket-name`                | `your-r2-bucket-name`                            |
+| `STORAGE_ACCESS_KEY`       | `minioadmin`                               | `<AWS_IAM_ACCESS_KEY>`                 | `<R2_TOKEN_ACCESS_KEY>`                          |
+| `STORAGE_SECRET_KEY`       | `minioadmin123`                            | `<AWS_IAM_SECRET_KEY>`                 | `<R2_TOKEN_SECRET_KEY>`                          |
+| `STORAGE_PUBLIC_URL`       | `http://localhost:9002/ecommerce-products` | `https://your-bucket.s3.amazonaws.com` | `https://media.yourdomain.com`                   |
+| `STORAGE_FORCE_PATH_STYLE` | `true`                                     | `false`                                | `true`                                           |
+
+#### D. MinIO Web Console Access
+When running locally with `docker compose up -d`:
+- **Web Console**: [http://localhost:9001](http://localhost:9001)
+- **Login Credentials**: User `minioadmin`, Password `minioadmin123`
+- The `ecommerce-minio-init` container automatically executes `mc mb -p myminio/ecommerce-products` and sets anonymous download permissions (`mc anonymous set download myminio/ecommerce-products`), so images render seamlessly in both the Admin Dashboard and Storefront without authentication tokens.
 
 ---
 
@@ -675,10 +742,10 @@ pnpm run stop:db:clean
 
 ### 3. Free Hanging Ports (Emergency Cleanup)
 
-If any background process was left dangling and occupies the project ports (`3000`, `3001`, `5173`, `5001-5004`, `8123`, `5438`, `6379`), free all ports instantly with:
+If any background process was left dangling and occupies the project ports (`3000`, `3001`, `5173`, `5001-5004`, `8123`, `5438`, `6379`, `9001`, `9002`), free all ports instantly with:
 
 ```bash
-npx kill-port 3000 3001 5173 5001 5002 5003 5004 8123 5438 6379
+npx kill-port 3000 3001 5173 5001 5002 5003 5004 8123 5438 6379 9001 9002
 ```
 
 ---

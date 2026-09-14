@@ -21,6 +21,10 @@ interface ProductBody {
   colors?: string[];
   sizes?: string[];
   images?: Record<string, string>;
+  sku?: string;
+  categorySlug?: string;
+  reorderPoint?: number | string;
+  status?: string;
 }
 
 @ApiTags('Products')
@@ -51,22 +55,67 @@ export class CatalogController {
   get(@Param('id') id: string) { return this.catalog.getProduct(id); }
 
   @UseGuards(AdminGuard)
+  @Post('upload-url')
+  @ApiOperation({ summary: 'Get a presigned S3 upload URL for product media' })
+  @ApiResponse({ status: 200, description: 'Presigned upload URL generated' })
+  getUploadUrl(
+    @Body()
+    body: {
+      fileName: string;
+      contentType: string;
+      folder?: string;
+      productId?: string;
+    },
+  ) {
+    return this.catalog.getUploadPresignedUrl(body);
+  }
+
+  @UseGuards(AdminGuard)
   @Post()
-  async create(@Body() body: ProductBody, @CurrentActor() actor: ActorContext) { const product = await this.catalog.createProduct({
-    slug: body.slug ?? '', name: body.name ?? '', description: body.description ?? '', stockQuantity: Number(body.stockQuantity ?? 0),
-    price: { amountMinor: Number(body.price?.amountMinor ?? body.priceAmountMinor ?? 0), currency: body.price?.currency ?? body.currency ?? 'VND' },
-    colors: body.colors ?? [], sizes: body.sizes ?? [], images: body.images ?? {}
-  }, createActorMetadata(actor)) as Product; this.publishLowStock(product); return product; }
+  async create(@Body() body: ProductBody, @CurrentActor() actor: ActorContext) {
+    const product = await this.catalog.createProduct({
+      slug: body.slug ?? '',
+      name: body.name ?? '',
+      description: body.description ?? '',
+      stockQuantity: Number(body.stockQuantity ?? 0),
+      price: {
+        amountMinor: Number(body.price?.amountMinor ?? body.priceAmountMinor ?? 0),
+        currency: body.price?.currency ?? body.currency ?? 'VND',
+      },
+      colors: body.colors ?? [],
+      sizes: body.sizes ?? [],
+      images: body.images ?? {},
+      sku: body.sku?.trim() || undefined,
+      categorySlug: body.categorySlug?.trim() || '',
+      reorderPoint: Number(body.reorderPoint ?? 20),
+    }, createActorMetadata(actor)) as Product;
+    this.publishLowStock(product);
+    return product;
+  }
 
   @UseGuards(AdminGuard)
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() body: ProductBody, @CurrentActor() actor: ActorContext) { const product = await this.catalog.updateProduct({
-    productId: id, name: body.name ?? '', description: body.description ?? '', ...(body.stockQuantity !== undefined ? { stockQuantity: Number(body.stockQuantity) } : {}),
-    price: body.price || body.priceAmountMinor !== undefined ? { amountMinor: Number(body.price?.amountMinor ?? body.priceAmountMinor), currency: body.price?.currency ?? body.currency ?? 'VND' } : undefined,
-    colors: body.colors || [],
-    sizes: body.sizes || [],
-    images: body.images || {}
-  }, createActorMetadata(actor)) as Product; this.publishLowStock(product); return product; }
+  async update(@Param('id') id: string, @Body() body: ProductBody, @CurrentActor() actor: ActorContext) {
+    const product = await this.catalog.updateProduct({
+      productId: id,
+      name: body.name ?? '',
+      description: body.description ?? '',
+      ...(body.stockQuantity !== undefined ? { stockQuantity: Number(body.stockQuantity) } : {}),
+      price: body.price || body.priceAmountMinor !== undefined ? {
+        amountMinor: Number(body.price?.amountMinor ?? body.priceAmountMinor),
+        currency: body.price?.currency ?? body.currency ?? 'VND',
+      } : undefined,
+      colors: body.colors || [],
+      sizes: body.sizes || [],
+      images: body.images || {},
+      sku: body.sku?.trim() || undefined,
+      categorySlug: body.categorySlug?.trim() || undefined,
+      reorderPoint: body.reorderPoint !== undefined ? Number(body.reorderPoint) : undefined,
+      status: body.status || undefined,
+    }, createActorMetadata(actor)) as Product;
+    this.publishLowStock(product);
+    return product;
+  }
 
   @UseGuards(AdminGuard)
   @Delete(':id')

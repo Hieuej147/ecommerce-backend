@@ -118,6 +118,15 @@ export class CreateProductBodyDto {
   @ApiProperty()
   price!: MoneyDto;
 
+  @ApiPropertyOptional()
+  sku?: string;
+
+  @ApiPropertyOptional()
+  categorySlug?: string;
+
+  @ApiPropertyOptional()
+  reorderPoint?: number;
+
   @ApiPropertyOptional({
     type: 'object',
     additionalProperties: { type: 'string' },
@@ -143,6 +152,18 @@ export class UpdateProductBodyDto {
 
   @ApiPropertyOptional()
   price?: MoneyDto;
+
+  @ApiPropertyOptional()
+  sku?: string;
+
+  @ApiPropertyOptional()
+  categorySlug?: string;
+
+  @ApiPropertyOptional()
+  reorderPoint?: number;
+
+  @ApiPropertyOptional()
+  status?: string;
 
   @ApiPropertyOptional({
     type: 'object',

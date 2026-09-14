@@ -9,6 +9,8 @@ import {
   type ReleaseStockRequest,
   type ReserveStockRequest,
   type UpdateProductRequest,
+  type GetUploadUrlRequest,
+  type GetUploadUrlResponse,
 } from '@app/contracts/generated/catalog';
 import type { Empty } from '@app/contracts/generated/common';
 import { CatalogService } from './catalog.service';
@@ -46,5 +48,8 @@ export class CatalogController {
   }
   releaseStock(request: ReleaseStockRequest): Promise<Empty> {
     return this.catalogService.releaseStock(request);
+  }
+  getUploadPresignedUrl(request: GetUploadUrlRequest): Promise<GetUploadUrlResponse> {
+    return this.catalogService.getUploadPresignedUrl(request);
   }
 }

@@ -8,12 +8,17 @@ import type {
   ReleaseStockRequest, ReserveStockRequest, ReserveStockResponse,
   UpdateProductRequest,
   GetInventoryMetricsRequest, InventoryMetrics,
+  GetUploadUrlRequest, GetUploadUrlResponse,
 } from '@app/contracts/generated/catalog';
 import { PrismaService } from './prisma/prisma.service';
+import { StorageService } from './storage/storage.service';
 
 @Injectable()
 export class CatalogService implements CatalogServiceController {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly storageService: StorageService,
+  ) {}
 
   private toProto(product: Prisma.ProductGetPayload<object>): Product {
     let imagesMap: { [key: string]: string } = {};
@@ -83,15 +88,26 @@ export class CatalogService implements CatalogServiceController {
     return { products: page.map((p) => this.toProto(p)), pageInfo };
   }
 
+  private generateSku(categorySlug?: string): string {
+    const prefix = (categorySlug?.trim() || 'PRD').slice(0, 3).toUpperCase();
+    const randomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+    return `${prefix}-${randomCode}`;
+  }
+
   async createProduct(request: CreateProductRequest, actorRole = ''): Promise<Product> {
     this.requireAdmin(actorRole);
     const currency = request.price?.currency?.trim().toUpperCase() || 'VND';
     if (!request.name.trim() || !request.slug.trim() || request.stockQuantity < 0 || !request.price || request.price.amountMinor < 0 || !/^[A-Z]{3}$/.test(currency)) {
       this.error('INVALID_ARGUMENT', 'Invalid product fields');
     }
+    const categorySlug = request.categorySlug?.trim() || 'uncategorized';
+    const sku = request.sku?.trim() || this.generateSku(categorySlug);
+    const reorderPoint = request.reorderPoint && request.reorderPoint > 0 ? request.reorderPoint : 20;
+
     try {
       const product = await this.prisma.product.create({ data: {
         slug: request.slug.trim(), name: request.name.trim(), description: request.description ?? '',
+        sku, categorySlug, reorderPoint,
         priceAmountMinor: BigInt(request.price.amountMinor), currency,
         stockQuantity: request.stockQuantity,
         colors: request.colors || [],
@@ -100,7 +116,7 @@ export class CatalogService implements CatalogServiceController {
       } });
       return this.toProto(product);
     } catch (e) {
-      if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2002') this.error('ALREADY_EXISTS', 'Slug already exists');
+      if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2002') this.error('ALREADY_EXISTS', 'Slug or SKU already exists');
       throw e;
     }
   }
@@ -109,16 +125,30 @@ export class CatalogService implements CatalogServiceController {
     this.requireAdmin(actorRole);
     const existing = await this.prisma.product.findUnique({ where: { id: request.productId } });
     if (!existing) this.error('NOT_FOUND', 'Product not found');
-    if (existing.status === ProductStatus.ARCHIVED) this.error('FAILED_PRECONDITION', 'Archived product cannot be updated');
+    if (existing.status === ProductStatus.ARCHIVED && request.status !== 'ACTIVE') {
+      this.error('FAILED_PRECONDITION', 'Archived product cannot be updated');
+    }
     const currency = request.price?.currency?.trim().toUpperCase() || 'VND';
-    if ((request.stockQuantity !== undefined && request.stockQuantity < 0) || (request.price && (request.price.amountMinor < 0 || !/^[A-Z]{3}$/.test(currency)))) this.error('INVALID_ARGUMENT', 'Invalid product fields');
+    if ((request.stockQuantity !== undefined && request.stockQuantity < 0) || (request.price && (request.price.amountMinor < 0 || !/^[A-Z]{3}$/.test(currency)))) {
+      this.error('INVALID_ARGUMENT', 'Invalid product fields');
+    }
+
+    let nextStatus: ProductStatus | undefined = undefined;
+    if (request.status === 'ACTIVE') nextStatus = ProductStatus.ACTIVE;
+    if (request.status === 'ARCHIVED') nextStatus = ProductStatus.ARCHIVED;
+
     const product = await this.prisma.product.update({ where: { id: request.productId }, data: {
-      ...(request.name ? { name: request.name.trim() } : {}), ...(request.description ? { description: request.description } : {}),
+      ...(request.name ? { name: request.name.trim() } : {}),
+      ...(request.description !== undefined ? { description: request.description } : {}),
       ...(request.stockQuantity !== undefined ? { stockQuantity: request.stockQuantity } : {}),
       ...(request.price ? { priceAmountMinor: BigInt(request.price.amountMinor), currency } : {}),
       ...(request.colors?.length ? { colors: request.colors } : {}),
       ...(request.sizes?.length ? { sizes: request.sizes } : {}),
-      ...(Object.keys(request.images || {}).length ? { images: request.images } : {}),
+      ...(request.images && Object.keys(request.images).length ? { images: request.images } : {}),
+      ...(request.categorySlug ? { categorySlug: request.categorySlug.trim() } : {}),
+      ...(request.reorderPoint !== undefined && request.reorderPoint >= 0 ? { reorderPoint: request.reorderPoint } : {}),
+      ...(request.sku ? { sku: request.sku.trim() } : {}),
+      ...(nextStatus ? { status: nextStatus } : {}),
     } });
     return this.toProto(product);
   }
@@ -169,5 +199,20 @@ export class CatalogService implements CatalogServiceController {
       this.prisma.product.count({ where: { status: ProductStatus.ACTIVE, stockQuantity: 0 } }),
     ]);
     return { totalProducts: total, activeProducts: active, lowStockProducts: lowStock, outOfStockProducts: outOfStock };
+  }
+
+  async getUploadPresignedUrl(request: GetUploadUrlRequest): Promise<GetUploadUrlResponse> {
+    const res = await this.storageService.createPresignedUploadUrl({
+      fileName: request.fileName,
+      contentType: request.contentType,
+      folder: request.folder || 'products',
+      productId: request.productId,
+    });
+
+    return {
+      uploadUrl: res.uploadUrl,
+      fileKey: res.fileKey,
+      publicUrl: res.publicUrl,
+    };
   }
 }

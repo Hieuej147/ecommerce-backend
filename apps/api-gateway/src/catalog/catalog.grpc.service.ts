@@ -55,4 +55,19 @@ export class CatalogGrpcService implements OnModuleInit {
   inventoryMetrics(metadata?: Metadata) {
     return firstValueFrom((this.catalog.getInventoryMetrics as any)({}, metadata));
   }
+  getUploadPresignedUrl(params: {
+    fileName: string;
+    contentType: string;
+    folder?: string;
+    productId?: string;
+  }) {
+    return firstValueFrom(
+      this.catalog.getUploadPresignedUrl({
+        fileName: params.fileName,
+        contentType: params.contentType,
+        folder: params.folder ?? 'products',
+        productId: params.productId ?? '',
+      }),
+    );
+  }
 }

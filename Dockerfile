@@ -21,7 +21,8 @@ ENV APP_NAME=${APP_NAME}
 ENV DATABASE_URL="postgresql://placeholder:placeholder@localhost:5432/ecommerce"
 
 
-RUN pnpm run db:catalog:generate && \
+RUN pnpm run proto:generate && \
+    pnpm run db:catalog:generate && \
     pnpm run db:order:generate && \
     pnpm run db:payment:generate && \
     pnpm run db:users:generate && \
