@@ -1,4 +1,4 @@
-require('dotenv/config');
+try { require('dotenv/config'); } catch (_) {}
 const { PrismaClient } = require('@prisma/client');
 const { PrismaPg } = require('@prisma/adapter-pg');
 
@@ -43,7 +43,8 @@ async function main() {
   for (let i = 0; i < PRODUCT_COUNT; i += 1) {
     const [name, category, price, badge] = base[i % base.length];
     const number = String(i + 1).padStart(2, '0');
-        const seedImages = { main: Object.values(colorInfo.images)[0], ...colorInfo.images };
+    const colorInfo = colorMapping[i % colorMapping.length];
+    const seedImages = { main: Object.values(colorInfo.images)[0], ...colorInfo.images };
         const product = await prisma.product.upsert({
           where: { externalId: `ui-product-${number}` },
           create: {

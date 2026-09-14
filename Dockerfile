@@ -49,6 +49,8 @@ COPY --from=builder /app/dist/apps/${APP_NAME} ./dist/apps/${APP_NAME}
 COPY --from=builder /app/proto ./proto
 COPY --from=builder /app/libs ./libs
 COPY --from=builder /app/apps ./apps
+COPY --from=builder /app/prisma*.config.ts ./
+COPY --from=builder /app/scripts ./scripts
 
 
 USER node
