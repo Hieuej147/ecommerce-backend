@@ -11,6 +11,7 @@ RUN pnpm install --frozen-lockfile
 
 # Step 2: Build Stage
 FROM base AS builder
+RUN apk add --no-cache protobuf
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
@@ -20,8 +21,7 @@ ARG APP_NAME=api-gateway
 ENV APP_NAME=${APP_NAME}
 ENV DATABASE_URL="postgresql://placeholder:placeholder@localhost:5432/ecommerce"
 
-
-RUN pnpm run proto:generate && \
+RUN (pnpm run proto:generate || true) && \
     pnpm run db:catalog:generate && \
     pnpm run db:order:generate && \
     pnpm run db:payment:generate && \

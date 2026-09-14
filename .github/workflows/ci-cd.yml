@@ -7,6 +7,7 @@ on:
   pull_request:
     branches:
       - main
+  workflow_dispatch:
 
 permissions:
   id-token: write   # Required for AWS OIDC authentication
@@ -50,7 +51,7 @@ jobs:
   build-and-push:
     name: Build & Push Service Images
     needs: test
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -86,7 +87,7 @@ jobs:
   build-and-push-agent-python:
     name: Build & Push Python AI Agent
     needs: test
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -118,7 +119,7 @@ jobs:
   deploy-to-eks:
     name: Deploy to Amazon EKS (Rolling Restart)
     needs: [build-and-push, build-and-push-agent-python]
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
     steps:
       - name: Configure AWS Credentials (OIDC)

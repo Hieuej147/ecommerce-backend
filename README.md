@@ -145,7 +145,7 @@ This project is an enterprise-grade, full-stack **E-Commerce Microservices Platf
 | Component                  | Technologies                                                                              |
 | :------------------------- | :---------------------------------------------------------------------------------------- |
 | **Backend Monorepo**       | NestJS 11, TypeScript, gRPC (@grpc/grpc-js), Prisma ORM, PostgreSQL, Redis, Inngest       |
-| **Object Storage & Media** | MinIO (S3-compatible), AWS SDK v3 (`@aws-sdk/client-s3`, presigned direct client uploads)  |
+| **Object Storage & Media** | MinIO (S3-compatible), AWS SDK v3 (`@aws-sdk/client-s3`, presigned direct client uploads) |
 | **AI Agent Layer**         | Python 3.12, FastAPI, LangGraph, LangChain, CopilotKit, AG-UI protocol                    |
 | **Customer Storefront**    | Next.js 16.2 (App Router, Turbopack), React 19, Tailwind CSS v4, TanStack Query           |
 | **Admin Dashboard**        | React 19, Vite, TypeScript, Tailwind CSS, Radix UI / Shadcn, TanStack Query               |
@@ -158,18 +158,18 @@ This project is an enterprise-grade, full-stack **E-Commerce Microservices Platf
 
 ### 3. Services Breakdown
 
-| Service               | Protocol / Port      | Local URL                                                             | Role & Description                                                                     |
-| :-------------------- | :------------------- | :-------------------------------------------------------------------- | :------------------------------------------------------------------------------------- |
-| **`api-gateway`**     | HTTP `3000`          | `http://localhost:3000`                                               | REST API gateway, Clerk JWT verification, RBAC `AdminGuard`, Swagger docs at `/docs`.  |
-| **`catalog-service`** | gRPC `5001`          | `localhost:5001`                                                      | Manages products, categories, stock counts, and S3 media storage via Prisma.           |
-| **`order-service`**   | gRPC `5002`          | `localhost:5002`                                                      | Manages order creation, lifecycle state changes, and aggregated order KPI metrics.     |
-| **`payment-service`** | gRPC `5003`          | `localhost:5003`                                                      | Interfaces with Stripe, manages transaction records, refunds, and revenue KPI metrics. |
-| **`users-service`**   | gRPC `5004`          | `localhost:5004`                                                      | Synchronizes and manages customer accounts and administrator roles.                    |
-| **`ecommerce-minio`** | HTTP `9002` / `9001` | `http://localhost:9002` (API)<br>`http://localhost:9001` (Console)   | S3-compatible asset repository for multi-angle product photos, bucket auto-init.       |
-| **`agent-service`**   | HTTP `3010`          | `http://localhost:3010`                                               | NestJS AI thread manager, AG-UI protocol and session persistence.                      |
-| **`agent-python`**    | HTTP `8123`          | `http://localhost:8123`                                               | Python FastAPI + LangGraph AI agent execution runtime.                                 |
-| **Customer Store**    | HTTP `3001`          | `http://localhost:3001`                                               | Next.js 16 customer-facing shop with responsive hero banner and online checkout.       |
-| **Admin Dashboard**   | HTTP `5173`          | `http://localhost:5173`                                               | Backoffice portal with real-time KPI metrics, products CRUD, and order management.     |
+| Service               | Protocol / Port      | Local URL                                                          | Role & Description                                                                     |
+| :-------------------- | :------------------- | :----------------------------------------------------------------- | :------------------------------------------------------------------------------------- |
+| **`api-gateway`**     | HTTP `3000`          | `http://localhost:3000`                                            | REST API gateway, Clerk JWT verification, RBAC `AdminGuard`, Swagger docs at `/docs`.  |
+| **`catalog-service`** | gRPC `5001`          | `localhost:5001`                                                   | Manages products, categories, stock counts, and S3 media storage via Prisma.           |
+| **`order-service`**   | gRPC `5002`          | `localhost:5002`                                                   | Manages order creation, lifecycle state changes, and aggregated order KPI metrics.     |
+| **`payment-service`** | gRPC `5003`          | `localhost:5003`                                                   | Interfaces with Stripe, manages transaction records, refunds, and revenue KPI metrics. |
+| **`users-service`**   | gRPC `5004`          | `localhost:5004`                                                   | Synchronizes and manages customer accounts and administrator roles.                    |
+| **`ecommerce-minio`** | HTTP `9002` / `9001` | `http://localhost:9002` (API)<br>`http://localhost:9001` (Console) | S3-compatible asset repository for multi-angle product photos, bucket auto-init.       |
+| **`agent-service`**   | HTTP `3010`          | `http://localhost:3010`                                            | NestJS AI thread manager, AG-UI protocol and session persistence.                      |
+| **`agent-python`**    | HTTP `8123`          | `http://localhost:8123`                                            | Python FastAPI + LangGraph AI agent execution runtime.                                 |
+| **Customer Store**    | HTTP `3001`          | `http://localhost:3001`                                            | Next.js 16 customer-facing shop with responsive hero banner and online checkout.       |
+| **Admin Dashboard**   | HTTP `5173`          | `http://localhost:5173`                                            | Backoffice portal with real-time KPI metrics, products CRUD, and order management.     |
 
 ---
 
@@ -487,6 +487,7 @@ pnpm run dev:all:with-agent
 The platform features a high-performance **Presigned Direct Upload Architecture** for product assets (multi-angle photography, color-variant mappings):
 
 #### A. Presigned URL Architecture Flow
+
 Rather than piping multi-megabyte binary images through the API Gateway, file uploads bypass the backend servers completely:
 
 ```
@@ -510,7 +511,9 @@ Rather than piping multi-megabyte binary images through the API Gateway, file up
 ```
 
 #### B. Supported Storage Drivers
+
 The backend uses a modular storage abstraction (`apps/catalog/src/storage/`):
+
 - **`minio`**: Default for local development. Spun up automatically via Docker Compose (`quay.io/minio/minio`).
 - **`s3`**: Enterprise production deployment with Amazon S3.
 - **`r2`**: Zero-egress fee production deployment with Cloudflare R2.
@@ -519,19 +522,21 @@ The backend uses a modular storage abstraction (`apps/catalog/src/storage/`):
 
 Configure these keys in `backend/.env`:
 
-| Variable                   | Local Development (MinIO)                  | Production (AWS S3)                    | Production (Cloudflare R2)                       |
-| :------------------------- | :----------------------------------------- | :------------------------------------- | :----------------------------------------------- |
-| `STORAGE_DRIVER`           | `minio`                                    | `s3`                                   | `r2`                                             |
-| `STORAGE_ENDPOINT`         | `http://localhost:9002`                    | *(leave blank)*                        | `https://<account_id>.r2.cloudflarestorage.com` |
-| `STORAGE_REGION`           | `us-east-1`                                | `ap-southeast-1`                       | `auto`                                           |
-| `STORAGE_BUCKET`           | `ecommerce-products`                       | `your-prod-bucket-name`                | `your-r2-bucket-name`                            |
-| `STORAGE_ACCESS_KEY`       | `minioadmin`                               | `<AWS_IAM_ACCESS_KEY>`                 | `<R2_TOKEN_ACCESS_KEY>`                          |
-| `STORAGE_SECRET_KEY`       | `minioadmin123`                            | `<AWS_IAM_SECRET_KEY>`                 | `<R2_TOKEN_SECRET_KEY>`                          |
-| `STORAGE_PUBLIC_URL`       | `http://localhost:9002/ecommerce-products` | `https://your-bucket.s3.amazonaws.com` | `https://media.yourdomain.com`                   |
-| `STORAGE_FORCE_PATH_STYLE` | `true`                                     | `false`                                | `true`                                           |
+| Variable                   | Local Development (MinIO)                  | Production (AWS S3)                    | Production (Cloudflare R2)                      |
+| :------------------------- | :----------------------------------------- | :------------------------------------- | :---------------------------------------------- |
+| `STORAGE_DRIVER`           | `minio`                                    | `s3`                                   | `r2`                                            |
+| `STORAGE_ENDPOINT`         | `http://localhost:9002`                    | _(leave blank)_                        | `https://<account_id>.r2.cloudflarestorage.com` |
+| `STORAGE_REGION`           | `us-east-1`                                | `ap-southeast-1`                       | `auto`                                          |
+| `STORAGE_BUCKET`           | `ecommerce-products`                       | `your-prod-bucket-name`                | `your-r2-bucket-name`                           |
+| `STORAGE_ACCESS_KEY`       | `minioadmin`                               | `<AWS_IAM_ACCESS_KEY>`                 | `<R2_TOKEN_ACCESS_KEY>`                         |
+| `STORAGE_SECRET_KEY`       | `minioadmin123`                            | `<AWS_IAM_SECRET_KEY>`                 | `<R2_TOKEN_SECRET_KEY>`                         |
+| `STORAGE_PUBLIC_URL`       | `http://localhost:9002/ecommerce-products` | `https://your-bucket.s3.amazonaws.com` | `https://media.yourdomain.com`                  |
+| `STORAGE_FORCE_PATH_STYLE` | `true`                                     | `false`                                | `true`                                          |
 
 #### D. MinIO Web Console Access
+
 When running locally with `docker compose up -d`:
+
 - **Web Console**: [http://localhost:9001](http://localhost:9001)
 - **Login Credentials**: User `minioadmin`, Password `minioadmin123`
 - The `ecommerce-minio-init` container automatically executes `mc mb -p myminio/ecommerce-products` and sets anonymous download permissions (`mc anonymous set download myminio/ecommerce-products`), so images render seamlessly in both the Admin Dashboard and Storefront without authentication tokens.
