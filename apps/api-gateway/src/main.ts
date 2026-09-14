@@ -24,7 +24,7 @@ async function bootstrap() {
   const authorizedParties = config
     .getOrThrow<string>('CLERK_AUTHORIZED_PARTIES')
     .split(',')
-    .map((party) => party.trim())
+    .map((party) => party.replace(/\s+/g, ''))
     .filter(Boolean);
 
   app.enableCors({
