@@ -22,15 +22,20 @@ export class StorageService {
 
   constructor() {
     this.config = getStorageConfig();
-    this.s3Client = new S3Client({
-      endpoint: this.config.endpoint,
+    const clientConfig: any = {
       region: this.config.region,
-      credentials: {
+      forcePathStyle: this.config.forcePathStyle,
+    };
+    if (this.config.endpoint) {
+      clientConfig.endpoint = this.config.endpoint;
+    }
+    if (this.config.accessKeyId && this.config.secretAccessKey) {
+      clientConfig.credentials = {
         accessKeyId: this.config.accessKeyId,
         secretAccessKey: this.config.secretAccessKey,
-      },
-      forcePathStyle: this.config.forcePathStyle,
-    });
+      };
+    }
+    this.s3Client = new S3Client(clientConfig);
     this.logger.log(
       `Initialized StorageService with driver: ${this.config.driver}, bucket: ${this.config.bucket}`,
     );

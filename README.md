@@ -638,6 +638,12 @@ project = {
   domain     = "yourdomain.com"    # Your purchased domain name
   admin_user = "admin"             # Your AWS IAM username
 }
+
+# Allowed web origins for S3 Media Bucket CORS uploads (Optional: defaults to admin and store subdomains)
+cors_allowed_origins = [
+  "https://admin.yourdomain.com",
+  "https://store.yourdomain.com"
+]
 ```
 
 #### Step 2: Provision AWS Infrastructure via Terraform
