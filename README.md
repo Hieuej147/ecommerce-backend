@@ -281,8 +281,14 @@ pnpm run db:seed:demo     # Seeds 100 demo products with /v1/media/demo/... path
 # 6. Launch all 5 microservices & API Gateway concurrently:
 pnpm run dev:all
 
-# OR launch everything INCLUDING the AI Agent services (NestJS agent-service + Python agent):
+# OR launch with background Inngest dev server:
+# pnpm run dev:all:with-inngest
+
+# OR launch with AI Agent services (NestJS agent-service + Python LangGraph):
 # pnpm run dev:all:with-agent
+
+# OR launch EVERYTHING (5 services + AI Agent + Inngest):
+# pnpm run dev:all:full
 ```
 
 ✅ **Verification**:
