@@ -21,6 +21,7 @@ import {
 import type { Request, Response } from 'express';
 import { randomUUID } from 'crypto';
 import { StorageService } from '../storage/storage.service';
+import { Public } from '../auth/decorators/public.decorator';
 
 const ALLOWED_MIME_TYPES = new Set([
   'image/jpeg',
@@ -106,7 +107,7 @@ export class MediaController {
       fileKey: result.fileKey,
     };
   }
-
+  @Public()
   @Get('*fileKey')
   @ApiOperation({ summary: 'Stream an image file with caching headers' })
   async serveFile(@Req() req: Request, @Res() res: Response) {
