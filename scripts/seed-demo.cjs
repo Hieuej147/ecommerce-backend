@@ -24,7 +24,7 @@ const tones = ['#e9e3d3', '#dce6e2', '#e1d8f5', '#f5d9c3'];
 const customers = ['Nguyễn Minh Anh', 'Trần Quốc Bảo', 'Lê Hoàng Yến', 'Phạm Gia Huy', 'Võ Khánh Linh', 'Đỗ Nhật Nam', 'Bùi Thanh Hà', 'Hoàng Gia Khang', 'Mai Thảo Vy', 'Ngô Đức Anh', 'Phan Ngọc Mai', 'Đặng Khôi'];
 const cities = ['Hồ Chí Minh', 'Đà Nẵng', 'Hà Nội', 'Cần Thơ', 'Hải Phòng'];
 
-const storageBase = (process.env.STORAGE_PUBLIC_URL || 'https://prod-ecommerce-media-assets.s3.ap-southeast-1.amazonaws.com').replace(/\/+$/, '') + '/demo';
+const storageBase = (process.env.STORAGE_PUBLIC_URL || '/v1/media').replace(/\/+$/, '') + '/demo';
 
 const colorMapping = [
   { colors: ['#000000', '#FFFFFF', '#FFC0CB'], images: { '#000000': `${storageBase}/1g.png`, '#FFFFFF': `${storageBase}/1gr.png`, '#FFC0CB': `${storageBase}/1p.png` } },

@@ -19,31 +19,23 @@ export function getStorageConfig(): StorageConfig {
   }
 
   const region = process.env.STORAGE_REGION || (isS3 ? 'ap-southeast-1' : 'us-east-1');
-  const bucket = process.env.STORAGE_BUCKET || 'ecommerce-products';
+  const bucket = process.env.STORAGE_BUCKET || 'prod-ecommerce-media-assets';
 
-  let accessKeyId = process.env.STORAGE_ACCESS_KEY;
-  let secretAccessKey = process.env.STORAGE_SECRET_KEY;
+  let accessKeyId = process.env.STORAGE_ACCESS_KEY || process.env.AWS_ACCESS_KEY_ID;
+  let secretAccessKey = process.env.STORAGE_SECRET_KEY || process.env.AWS_SECRET_ACCESS_KEY;
 
   if (!accessKeyId && driver === 'minio') {
     accessKeyId = 'minioadmin';
     secretAccessKey = 'minioadmin123';
   }
 
-  let publicUrl = process.env.STORAGE_PUBLIC_URL;
-  if (!publicUrl) {
-    if (isS3) {
-      publicUrl = `https://${bucket}.s3.${region}.amazonaws.com`;
-    } else if (endpoint) {
-      publicUrl = `${endpoint}/${bucket}`;
-    } else {
-      publicUrl = `https://${bucket}.r2.cloudflarestorage.com`;
-    }
-  }
+  let publicUrl = process.env.STORAGE_PUBLIC_URL || '/v1/media';
   publicUrl = publicUrl.replace(/\/+$/, '');
 
-  const forcePathStyle = process.env.STORAGE_FORCE_PATH_STYLE !== undefined
-    ? process.env.STORAGE_FORCE_PATH_STYLE === 'true'
-    : !isS3;
+  const forcePathStyle =
+    process.env.STORAGE_FORCE_PATH_STYLE !== undefined
+      ? process.env.STORAGE_FORCE_PATH_STYLE === 'true'
+      : !isS3;
 
   return {
     driver,

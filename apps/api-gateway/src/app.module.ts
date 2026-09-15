@@ -14,6 +14,7 @@ import { AdminOverviewModule } from './admin/admin-overview.module';
 import { InngestModule } from './inngest/inngest.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { MediaModule } from './media/media.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { NotificationsModule } from './notifications/notifications.module';
     AdminOverviewModule,
     InngestModule,
     NotificationsModule,
+    MediaModule,
   ],
   controllers: [AppController],
   providers: [AppService],

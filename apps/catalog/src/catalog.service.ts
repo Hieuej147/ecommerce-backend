@@ -11,13 +11,11 @@ import type {
   GetUploadUrlRequest, GetUploadUrlResponse,
 } from '@app/contracts/generated/catalog';
 import { PrismaService } from './prisma/prisma.service';
-import { StorageService } from './storage/storage.service';
 
 @Injectable()
 export class CatalogService implements CatalogServiceController {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly storageService: StorageService,
   ) {}
 
   private toProto(product: Prisma.ProductGetPayload<object>): Product {
@@ -202,17 +200,15 @@ export class CatalogService implements CatalogServiceController {
   }
 
   async getUploadPresignedUrl(request: GetUploadUrlRequest): Promise<GetUploadUrlResponse> {
-    const res = await this.storageService.createPresignedUploadUrl({
-      fileName: request.fileName,
-      contentType: request.contentType,
-      folder: request.folder || 'products',
-      productId: request.productId,
-    });
+    const extMatch = request.fileName.match(/\.([a-zA-Z0-9]+)$/);
+    const ext = extMatch ? extMatch[1].toLowerCase() : 'png';
+    const folder = request.folder || 'products';
+    const fileKey = `${folder}/${Date.now()}.${ext}`;
 
     return {
-      uploadUrl: res.uploadUrl,
-      fileKey: res.fileKey,
-      publicUrl: res.publicUrl,
+      uploadUrl: '/v1/media/upload',
+      fileKey,
+      publicUrl: `/v1/media/${fileKey}`,
     };
   }
 }
