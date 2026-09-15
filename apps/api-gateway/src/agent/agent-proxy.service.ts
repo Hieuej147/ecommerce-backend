@@ -35,7 +35,9 @@ export class AgentProxyService {
     const headers = this.createHeaders(request, actor);
     const method = request.method.toUpperCase();
     const hasBody = method !== 'GET' && method !== 'HEAD';
-    const body = hasBody ? this.serializeBody(request.body, headers) : undefined;
+    const body = hasBody
+      ? this.serializeBody(request.body, headers)
+      : undefined;
 
     let upstream: globalThis.Response;
     try {
@@ -81,7 +83,10 @@ export class AgentProxyService {
   private createHeaders(request: Request, actor: ActorContext): Headers {
     const headers = new Headers();
     for (const [name, value] of Object.entries(request.headers)) {
-      if (REQUEST_HEADERS_TO_DROP.has(name.toLowerCase()) || value === undefined) {
+      if (
+        REQUEST_HEADERS_TO_DROP.has(name.toLowerCase()) ||
+        value === undefined
+      ) {
         continue;
       }
       headers.set(name, Array.isArray(value) ? value.join(',') : value);

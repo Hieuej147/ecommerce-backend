@@ -16,7 +16,8 @@ export class UsersGrpcService implements OnModuleInit {
   constructor(@Inject('USERS_GRPC') private readonly client: ClientGrpc) {}
 
   onModuleInit(): void {
-    this.service = this.client.getService<UsersServiceClient>(USERS_SERVICE_NAME);
+    this.service =
+      this.client.getService<UsersServiceClient>(USERS_SERVICE_NAME);
   }
 
   getByClerkId(clerkId: string) {

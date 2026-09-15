@@ -159,11 +159,7 @@ export class AgentThreadsController {
     };
   }
 
-  private scoped<T>(
-    actor: AgentActor,
-    request: Request,
-    callback: () => T,
-  ): T {
+  private scoped<T>(actor: AgentActor, request: Request, callback: () => T): T {
     return this.context.run(
       {
         userId: actor.userId,

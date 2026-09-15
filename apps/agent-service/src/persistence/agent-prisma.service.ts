@@ -5,7 +5,10 @@ import { ConfigService } from '@nestjs/config';
 import { PrismaClient } from '../../generated/prisma';
 
 @Injectable()
-export class AgentPrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
+export class AgentPrismaService
+  extends PrismaClient
+  implements OnModuleInit, OnModuleDestroy
+{
   constructor(config: ConfigService) {
     const pool = new Pool({
       connectionString: config.getOrThrow<string>('DATABASE_URL'),

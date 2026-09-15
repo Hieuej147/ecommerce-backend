@@ -31,9 +31,7 @@ export class ClerkAuthGuard implements CanActivate {
       return true;
     }
 
-    const request = context
-      .switchToHttp()
-      .getRequest<AuthenticatedRequest>();
+    const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
 
     // Support internal agent service authentication
     const internalToken = this.config?.get<string>('AGENT_INTERNAL_TOKEN');

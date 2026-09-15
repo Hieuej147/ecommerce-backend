@@ -37,11 +37,20 @@ export class CatalogController {
   updateProduct(request: UpdateProductRequest, metadata?: Metadata) {
     return this.catalogService.updateProduct(request, this.role(metadata));
   }
-  archiveProduct(request: ArchiveProductRequest, metadata?: Metadata): Promise<Empty> {
+  archiveProduct(
+    request: ArchiveProductRequest,
+    metadata?: Metadata,
+  ): Promise<Empty> {
     return this.catalogService.archiveProduct(request, this.role(metadata));
   }
-  getInventoryMetrics(request: GetInventoryMetricsRequest, metadata?: Metadata) {
-    return this.catalogService.getInventoryMetrics(request, this.role(metadata));
+  getInventoryMetrics(
+    request: GetInventoryMetricsRequest,
+    metadata?: Metadata,
+  ) {
+    return this.catalogService.getInventoryMetrics(
+      request,
+      this.role(metadata),
+    );
   }
   reserveStock(request: ReserveStockRequest) {
     return this.catalogService.reserveStock(request);
@@ -49,7 +58,9 @@ export class CatalogController {
   releaseStock(request: ReleaseStockRequest): Promise<Empty> {
     return this.catalogService.releaseStock(request);
   }
-  getUploadPresignedUrl(request: GetUploadUrlRequest): Promise<GetUploadUrlResponse> {
+  getUploadPresignedUrl(
+    request: GetUploadUrlRequest,
+  ): Promise<GetUploadUrlResponse> {
     return this.catalogService.getUploadPresignedUrl(request);
   }
 }

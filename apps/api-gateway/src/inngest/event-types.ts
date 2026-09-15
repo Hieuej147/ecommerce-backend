@@ -8,7 +8,12 @@ export const INNGEST_EVENTS = {
 export type UserCreatedEvent = {
   id: string;
   name: typeof INNGEST_EVENTS.userCreated;
-  data: { userId: string; email: string; displayName: string; occurredAt: string };
+  data: {
+    userId: string;
+    email: string;
+    displayName: string;
+    occurredAt: string;
+  };
 };
 
 export type OrderCreatedEvent = {

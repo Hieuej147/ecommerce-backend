@@ -9,8 +9,20 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiParam, ApiBearerAuth, ApiExcludeEndpoint } from '@nestjs/swagger';
-import { CheckoutBodyDto, CheckoutResponseDto, PaymentDto } from '../swagger/dtos';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiQuery,
+  ApiParam,
+  ApiBearerAuth,
+  ApiExcludeEndpoint,
+} from '@nestjs/swagger';
+import {
+  CheckoutBodyDto,
+  CheckoutResponseDto,
+  PaymentDto,
+} from '../swagger/dtos';
 import type { Request } from 'express';
 import { Public } from '../auth/decorators/public.decorator';
 import { PaymentsGrpcService } from './payments.grpc.service';
@@ -34,19 +46,30 @@ export class PaymentsController {
   @ApiOperation({ summary: 'Create checkout session' })
   @ApiResponse({ status: 201, type: CheckoutResponseDto })
   checkout(@Body() body: CheckoutBodyDto, @CurrentActor() actor: ActorContext) {
-    return this.payments.checkout({
-      orderId: body.orderId || '',
-      successUrl: body.successUrl || '',
-      cancelUrl: body.cancelUrl || '',
-      idempotencyKey: body.idempotencyKey || '',
-    }, createActorMetadata(actor));
+    return this.payments.checkout(
+      {
+        orderId: body.orderId || '',
+        successUrl: body.successUrl || '',
+        cancelUrl: body.cancelUrl || '',
+        idempotencyKey: body.idempotencyKey || '',
+      },
+      createActorMetadata(actor),
+    );
   }
   @UseGuards(AdminGuard)
   @Get('admin/metrics')
   @ApiExcludeEndpoint()
-  async metrics(@Query('from') from: string | undefined, @Query('to') to: string | undefined, @CurrentActor() actor: ActorContext) {
-    const res = await this.payments.metrics({ fromAt: from, toAt: to }, createActorMetadata(actor)) as any;
-    const toNumber = (v: any) => (v && typeof v === 'object' && 'low' in v ? Number(v.low) : Number(v) || 0);
+  async metrics(
+    @Query('from') from: string | undefined,
+    @Query('to') to: string | undefined,
+    @CurrentActor() actor: ActorContext,
+  ) {
+    const res = (await this.payments.metrics(
+      { fromAt: from, toAt: to },
+      createActorMetadata(actor),
+    )) as any;
+    const toNumber = (v: any) =>
+      v && typeof v === 'object' && 'low' in v ? Number(v.low) : Number(v) || 0;
     return {
       totalCount: toNumber(res?.totalCount),
       paidCount: toNumber(res?.paidCount),
@@ -79,10 +102,14 @@ export class PaymentsController {
     return result;
   }
 
-
-  private async publishPaymentEvent(result: { paymentId: string; orderId: string; paymentStatus: string; providerEventId: string }) {
+  private async publishPaymentEvent(result: {
+    paymentId: string;
+    orderId: string;
+    paymentStatus: string;
+    providerEventId: string;
+  }) {
     try {
-      const order = await this.orders.get(result.orderId) as Order;
+      const order = (await this.orders.get(result.orderId)) as Order;
       await this.inngest.paymentStatusChanged({
         paymentId: result.paymentId,
         orderId: result.orderId,
@@ -103,4 +130,3 @@ export class PaymentsController {
     }
   }
 }
-

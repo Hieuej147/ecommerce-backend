@@ -116,7 +116,10 @@ describe('NotificationsService', () => {
 
   it('marks a notification as read when it belongs to customer', async () => {
     const mockDate = new Date();
-    prisma.notification.findFirst.mockResolvedValue({ id: 'notif_1', userId: 'user_cust_1' });
+    prisma.notification.findFirst.mockResolvedValue({
+      id: 'notif_1',
+      userId: 'user_cust_1',
+    });
     prisma.notification.update.mockResolvedValue({
       id: 'notif_1',
       read: true,
@@ -138,9 +141,9 @@ describe('NotificationsService', () => {
   it('throws NotFoundException when marking a notification not belonging to actor', async () => {
     prisma.notification.findFirst.mockResolvedValue(null);
 
-    await expect(service.markAsRead('notif_foreign', customerActor)).rejects.toThrow(
-      NotFoundException,
-    );
+    await expect(
+      service.markAsRead('notif_foreign', customerActor),
+    ).rejects.toThrow(NotFoundException);
   });
 
   it('marks all as read for user scope', async () => {

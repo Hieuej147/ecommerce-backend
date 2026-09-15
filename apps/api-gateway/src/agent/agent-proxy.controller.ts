@@ -49,7 +49,8 @@ export class AgentProxyController {
     try {
       const auth = getAuth(request);
       if (auth?.userId) {
-        const claims = auth.sessionClaims as Record<string, unknown> | undefined;
+        const claims = auth.sessionClaims as
+          Record<string, unknown> | undefined;
         return toActorContext({
           ...auth,
           role: roleFromSessionClaims(claims),
@@ -61,7 +62,9 @@ export class AgentProxyController {
     }
 
     const internalToken = request.header('x-internal-service-token');
-    const configuredInternalToken = this.config.get<string>('AGENT_INTERNAL_TOKEN');
+    const configuredInternalToken = this.config.get<string>(
+      'AGENT_INTERNAL_TOKEN',
+    );
     const forwardedUserId = request.header('x-user-id');
     if (
       internalToken &&

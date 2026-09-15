@@ -15,10 +15,14 @@ export class PaymentsGrpcService implements OnModuleInit {
     input: Parameters<PaymentServiceClient['createCheckoutSession']>[0],
     metadata?: Metadata,
   ) {
-    return firstValueFrom((this.service.createCheckoutSession as any)(input, metadata));
+    return firstValueFrom(
+      (this.service.createCheckoutSession as any)(input, metadata),
+    );
   }
   get(id: string, metadata?: Metadata) {
-    return firstValueFrom((this.service.getPayment as any)({ paymentId: id }, metadata));
+    return firstValueFrom(
+      (this.service.getPayment as any)({ paymentId: id }, metadata),
+    );
   }
   webhook(rawBody: Buffer, signature: string) {
     return firstValueFrom(
@@ -26,6 +30,11 @@ export class PaymentsGrpcService implements OnModuleInit {
     );
   }
   metrics(input: { fromAt?: string; toAt?: string }, metadata?: Metadata) {
-    return firstValueFrom((this.service.getPaymentMetrics as any)({ fromAt: input.fromAt ?? '', toAt: input.toAt ?? '' }, metadata));
+    return firstValueFrom(
+      (this.service.getPaymentMetrics as any)(
+        { fromAt: input.fromAt ?? '', toAt: input.toAt ?? '' },
+        metadata,
+      ),
+    );
   }
 }

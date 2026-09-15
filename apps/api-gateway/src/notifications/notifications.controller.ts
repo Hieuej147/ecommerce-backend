@@ -28,10 +28,28 @@ export class NotificationsController {
   constructor(private readonly notificationsService: NotificationsService) {}
 
   @Get()
-  @ApiOperation({ summary: 'List notifications for the current authenticated user or admin' })
-  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Max items to return (default 50)' })
-  @ApiQuery({ name: 'unreadOnly', required: false, type: Boolean, description: 'Only return unread notifications' })
-  @ApiQuery({ name: 'type', required: false, type: String, description: 'Filter by notification type or category (orders, payments, etc.)' })
+  @ApiOperation({
+    summary: 'List notifications for the current authenticated user or admin',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Max items to return (default 50)',
+  })
+  @ApiQuery({
+    name: 'unreadOnly',
+    required: false,
+    type: Boolean,
+    description: 'Only return unread notifications',
+  })
+  @ApiQuery({
+    name: 'type',
+    required: false,
+    type: String,
+    description:
+      'Filter by notification type or category (orders, payments, etc.)',
+  })
   @ApiResponse({ status: 200, type: [NotificationDto] })
   async list(
     @CurrentActor() actor: ActorContext,

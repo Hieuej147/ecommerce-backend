@@ -262,8 +262,14 @@ export class OrderService implements OrderServiceController {
           status: OrderStatus.PENDING_PAYMENT,
         },
       }),
-      this.prisma.order.aggregate({ where: paidWhere, _sum: { totalAmountMinor: true } }),
-      this.prisma.order.findFirst({ where: paidWhere, select: { currency: true } }),
+      this.prisma.order.aggregate({
+        where: paidWhere,
+        _sum: { totalAmountMinor: true },
+      }),
+      this.prisma.order.findFirst({
+        where: paidWhere,
+        select: { currency: true },
+      }),
     ]);
     return {
       orderCount: count,

@@ -5,13 +5,16 @@
 // source: payment.proto
 
 /* eslint-disable */
-import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
-import type { handleUnaryCall, UntypedServiceImplementation } from "@grpc/grpc-js";
-import { GrpcMethod, GrpcStreamMethod } from "@nestjs/microservices";
-import { Observable } from "rxjs";
-import { Money } from "./common";
+import { BinaryReader, BinaryWriter } from '@bufbuild/protobuf/wire';
+import type {
+  handleUnaryCall,
+  UntypedServiceImplementation,
+} from '@grpc/grpc-js';
+import { GrpcMethod, GrpcStreamMethod } from '@nestjs/microservices';
+import { Observable } from 'rxjs';
+import { Money } from './common';
 
-export const protobufPackage = "payment.v1";
+export const protobufPackage = 'payment.v1';
 
 export interface CheckoutSession {
   paymentId: string;
@@ -68,34 +71,44 @@ export interface PaymentMetrics {
   currency: string;
 }
 
-export const PAYMENT_V1_PACKAGE_NAME = "payment.v1";
+export const PAYMENT_V1_PACKAGE_NAME = 'payment.v1';
 
 function createBaseCheckoutSession(): CheckoutSession {
-  return { paymentId: "", orderId: "", checkoutUrl: "", providerSessionId: "", status: "" };
+  return {
+    paymentId: '',
+    orderId: '',
+    checkoutUrl: '',
+    providerSessionId: '',
+    status: '',
+  };
 }
 
 export const CheckoutSession: MessageFns<CheckoutSession> = {
-  encode(message: CheckoutSession, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.paymentId !== "") {
+  encode(
+    message: CheckoutSession,
+    writer: BinaryWriter = new BinaryWriter(),
+  ): BinaryWriter {
+    if (message.paymentId !== '') {
       writer.uint32(10).string(message.paymentId);
     }
-    if (message.orderId !== "") {
+    if (message.orderId !== '') {
       writer.uint32(18).string(message.orderId);
     }
-    if (message.checkoutUrl !== "") {
+    if (message.checkoutUrl !== '') {
       writer.uint32(26).string(message.checkoutUrl);
     }
-    if (message.providerSessionId !== "") {
+    if (message.providerSessionId !== '') {
       writer.uint32(34).string(message.providerSessionId);
     }
-    if (message.status !== "") {
+    if (message.status !== '') {
       writer.uint32(42).string(message.status);
     }
     return writer;
   },
 
   decode(input: BinaryReader | Uint8Array, length?: number): CheckoutSession {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const reader =
+      input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseCheckoutSession();
     while (reader.pos < end) {
@@ -153,48 +166,52 @@ export const CheckoutSession: MessageFns<CheckoutSession> = {
 
 function createBasePayment(): Payment {
   return {
-    id: "",
-    orderId: "",
-    userId: "",
+    id: '',
+    orderId: '',
+    userId: '',
     amount: undefined,
-    status: "",
-    provider: "",
-    providerPaymentId: "",
-    createdAt: "",
+    status: '',
+    provider: '',
+    providerPaymentId: '',
+    createdAt: '',
   };
 }
 
 export const Payment: MessageFns<Payment> = {
-  encode(message: Payment, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.id !== "") {
+  encode(
+    message: Payment,
+    writer: BinaryWriter = new BinaryWriter(),
+  ): BinaryWriter {
+    if (message.id !== '') {
       writer.uint32(10).string(message.id);
     }
-    if (message.orderId !== "") {
+    if (message.orderId !== '') {
       writer.uint32(18).string(message.orderId);
     }
-    if (message.userId !== "") {
+    if (message.userId !== '') {
       writer.uint32(26).string(message.userId);
     }
     if (message.amount !== undefined) {
       Money.encode(message.amount, writer.uint32(34).fork()).join();
     }
-    if (message.status !== "") {
+    if (message.status !== '') {
       writer.uint32(42).string(message.status);
     }
-    if (message.provider !== "") {
+    if (message.provider !== '') {
       writer.uint32(50).string(message.provider);
     }
-    if (message.providerPaymentId !== "") {
+    if (message.providerPaymentId !== '') {
       writer.uint32(58).string(message.providerPaymentId);
     }
-    if (message.createdAt !== "") {
+    if (message.createdAt !== '') {
       writer.uint32(66).string(message.createdAt);
     }
     return writer;
   },
 
   decode(input: BinaryReader | Uint8Array, length?: number): Payment {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const reader =
+      input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBasePayment();
     while (reader.pos < end) {
@@ -275,89 +292,101 @@ export const Payment: MessageFns<Payment> = {
 };
 
 function createBaseCreateCheckoutSessionRequest(): CreateCheckoutSessionRequest {
-  return { orderId: "", successUrl: "", cancelUrl: "", idempotencyKey: "" };
+  return { orderId: '', successUrl: '', cancelUrl: '', idempotencyKey: '' };
 }
 
-export const CreateCheckoutSessionRequest: MessageFns<CreateCheckoutSessionRequest> = {
-  encode(message: CreateCheckoutSessionRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.orderId !== "") {
-      writer.uint32(10).string(message.orderId);
-    }
-    if (message.successUrl !== "") {
-      writer.uint32(18).string(message.successUrl);
-    }
-    if (message.cancelUrl !== "") {
-      writer.uint32(26).string(message.cancelUrl);
-    }
-    if (message.idempotencyKey !== "") {
-      writer.uint32(34).string(message.idempotencyKey);
-    }
-    return writer;
-  },
-
-  decode(input: BinaryReader | Uint8Array, length?: number): CreateCheckoutSessionRequest {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseCreateCheckoutSessionRequest();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1: {
-          if (tag !== 10) {
-            break;
-          }
-
-          message.orderId = reader.string();
-          continue;
-        }
-        case 2: {
-          if (tag !== 18) {
-            break;
-          }
-
-          message.successUrl = reader.string();
-          continue;
-        }
-        case 3: {
-          if (tag !== 26) {
-            break;
-          }
-
-          message.cancelUrl = reader.string();
-          continue;
-        }
-        case 4: {
-          if (tag !== 34) {
-            break;
-          }
-
-          message.idempotencyKey = reader.string();
-          continue;
-        }
+export const CreateCheckoutSessionRequest: MessageFns<CreateCheckoutSessionRequest> =
+  {
+    encode(
+      message: CreateCheckoutSessionRequest,
+      writer: BinaryWriter = new BinaryWriter(),
+    ): BinaryWriter {
+      if (message.orderId !== '') {
+        writer.uint32(10).string(message.orderId);
       }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
+      if (message.successUrl !== '') {
+        writer.uint32(18).string(message.successUrl);
       }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
-};
+      if (message.cancelUrl !== '') {
+        writer.uint32(26).string(message.cancelUrl);
+      }
+      if (message.idempotencyKey !== '') {
+        writer.uint32(34).string(message.idempotencyKey);
+      }
+      return writer;
+    },
+
+    decode(
+      input: BinaryReader | Uint8Array,
+      length?: number,
+    ): CreateCheckoutSessionRequest {
+      const reader =
+        input instanceof BinaryReader ? input : new BinaryReader(input);
+      const end = length === undefined ? reader.len : reader.pos + length;
+      const message = createBaseCreateCheckoutSessionRequest();
+      while (reader.pos < end) {
+        const tag = reader.uint32();
+        switch (tag >>> 3) {
+          case 1: {
+            if (tag !== 10) {
+              break;
+            }
+
+            message.orderId = reader.string();
+            continue;
+          }
+          case 2: {
+            if (tag !== 18) {
+              break;
+            }
+
+            message.successUrl = reader.string();
+            continue;
+          }
+          case 3: {
+            if (tag !== 26) {
+              break;
+            }
+
+            message.cancelUrl = reader.string();
+            continue;
+          }
+          case 4: {
+            if (tag !== 34) {
+              break;
+            }
+
+            message.idempotencyKey = reader.string();
+            continue;
+          }
+        }
+        if ((tag & 7) === 4 || tag === 0) {
+          break;
+        }
+        reader.skip(tag & 7);
+      }
+      return message;
+    },
+  };
 
 function createBaseGetPaymentRequest(): GetPaymentRequest {
-  return { paymentId: "" };
+  return { paymentId: '' };
 }
 
 export const GetPaymentRequest: MessageFns<GetPaymentRequest> = {
-  encode(message: GetPaymentRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.paymentId !== "") {
+  encode(
+    message: GetPaymentRequest,
+    writer: BinaryWriter = new BinaryWriter(),
+  ): BinaryWriter {
+    if (message.paymentId !== '') {
       writer.uint32(10).string(message.paymentId);
     }
     return writer;
   },
 
   decode(input: BinaryReader | Uint8Array, length?: number): GetPaymentRequest {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const reader =
+      input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGetPaymentRequest();
     while (reader.pos < end) {
@@ -382,22 +411,29 @@ export const GetPaymentRequest: MessageFns<GetPaymentRequest> = {
 };
 
 function createBaseProcessWebhookRequest(): ProcessWebhookRequest {
-  return { rawBody: new Uint8Array(0), stripeSignature: "" };
+  return { rawBody: new Uint8Array(0), stripeSignature: '' };
 }
 
 export const ProcessWebhookRequest: MessageFns<ProcessWebhookRequest> = {
-  encode(message: ProcessWebhookRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+  encode(
+    message: ProcessWebhookRequest,
+    writer: BinaryWriter = new BinaryWriter(),
+  ): BinaryWriter {
     if (message.rawBody.length !== 0) {
       writer.uint32(10).bytes(message.rawBody);
     }
-    if (message.stripeSignature !== "") {
+    if (message.stripeSignature !== '') {
       writer.uint32(18).string(message.stripeSignature);
     }
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): ProcessWebhookRequest {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+  decode(
+    input: BinaryReader | Uint8Array,
+    length?: number,
+  ): ProcessWebhookRequest {
+    const reader =
+      input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseProcessWebhookRequest();
     while (reader.pos < end) {
@@ -430,28 +466,35 @@ export const ProcessWebhookRequest: MessageFns<ProcessWebhookRequest> = {
 };
 
 function createBaseProcessWebhookResponse(): ProcessWebhookResponse {
-  return { orderId: "", paymentId: "", paymentStatus: "", providerEventId: "" };
+  return { orderId: '', paymentId: '', paymentStatus: '', providerEventId: '' };
 }
 
 export const ProcessWebhookResponse: MessageFns<ProcessWebhookResponse> = {
-  encode(message: ProcessWebhookResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.orderId !== "") {
+  encode(
+    message: ProcessWebhookResponse,
+    writer: BinaryWriter = new BinaryWriter(),
+  ): BinaryWriter {
+    if (message.orderId !== '') {
       writer.uint32(10).string(message.orderId);
     }
-    if (message.paymentId !== "") {
+    if (message.paymentId !== '') {
       writer.uint32(18).string(message.paymentId);
     }
-    if (message.paymentStatus !== "") {
+    if (message.paymentStatus !== '') {
       writer.uint32(26).string(message.paymentStatus);
     }
-    if (message.providerEventId !== "") {
+    if (message.providerEventId !== '') {
       writer.uint32(34).string(message.providerEventId);
     }
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): ProcessWebhookResponse {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+  decode(
+    input: BinaryReader | Uint8Array,
+    length?: number,
+  ): ProcessWebhookResponse {
+    const reader =
+      input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseProcessWebhookResponse();
     while (reader.pos < end) {
@@ -500,22 +543,29 @@ export const ProcessWebhookResponse: MessageFns<ProcessWebhookResponse> = {
 };
 
 function createBaseGetPaymentMetricsRequest(): GetPaymentMetricsRequest {
-  return { fromAt: "", toAt: "" };
+  return { fromAt: '', toAt: '' };
 }
 
 export const GetPaymentMetricsRequest: MessageFns<GetPaymentMetricsRequest> = {
-  encode(message: GetPaymentMetricsRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.fromAt !== "") {
+  encode(
+    message: GetPaymentMetricsRequest,
+    writer: BinaryWriter = new BinaryWriter(),
+  ): BinaryWriter {
+    if (message.fromAt !== '') {
       writer.uint32(10).string(message.fromAt);
     }
-    if (message.toAt !== "") {
+    if (message.toAt !== '') {
       writer.uint32(18).string(message.toAt);
     }
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): GetPaymentMetricsRequest {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+  decode(
+    input: BinaryReader | Uint8Array,
+    length?: number,
+  ): GetPaymentMetricsRequest {
+    const reader =
+      input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGetPaymentMetricsRequest();
     while (reader.pos < end) {
@@ -548,11 +598,20 @@ export const GetPaymentMetricsRequest: MessageFns<GetPaymentMetricsRequest> = {
 };
 
 function createBasePaymentMetrics(): PaymentMetrics {
-  return { totalCount: 0, paidCount: 0, failedCount: 0, pendingCount: 0, currency: "" };
+  return {
+    totalCount: 0,
+    paidCount: 0,
+    failedCount: 0,
+    pendingCount: 0,
+    currency: '',
+  };
 }
 
 export const PaymentMetrics: MessageFns<PaymentMetrics> = {
-  encode(message: PaymentMetrics, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+  encode(
+    message: PaymentMetrics,
+    writer: BinaryWriter = new BinaryWriter(),
+  ): BinaryWriter {
     if (message.totalCount !== 0) {
       writer.uint32(8).int64(message.totalCount);
     }
@@ -565,14 +624,15 @@ export const PaymentMetrics: MessageFns<PaymentMetrics> = {
     if (message.pendingCount !== 0) {
       writer.uint32(32).int64(message.pendingCount);
     }
-    if (message.currency !== "") {
+    if (message.currency !== '') {
       writer.uint32(42).string(message.currency);
     }
     return writer;
   },
 
   decode(input: BinaryReader | Uint8Array, length?: number): PaymentMetrics {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const reader =
+      input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBasePaymentMetrics();
     while (reader.pos < end) {
@@ -629,13 +689,19 @@ export const PaymentMetrics: MessageFns<PaymentMetrics> = {
 };
 
 export interface PaymentServiceClient {
-  createCheckoutSession(request: CreateCheckoutSessionRequest): Observable<CheckoutSession>;
+  createCheckoutSession(
+    request: CreateCheckoutSessionRequest,
+  ): Observable<CheckoutSession>;
 
   getPayment(request: GetPaymentRequest): Observable<Payment>;
 
-  processWebhook(request: ProcessWebhookRequest): Observable<ProcessWebhookResponse>;
+  processWebhook(
+    request: ProcessWebhookRequest,
+  ): Observable<ProcessWebhookResponse>;
 
-  getPaymentMetrics(request: GetPaymentMetricsRequest): Observable<PaymentMetrics>;
+  getPaymentMetrics(
+    request: GetPaymentMetricsRequest,
+  ): Observable<PaymentMetrics>;
 }
 
 export interface PaymentServiceController {
@@ -643,11 +709,16 @@ export interface PaymentServiceController {
     request: CreateCheckoutSessionRequest,
   ): Promise<CheckoutSession> | Observable<CheckoutSession> | CheckoutSession;
 
-  getPayment(request: GetPaymentRequest): Promise<Payment> | Observable<Payment> | Payment;
+  getPayment(
+    request: GetPaymentRequest,
+  ): Promise<Payment> | Observable<Payment> | Payment;
 
   processWebhook(
     request: ProcessWebhookRequest,
-  ): Promise<ProcessWebhookResponse> | Observable<ProcessWebhookResponse> | ProcessWebhookResponse;
+  ):
+    | Promise<ProcessWebhookResponse>
+    | Observable<ProcessWebhookResponse>
+    | ProcessWebhookResponse;
 
   getPaymentMetrics(
     request: GetPaymentMetricsRequest,
@@ -656,79 +727,115 @@ export interface PaymentServiceController {
 
 export function PaymentServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ["createCheckoutSession", "getPayment", "processWebhook", "getPaymentMetrics"];
+    const grpcMethods: string[] = [
+      'createCheckoutSession',
+      'getPayment',
+      'processWebhook',
+      'getPaymentMetrics',
+    ];
     for (const method of grpcMethods) {
-      const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcMethod("PaymentService", method)(constructor.prototype[method], method, descriptor);
+      const descriptor: any = Reflect.getOwnPropertyDescriptor(
+        constructor.prototype,
+        method,
+      );
+      GrpcMethod('PaymentService', method)(
+        constructor.prototype[method],
+        method,
+        descriptor,
+      );
     }
     const grpcStreamMethods: string[] = [];
     for (const method of grpcStreamMethods) {
-      const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcStreamMethod("PaymentService", method)(constructor.prototype[method], method, descriptor);
+      const descriptor: any = Reflect.getOwnPropertyDescriptor(
+        constructor.prototype,
+        method,
+      );
+      GrpcStreamMethod('PaymentService', method)(
+        constructor.prototype[method],
+        method,
+        descriptor,
+      );
     }
   };
 }
 
-export const PAYMENT_SERVICE_NAME = "PaymentService";
+export const PAYMENT_SERVICE_NAME = 'PaymentService';
 
 export type PaymentServiceService = typeof PaymentServiceService;
 export const PaymentServiceService = {
   createCheckoutSession: {
-    path: "/payment.v1.PaymentService/CreateCheckoutSession" as const,
+    path: '/payment.v1.PaymentService/CreateCheckoutSession' as const,
     requestStream: false as const,
     responseStream: false as const,
     requestSerialize: (value: CreateCheckoutSessionRequest): Buffer =>
       Buffer.from(CreateCheckoutSessionRequest.encode(value).finish()),
-    requestDeserialize: (value: Buffer): CreateCheckoutSessionRequest => CreateCheckoutSessionRequest.decode(value),
-    responseSerialize: (value: CheckoutSession): Buffer => Buffer.from(CheckoutSession.encode(value).finish()),
-    responseDeserialize: (value: Buffer): CheckoutSession => CheckoutSession.decode(value),
+    requestDeserialize: (value: Buffer): CreateCheckoutSessionRequest =>
+      CreateCheckoutSessionRequest.decode(value),
+    responseSerialize: (value: CheckoutSession): Buffer =>
+      Buffer.from(CheckoutSession.encode(value).finish()),
+    responseDeserialize: (value: Buffer): CheckoutSession =>
+      CheckoutSession.decode(value),
   },
   getPayment: {
-    path: "/payment.v1.PaymentService/GetPayment" as const,
+    path: '/payment.v1.PaymentService/GetPayment' as const,
     requestStream: false as const,
     responseStream: false as const,
-    requestSerialize: (value: GetPaymentRequest): Buffer => Buffer.from(GetPaymentRequest.encode(value).finish()),
-    requestDeserialize: (value: Buffer): GetPaymentRequest => GetPaymentRequest.decode(value),
-    responseSerialize: (value: Payment): Buffer => Buffer.from(Payment.encode(value).finish()),
+    requestSerialize: (value: GetPaymentRequest): Buffer =>
+      Buffer.from(GetPaymentRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): GetPaymentRequest =>
+      GetPaymentRequest.decode(value),
+    responseSerialize: (value: Payment): Buffer =>
+      Buffer.from(Payment.encode(value).finish()),
     responseDeserialize: (value: Buffer): Payment => Payment.decode(value),
   },
   processWebhook: {
-    path: "/payment.v1.PaymentService/ProcessWebhook" as const,
+    path: '/payment.v1.PaymentService/ProcessWebhook' as const,
     requestStream: false as const,
     responseStream: false as const,
     requestSerialize: (value: ProcessWebhookRequest): Buffer =>
       Buffer.from(ProcessWebhookRequest.encode(value).finish()),
-    requestDeserialize: (value: Buffer): ProcessWebhookRequest => ProcessWebhookRequest.decode(value),
+    requestDeserialize: (value: Buffer): ProcessWebhookRequest =>
+      ProcessWebhookRequest.decode(value),
     responseSerialize: (value: ProcessWebhookResponse): Buffer =>
       Buffer.from(ProcessWebhookResponse.encode(value).finish()),
-    responseDeserialize: (value: Buffer): ProcessWebhookResponse => ProcessWebhookResponse.decode(value),
+    responseDeserialize: (value: Buffer): ProcessWebhookResponse =>
+      ProcessWebhookResponse.decode(value),
   },
   getPaymentMetrics: {
-    path: "/payment.v1.PaymentService/GetPaymentMetrics" as const,
+    path: '/payment.v1.PaymentService/GetPaymentMetrics' as const,
     requestStream: false as const,
     responseStream: false as const,
     requestSerialize: (value: GetPaymentMetricsRequest): Buffer =>
       Buffer.from(GetPaymentMetricsRequest.encode(value).finish()),
-    requestDeserialize: (value: Buffer): GetPaymentMetricsRequest => GetPaymentMetricsRequest.decode(value),
-    responseSerialize: (value: PaymentMetrics): Buffer => Buffer.from(PaymentMetrics.encode(value).finish()),
-    responseDeserialize: (value: Buffer): PaymentMetrics => PaymentMetrics.decode(value),
+    requestDeserialize: (value: Buffer): GetPaymentMetricsRequest =>
+      GetPaymentMetricsRequest.decode(value),
+    responseSerialize: (value: PaymentMetrics): Buffer =>
+      Buffer.from(PaymentMetrics.encode(value).finish()),
+    responseDeserialize: (value: Buffer): PaymentMetrics =>
+      PaymentMetrics.decode(value),
   },
 } as const;
 
 export interface PaymentServiceServer extends UntypedServiceImplementation {
-  createCheckoutSession: handleUnaryCall<CreateCheckoutSessionRequest, CheckoutSession>;
+  createCheckoutSession: handleUnaryCall<
+    CreateCheckoutSessionRequest,
+    CheckoutSession
+  >;
   getPayment: handleUnaryCall<GetPaymentRequest, Payment>;
-  processWebhook: handleUnaryCall<ProcessWebhookRequest, ProcessWebhookResponse>;
+  processWebhook: handleUnaryCall<
+    ProcessWebhookRequest,
+    ProcessWebhookResponse
+  >;
   getPaymentMetrics: handleUnaryCall<GetPaymentMetricsRequest, PaymentMetrics>;
 }
 
 function longToNumber(int64: { toString(): string }): number {
   const num = globalThis.Number(int64.toString());
   if (num > globalThis.Number.MAX_SAFE_INTEGER) {
-    throw new globalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
+    throw new globalThis.Error('Value is larger than Number.MAX_SAFE_INTEGER');
   }
   if (num < globalThis.Number.MIN_SAFE_INTEGER) {
-    throw new globalThis.Error("Value is smaller than Number.MIN_SAFE_INTEGER");
+    throw new globalThis.Error('Value is smaller than Number.MIN_SAFE_INTEGER');
   }
   return num;
 }

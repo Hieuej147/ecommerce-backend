@@ -19,8 +19,16 @@ export function roleFromSessionClaims(
   for (const candidate of metadataCandidates) {
     if (!candidate || typeof candidate !== 'object') continue;
     const record = candidate as Record<string, unknown>;
-    const nested = record.publicMetadata ?? record.public_metadata ?? record.metadata ?? record;
-    if (nested && typeof nested === 'object' && typeof (nested as Record<string, unknown>).role === 'string') {
+    const nested =
+      record.publicMetadata ??
+      record.public_metadata ??
+      record.metadata ??
+      record;
+    if (
+      nested &&
+      typeof nested === 'object' &&
+      typeof (nested as Record<string, unknown>).role === 'string'
+    ) {
       return (nested as Record<string, unknown>).role === 'admin'
         ? 'admin'
         : 'customer';

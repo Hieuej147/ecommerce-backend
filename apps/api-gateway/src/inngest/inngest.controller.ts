@@ -12,8 +12,14 @@ import { Public } from '../auth/decorators/public.decorator';
 
 const handler = serve({
   client: inngest,
-  functions: [welcomeUserFunction, orderCreatedFunction, paymentStatusFunction, lowStockFunction],
-  serveOrigin: process.env.INNGEST_SERVE_ORIGIN || 'http://localhost:3000/v1/inngest',
+  functions: [
+    welcomeUserFunction,
+    orderCreatedFunction,
+    paymentStatusFunction,
+    lowStockFunction,
+  ],
+  serveOrigin:
+    process.env.INNGEST_SERVE_ORIGIN || 'http://localhost:3000/v1/inngest',
 });
 
 @Controller('inngest')

@@ -23,7 +23,8 @@ export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
   async getUserByClerkId(request: GetUserByClerkIdRequest): Promise<User> {
-    if (!request.clerkId) this.fail(status.INVALID_ARGUMENT, 'clerk_id is required');
+    if (!request.clerkId)
+      this.fail(status.INVALID_ARGUMENT, 'clerk_id is required');
     const user = await this.prisma.user.findUnique({
       where: { clerkId: request.clerkId },
     });
@@ -184,7 +185,10 @@ export class UsersService {
     if (!value) return null;
     const date = new Date(value);
     if (Number.isNaN(date.getTime())) {
-      this.fail(status.INVALID_ARGUMENT, 'clerk_created_at must be an ISO date');
+      this.fail(
+        status.INVALID_ARGUMENT,
+        'clerk_created_at must be an ISO date',
+      );
     }
     return date;
   }
@@ -192,7 +196,8 @@ export class UsersService {
   private toRole(value: string, strict = false): UserRole {
     const normalized = value.trim().toUpperCase();
     if (normalized === UserRole.ADMIN) return UserRole.ADMIN;
-    if (!normalized || normalized === UserRole.CUSTOMER) return UserRole.CUSTOMER;
+    if (!normalized || normalized === UserRole.CUSTOMER)
+      return UserRole.CUSTOMER;
     if (strict) this.fail(status.INVALID_ARGUMENT, 'Invalid user role');
     return UserRole.CUSTOMER;
   }
@@ -214,7 +219,10 @@ export class UsersService {
   }
 
   private isDuplicateEvent(error: unknown): boolean {
-    return error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002';
+    return (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === 'P2002'
+    );
   }
 
   private fail(code: status, message: string): never {

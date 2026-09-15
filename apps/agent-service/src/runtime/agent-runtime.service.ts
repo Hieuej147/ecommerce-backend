@@ -224,9 +224,9 @@ export class AgentRuntimeService implements OnModuleInit {
     }
 
     try {
-      Readable.fromWeb(
-        webResponse.body as unknown as NodeReadableStream,
-      ).pipe(response);
+      Readable.fromWeb(webResponse.body as unknown as NodeReadableStream).pipe(
+        response,
+      );
       await once(response, 'finish');
     } catch (error) {
       if (!response.destroyed) response.destroy(error as Error);

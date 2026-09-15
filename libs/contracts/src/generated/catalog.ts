@@ -5,13 +5,16 @@
 // source: catalog.proto
 
 /* eslint-disable */
-import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
-import type { handleUnaryCall, UntypedServiceImplementation } from "@grpc/grpc-js";
-import { GrpcMethod, GrpcStreamMethod } from "@nestjs/microservices";
-import { Observable } from "rxjs";
-import { Empty, Money, PageInfo, PageRequest } from "./common";
+import { BinaryReader, BinaryWriter } from '@bufbuild/protobuf/wire';
+import type {
+  handleUnaryCall,
+  UntypedServiceImplementation,
+} from '@grpc/grpc-js';
+import { GrpcMethod, GrpcStreamMethod } from '@nestjs/microservices';
+import { Observable } from 'rxjs';
+import { Empty, Money, PageInfo, PageRequest } from './common';
 
-export const protobufPackage = "catalog.v1";
+export const protobufPackage = 'catalog.v1';
 
 export interface Product {
   id: string;
@@ -113,8 +116,7 @@ export interface ReserveStockResponse {
   reserved: boolean;
 }
 
-export interface GetInventoryMetricsRequest {
-}
+export interface GetInventoryMetricsRequest {}
 
 export interface InventoryMetrics {
   totalProducts: number;
@@ -136,21 +138,21 @@ export interface GetUploadUrlResponse {
   publicUrl: string;
 }
 
-export const CATALOG_V1_PACKAGE_NAME = "catalog.v1";
+export const CATALOG_V1_PACKAGE_NAME = 'catalog.v1';
 
 function createBaseProduct(): Product {
   return {
-    id: "",
-    slug: "",
-    name: "",
-    description: "",
+    id: '',
+    slug: '',
+    name: '',
+    description: '',
     price: undefined,
     stockQuantity: 0,
-    status: "",
-    createdAt: "",
-    updatedAt: "",
-    sku: "",
-    categorySlug: "",
+    status: '',
+    createdAt: '',
+    updatedAt: '',
+    sku: '',
+    categorySlug: '',
     reorderPoint: 0,
     images: {},
     colors: [],
@@ -159,17 +161,20 @@ function createBaseProduct(): Product {
 }
 
 export const Product: MessageFns<Product> = {
-  encode(message: Product, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.id !== "") {
+  encode(
+    message: Product,
+    writer: BinaryWriter = new BinaryWriter(),
+  ): BinaryWriter {
+    if (message.id !== '') {
       writer.uint32(10).string(message.id);
     }
-    if (message.slug !== "") {
+    if (message.slug !== '') {
       writer.uint32(18).string(message.slug);
     }
-    if (message.name !== "") {
+    if (message.name !== '') {
       writer.uint32(26).string(message.name);
     }
-    if (message.description !== "") {
+    if (message.description !== '') {
       writer.uint32(34).string(message.description);
     }
     if (message.price !== undefined) {
@@ -178,27 +183,32 @@ export const Product: MessageFns<Product> = {
     if (message.stockQuantity !== 0) {
       writer.uint32(48).int32(message.stockQuantity);
     }
-    if (message.status !== "") {
+    if (message.status !== '') {
       writer.uint32(58).string(message.status);
     }
-    if (message.createdAt !== "") {
+    if (message.createdAt !== '') {
       writer.uint32(66).string(message.createdAt);
     }
-    if (message.updatedAt !== "") {
+    if (message.updatedAt !== '') {
       writer.uint32(74).string(message.updatedAt);
     }
-    if (message.sku !== "") {
+    if (message.sku !== '') {
       writer.uint32(82).string(message.sku);
     }
-    if (message.categorySlug !== "") {
+    if (message.categorySlug !== '') {
       writer.uint32(90).string(message.categorySlug);
     }
     if (message.reorderPoint !== 0) {
       writer.uint32(96).int32(message.reorderPoint);
     }
-    globalThis.Object.entries(message.images).forEach(([key, value]: [string, string]) => {
-      Product_ImagesEntry.encode({ key: key as any, value }, writer.uint32(106).fork()).join();
-    });
+    globalThis.Object.entries(message.images).forEach(
+      ([key, value]: [string, string]) => {
+        Product_ImagesEntry.encode(
+          { key: key as any, value },
+          writer.uint32(106).fork(),
+        ).join();
+      },
+    );
     for (const v of message.colors) {
       writer.uint32(114).string(v!);
     }
@@ -209,7 +219,8 @@ export const Product: MessageFns<Product> = {
   },
 
   decode(input: BinaryReader | Uint8Array, length?: number): Product {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const reader =
+      input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseProduct();
     while (reader.pos < end) {
@@ -349,22 +360,29 @@ export const Product: MessageFns<Product> = {
 };
 
 function createBaseProduct_ImagesEntry(): Product_ImagesEntry {
-  return { key: "", value: "" };
+  return { key: '', value: '' };
 }
 
 export const Product_ImagesEntry: MessageFns<Product_ImagesEntry> = {
-  encode(message: Product_ImagesEntry, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.key !== "") {
+  encode(
+    message: Product_ImagesEntry,
+    writer: BinaryWriter = new BinaryWriter(),
+  ): BinaryWriter {
+    if (message.key !== '') {
       writer.uint32(10).string(message.key);
     }
-    if (message.value !== "") {
+    if (message.value !== '') {
       writer.uint32(18).string(message.value);
     }
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): Product_ImagesEntry {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+  decode(
+    input: BinaryReader | Uint8Array,
+    length?: number,
+  ): Product_ImagesEntry {
+    const reader =
+      input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseProduct_ImagesEntry();
     while (reader.pos < end) {
@@ -397,19 +415,23 @@ export const Product_ImagesEntry: MessageFns<Product_ImagesEntry> = {
 };
 
 function createBaseGetProductRequest(): GetProductRequest {
-  return { productId: "" };
+  return { productId: '' };
 }
 
 export const GetProductRequest: MessageFns<GetProductRequest> = {
-  encode(message: GetProductRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.productId !== "") {
+  encode(
+    message: GetProductRequest,
+    writer: BinaryWriter = new BinaryWriter(),
+  ): BinaryWriter {
+    if (message.productId !== '') {
       writer.uint32(10).string(message.productId);
     }
     return writer;
   },
 
   decode(input: BinaryReader | Uint8Array, length?: number): GetProductRequest {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const reader =
+      input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGetProductRequest();
     while (reader.pos < end) {
@@ -434,25 +456,32 @@ export const GetProductRequest: MessageFns<GetProductRequest> = {
 };
 
 function createBaseListProductsRequest(): ListProductsRequest {
-  return { page: undefined, search: "", status: "" };
+  return { page: undefined, search: '', status: '' };
 }
 
 export const ListProductsRequest: MessageFns<ListProductsRequest> = {
-  encode(message: ListProductsRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+  encode(
+    message: ListProductsRequest,
+    writer: BinaryWriter = new BinaryWriter(),
+  ): BinaryWriter {
     if (message.page !== undefined) {
       PageRequest.encode(message.page, writer.uint32(10).fork()).join();
     }
-    if (message.search !== "") {
+    if (message.search !== '') {
       writer.uint32(18).string(message.search);
     }
-    if (message.status !== "") {
+    if (message.status !== '') {
       writer.uint32(26).string(message.status);
     }
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): ListProductsRequest {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+  decode(
+    input: BinaryReader | Uint8Array,
+    length?: number,
+  ): ListProductsRequest {
+    const reader =
+      input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseListProductsRequest();
     while (reader.pos < end) {
@@ -497,7 +526,10 @@ function createBaseListProductsResponse(): ListProductsResponse {
 }
 
 export const ListProductsResponse: MessageFns<ListProductsResponse> = {
-  encode(message: ListProductsResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+  encode(
+    message: ListProductsResponse,
+    writer: BinaryWriter = new BinaryWriter(),
+  ): BinaryWriter {
     for (const v of message.products) {
       Product.encode(v!, writer.uint32(10).fork()).join();
     }
@@ -507,8 +539,12 @@ export const ListProductsResponse: MessageFns<ListProductsResponse> = {
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): ListProductsResponse {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+  decode(
+    input: BinaryReader | Uint8Array,
+    length?: number,
+  ): ListProductsResponse {
+    const reader =
+      input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseListProductsResponse();
     while (reader.pos < end) {
@@ -542,28 +578,31 @@ export const ListProductsResponse: MessageFns<ListProductsResponse> = {
 
 function createBaseCreateProductRequest(): CreateProductRequest {
   return {
-    slug: "",
-    name: "",
-    description: "",
+    slug: '',
+    name: '',
+    description: '',
     price: undefined,
     stockQuantity: 0,
     images: {},
     colors: [],
     sizes: [],
-    categorySlug: "",
+    categorySlug: '',
     reorderPoint: 0,
   };
 }
 
 export const CreateProductRequest: MessageFns<CreateProductRequest> = {
-  encode(message: CreateProductRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.slug !== "") {
+  encode(
+    message: CreateProductRequest,
+    writer: BinaryWriter = new BinaryWriter(),
+  ): BinaryWriter {
+    if (message.slug !== '') {
       writer.uint32(10).string(message.slug);
     }
-    if (message.name !== "") {
+    if (message.name !== '') {
       writer.uint32(18).string(message.name);
     }
-    if (message.description !== "") {
+    if (message.description !== '') {
       writer.uint32(26).string(message.description);
     }
     if (message.price !== undefined) {
@@ -572,9 +611,14 @@ export const CreateProductRequest: MessageFns<CreateProductRequest> = {
     if (message.stockQuantity !== 0) {
       writer.uint32(40).int32(message.stockQuantity);
     }
-    globalThis.Object.entries(message.images).forEach(([key, value]: [string, string]) => {
-      CreateProductRequest_ImagesEntry.encode({ key: key as any, value }, writer.uint32(50).fork()).join();
-    });
+    globalThis.Object.entries(message.images).forEach(
+      ([key, value]: [string, string]) => {
+        CreateProductRequest_ImagesEntry.encode(
+          { key: key as any, value },
+          writer.uint32(50).fork(),
+        ).join();
+      },
+    );
     for (const v of message.colors) {
       writer.uint32(58).string(v!);
     }
@@ -584,7 +628,7 @@ export const CreateProductRequest: MessageFns<CreateProductRequest> = {
     if (message.sku !== undefined) {
       writer.uint32(74).string(message.sku);
     }
-    if (message.categorySlug !== "") {
+    if (message.categorySlug !== '') {
       writer.uint32(82).string(message.categorySlug);
     }
     if (message.reorderPoint !== 0) {
@@ -593,8 +637,12 @@ export const CreateProductRequest: MessageFns<CreateProductRequest> = {
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): CreateProductRequest {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+  decode(
+    input: BinaryReader | Uint8Array,
+    length?: number,
+  ): CreateProductRequest {
+    const reader =
+      input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseCreateProductRequest();
     while (reader.pos < end) {
@@ -645,7 +693,10 @@ export const CreateProductRequest: MessageFns<CreateProductRequest> = {
             break;
           }
 
-          const entry6 = CreateProductRequest_ImagesEntry.decode(reader, reader.uint32());
+          const entry6 = CreateProductRequest_ImagesEntry.decode(
+            reader,
+            reader.uint32(),
+          );
           if (entry6.value !== undefined) {
             message.images[entry6.key] = entry6.value;
           }
@@ -702,66 +753,85 @@ export const CreateProductRequest: MessageFns<CreateProductRequest> = {
 };
 
 function createBaseCreateProductRequest_ImagesEntry(): CreateProductRequest_ImagesEntry {
-  return { key: "", value: "" };
+  return { key: '', value: '' };
 }
 
-export const CreateProductRequest_ImagesEntry: MessageFns<CreateProductRequest_ImagesEntry> = {
-  encode(message: CreateProductRequest_ImagesEntry, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.key !== "") {
-      writer.uint32(10).string(message.key);
-    }
-    if (message.value !== "") {
-      writer.uint32(18).string(message.value);
-    }
-    return writer;
-  },
-
-  decode(input: BinaryReader | Uint8Array, length?: number): CreateProductRequest_ImagesEntry {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseCreateProductRequest_ImagesEntry();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1: {
-          if (tag !== 10) {
-            break;
-          }
-
-          message.key = reader.string();
-          continue;
-        }
-        case 2: {
-          if (tag !== 18) {
-            break;
-          }
-
-          message.value = reader.string();
-          continue;
-        }
+export const CreateProductRequest_ImagesEntry: MessageFns<CreateProductRequest_ImagesEntry> =
+  {
+    encode(
+      message: CreateProductRequest_ImagesEntry,
+      writer: BinaryWriter = new BinaryWriter(),
+    ): BinaryWriter {
+      if (message.key !== '') {
+        writer.uint32(10).string(message.key);
       }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
+      if (message.value !== '') {
+        writer.uint32(18).string(message.value);
       }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
-};
+      return writer;
+    },
+
+    decode(
+      input: BinaryReader | Uint8Array,
+      length?: number,
+    ): CreateProductRequest_ImagesEntry {
+      const reader =
+        input instanceof BinaryReader ? input : new BinaryReader(input);
+      const end = length === undefined ? reader.len : reader.pos + length;
+      const message = createBaseCreateProductRequest_ImagesEntry();
+      while (reader.pos < end) {
+        const tag = reader.uint32();
+        switch (tag >>> 3) {
+          case 1: {
+            if (tag !== 10) {
+              break;
+            }
+
+            message.key = reader.string();
+            continue;
+          }
+          case 2: {
+            if (tag !== 18) {
+              break;
+            }
+
+            message.value = reader.string();
+            continue;
+          }
+        }
+        if ((tag & 7) === 4 || tag === 0) {
+          break;
+        }
+        reader.skip(tag & 7);
+      }
+      return message;
+    },
+  };
 
 function createBaseUpdateProductRequest(): UpdateProductRequest {
-  return { productId: "", name: "", description: "", price: undefined, images: {}, colors: [], sizes: [] };
+  return {
+    productId: '',
+    name: '',
+    description: '',
+    price: undefined,
+    images: {},
+    colors: [],
+    sizes: [],
+  };
 }
 
 export const UpdateProductRequest: MessageFns<UpdateProductRequest> = {
-  encode(message: UpdateProductRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.productId !== "") {
+  encode(
+    message: UpdateProductRequest,
+    writer: BinaryWriter = new BinaryWriter(),
+  ): BinaryWriter {
+    if (message.productId !== '') {
       writer.uint32(10).string(message.productId);
     }
-    if (message.name !== "") {
+    if (message.name !== '') {
       writer.uint32(18).string(message.name);
     }
-    if (message.description !== "") {
+    if (message.description !== '') {
       writer.uint32(26).string(message.description);
     }
     if (message.price !== undefined) {
@@ -770,9 +840,14 @@ export const UpdateProductRequest: MessageFns<UpdateProductRequest> = {
     if (message.stockQuantity !== undefined) {
       writer.uint32(40).int32(message.stockQuantity);
     }
-    globalThis.Object.entries(message.images).forEach(([key, value]: [string, string]) => {
-      UpdateProductRequest_ImagesEntry.encode({ key: key as any, value }, writer.uint32(50).fork()).join();
-    });
+    globalThis.Object.entries(message.images).forEach(
+      ([key, value]: [string, string]) => {
+        UpdateProductRequest_ImagesEntry.encode(
+          { key: key as any, value },
+          writer.uint32(50).fork(),
+        ).join();
+      },
+    );
     for (const v of message.colors) {
       writer.uint32(58).string(v!);
     }
@@ -794,8 +869,12 @@ export const UpdateProductRequest: MessageFns<UpdateProductRequest> = {
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): UpdateProductRequest {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+  decode(
+    input: BinaryReader | Uint8Array,
+    length?: number,
+  ): UpdateProductRequest {
+    const reader =
+      input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseUpdateProductRequest();
     while (reader.pos < end) {
@@ -846,7 +925,10 @@ export const UpdateProductRequest: MessageFns<UpdateProductRequest> = {
             break;
           }
 
-          const entry6 = UpdateProductRequest_ImagesEntry.decode(reader, reader.uint32());
+          const entry6 = UpdateProductRequest_ImagesEntry.decode(
+            reader,
+            reader.uint32(),
+          );
           if (entry6.value !== undefined) {
             message.images[entry6.key] = entry6.value;
           }
@@ -911,67 +993,82 @@ export const UpdateProductRequest: MessageFns<UpdateProductRequest> = {
 };
 
 function createBaseUpdateProductRequest_ImagesEntry(): UpdateProductRequest_ImagesEntry {
-  return { key: "", value: "" };
+  return { key: '', value: '' };
 }
 
-export const UpdateProductRequest_ImagesEntry: MessageFns<UpdateProductRequest_ImagesEntry> = {
-  encode(message: UpdateProductRequest_ImagesEntry, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.key !== "") {
-      writer.uint32(10).string(message.key);
-    }
-    if (message.value !== "") {
-      writer.uint32(18).string(message.value);
-    }
-    return writer;
-  },
-
-  decode(input: BinaryReader | Uint8Array, length?: number): UpdateProductRequest_ImagesEntry {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseUpdateProductRequest_ImagesEntry();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1: {
-          if (tag !== 10) {
-            break;
-          }
-
-          message.key = reader.string();
-          continue;
-        }
-        case 2: {
-          if (tag !== 18) {
-            break;
-          }
-
-          message.value = reader.string();
-          continue;
-        }
+export const UpdateProductRequest_ImagesEntry: MessageFns<UpdateProductRequest_ImagesEntry> =
+  {
+    encode(
+      message: UpdateProductRequest_ImagesEntry,
+      writer: BinaryWriter = new BinaryWriter(),
+    ): BinaryWriter {
+      if (message.key !== '') {
+        writer.uint32(10).string(message.key);
       }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
+      if (message.value !== '') {
+        writer.uint32(18).string(message.value);
       }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
-};
+      return writer;
+    },
+
+    decode(
+      input: BinaryReader | Uint8Array,
+      length?: number,
+    ): UpdateProductRequest_ImagesEntry {
+      const reader =
+        input instanceof BinaryReader ? input : new BinaryReader(input);
+      const end = length === undefined ? reader.len : reader.pos + length;
+      const message = createBaseUpdateProductRequest_ImagesEntry();
+      while (reader.pos < end) {
+        const tag = reader.uint32();
+        switch (tag >>> 3) {
+          case 1: {
+            if (tag !== 10) {
+              break;
+            }
+
+            message.key = reader.string();
+            continue;
+          }
+          case 2: {
+            if (tag !== 18) {
+              break;
+            }
+
+            message.value = reader.string();
+            continue;
+          }
+        }
+        if ((tag & 7) === 4 || tag === 0) {
+          break;
+        }
+        reader.skip(tag & 7);
+      }
+      return message;
+    },
+  };
 
 function createBaseArchiveProductRequest(): ArchiveProductRequest {
-  return { productId: "" };
+  return { productId: '' };
 }
 
 export const ArchiveProductRequest: MessageFns<ArchiveProductRequest> = {
-  encode(message: ArchiveProductRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.productId !== "") {
+  encode(
+    message: ArchiveProductRequest,
+    writer: BinaryWriter = new BinaryWriter(),
+  ): BinaryWriter {
+    if (message.productId !== '') {
       writer.uint32(10).string(message.productId);
     }
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): ArchiveProductRequest {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+  decode(
+    input: BinaryReader | Uint8Array,
+    length?: number,
+  ): ArchiveProductRequest {
+    const reader =
+      input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseArchiveProductRequest();
     while (reader.pos < end) {
@@ -996,12 +1093,15 @@ export const ArchiveProductRequest: MessageFns<ArchiveProductRequest> = {
 };
 
 function createBaseReserveStockRequest(): ReserveStockRequest {
-  return { reservationId: "", lines: [] };
+  return { reservationId: '', lines: [] };
 }
 
 export const ReserveStockRequest: MessageFns<ReserveStockRequest> = {
-  encode(message: ReserveStockRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.reservationId !== "") {
+  encode(
+    message: ReserveStockRequest,
+    writer: BinaryWriter = new BinaryWriter(),
+  ): BinaryWriter {
+    if (message.reservationId !== '') {
       writer.uint32(10).string(message.reservationId);
     }
     for (const v of message.lines) {
@@ -1010,8 +1110,12 @@ export const ReserveStockRequest: MessageFns<ReserveStockRequest> = {
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): ReserveStockRequest {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+  decode(
+    input: BinaryReader | Uint8Array,
+    length?: number,
+  ): ReserveStockRequest {
+    const reader =
+      input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseReserveStockRequest();
     while (reader.pos < end) {
@@ -1044,19 +1148,26 @@ export const ReserveStockRequest: MessageFns<ReserveStockRequest> = {
 };
 
 function createBaseReleaseStockRequest(): ReleaseStockRequest {
-  return { reservationId: "" };
+  return { reservationId: '' };
 }
 
 export const ReleaseStockRequest: MessageFns<ReleaseStockRequest> = {
-  encode(message: ReleaseStockRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.reservationId !== "") {
+  encode(
+    message: ReleaseStockRequest,
+    writer: BinaryWriter = new BinaryWriter(),
+  ): BinaryWriter {
+    if (message.reservationId !== '') {
       writer.uint32(10).string(message.reservationId);
     }
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): ReleaseStockRequest {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+  decode(
+    input: BinaryReader | Uint8Array,
+    length?: number,
+  ): ReleaseStockRequest {
+    const reader =
+      input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseReleaseStockRequest();
     while (reader.pos < end) {
@@ -1081,12 +1192,15 @@ export const ReleaseStockRequest: MessageFns<ReleaseStockRequest> = {
 };
 
 function createBaseStockLine(): StockLine {
-  return { productId: "", quantity: 0 };
+  return { productId: '', quantity: 0 };
 }
 
 export const StockLine: MessageFns<StockLine> = {
-  encode(message: StockLine, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.productId !== "") {
+  encode(
+    message: StockLine,
+    writer: BinaryWriter = new BinaryWriter(),
+  ): BinaryWriter {
+    if (message.productId !== '') {
       writer.uint32(10).string(message.productId);
     }
     if (message.quantity !== 0) {
@@ -1096,7 +1210,8 @@ export const StockLine: MessageFns<StockLine> = {
   },
 
   decode(input: BinaryReader | Uint8Array, length?: number): StockLine {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const reader =
+      input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseStockLine();
     while (reader.pos < end) {
@@ -1129,12 +1244,15 @@ export const StockLine: MessageFns<StockLine> = {
 };
 
 function createBaseReserveStockResponse(): ReserveStockResponse {
-  return { reservationId: "", reserved: false };
+  return { reservationId: '', reserved: false };
 }
 
 export const ReserveStockResponse: MessageFns<ReserveStockResponse> = {
-  encode(message: ReserveStockResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.reservationId !== "") {
+  encode(
+    message: ReserveStockResponse,
+    writer: BinaryWriter = new BinaryWriter(),
+  ): BinaryWriter {
+    if (message.reservationId !== '') {
       writer.uint32(10).string(message.reservationId);
     }
     if (message.reserved !== false) {
@@ -1143,8 +1261,12 @@ export const ReserveStockResponse: MessageFns<ReserveStockResponse> = {
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): ReserveStockResponse {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+  decode(
+    input: BinaryReader | Uint8Array,
+    length?: number,
+  ): ReserveStockResponse {
+    const reader =
+      input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseReserveStockResponse();
     while (reader.pos < end) {
@@ -1180,34 +1302,50 @@ function createBaseGetInventoryMetricsRequest(): GetInventoryMetricsRequest {
   return {};
 }
 
-export const GetInventoryMetricsRequest: MessageFns<GetInventoryMetricsRequest> = {
-  encode(_: GetInventoryMetricsRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    return writer;
-  },
+export const GetInventoryMetricsRequest: MessageFns<GetInventoryMetricsRequest> =
+  {
+    encode(
+      _: GetInventoryMetricsRequest,
+      writer: BinaryWriter = new BinaryWriter(),
+    ): BinaryWriter {
+      return writer;
+    },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): GetInventoryMetricsRequest {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseGetInventoryMetricsRequest();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
+    decode(
+      input: BinaryReader | Uint8Array,
+      length?: number,
+    ): GetInventoryMetricsRequest {
+      const reader =
+        input instanceof BinaryReader ? input : new BinaryReader(input);
+      const end = length === undefined ? reader.len : reader.pos + length;
+      const message = createBaseGetInventoryMetricsRequest();
+      while (reader.pos < end) {
+        const tag = reader.uint32();
+        switch (tag >>> 3) {
+        }
+        if ((tag & 7) === 4 || tag === 0) {
+          break;
+        }
+        reader.skip(tag & 7);
       }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
-};
+      return message;
+    },
+  };
 
 function createBaseInventoryMetrics(): InventoryMetrics {
-  return { totalProducts: 0, activeProducts: 0, lowStockProducts: 0, outOfStockProducts: 0 };
+  return {
+    totalProducts: 0,
+    activeProducts: 0,
+    lowStockProducts: 0,
+    outOfStockProducts: 0,
+  };
 }
 
 export const InventoryMetrics: MessageFns<InventoryMetrics> = {
-  encode(message: InventoryMetrics, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+  encode(
+    message: InventoryMetrics,
+    writer: BinaryWriter = new BinaryWriter(),
+  ): BinaryWriter {
     if (message.totalProducts !== 0) {
       writer.uint32(8).int64(message.totalProducts);
     }
@@ -1224,7 +1362,8 @@ export const InventoryMetrics: MessageFns<InventoryMetrics> = {
   },
 
   decode(input: BinaryReader | Uint8Array, length?: number): InventoryMetrics {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const reader =
+      input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseInventoryMetrics();
     while (reader.pos < end) {
@@ -1273,28 +1412,35 @@ export const InventoryMetrics: MessageFns<InventoryMetrics> = {
 };
 
 function createBaseGetUploadUrlRequest(): GetUploadUrlRequest {
-  return { fileName: "", contentType: "", folder: "", productId: "" };
+  return { fileName: '', contentType: '', folder: '', productId: '' };
 }
 
 export const GetUploadUrlRequest: MessageFns<GetUploadUrlRequest> = {
-  encode(message: GetUploadUrlRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.fileName !== "") {
+  encode(
+    message: GetUploadUrlRequest,
+    writer: BinaryWriter = new BinaryWriter(),
+  ): BinaryWriter {
+    if (message.fileName !== '') {
       writer.uint32(10).string(message.fileName);
     }
-    if (message.contentType !== "") {
+    if (message.contentType !== '') {
       writer.uint32(18).string(message.contentType);
     }
-    if (message.folder !== "") {
+    if (message.folder !== '') {
       writer.uint32(26).string(message.folder);
     }
-    if (message.productId !== "") {
+    if (message.productId !== '') {
       writer.uint32(34).string(message.productId);
     }
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): GetUploadUrlRequest {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+  decode(
+    input: BinaryReader | Uint8Array,
+    length?: number,
+  ): GetUploadUrlRequest {
+    const reader =
+      input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGetUploadUrlRequest();
     while (reader.pos < end) {
@@ -1343,25 +1489,32 @@ export const GetUploadUrlRequest: MessageFns<GetUploadUrlRequest> = {
 };
 
 function createBaseGetUploadUrlResponse(): GetUploadUrlResponse {
-  return { uploadUrl: "", fileKey: "", publicUrl: "" };
+  return { uploadUrl: '', fileKey: '', publicUrl: '' };
 }
 
 export const GetUploadUrlResponse: MessageFns<GetUploadUrlResponse> = {
-  encode(message: GetUploadUrlResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.uploadUrl !== "") {
+  encode(
+    message: GetUploadUrlResponse,
+    writer: BinaryWriter = new BinaryWriter(),
+  ): BinaryWriter {
+    if (message.uploadUrl !== '') {
       writer.uint32(10).string(message.uploadUrl);
     }
-    if (message.fileKey !== "") {
+    if (message.fileKey !== '') {
       writer.uint32(18).string(message.fileKey);
     }
-    if (message.publicUrl !== "") {
+    if (message.publicUrl !== '') {
       writer.uint32(26).string(message.publicUrl);
     }
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): GetUploadUrlResponse {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+  decode(
+    input: BinaryReader | Uint8Array,
+    length?: number,
+  ): GetUploadUrlResponse {
+    const reader =
+      input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGetUploadUrlResponse();
     while (reader.pos < end) {
@@ -1416,153 +1569,217 @@ export interface CatalogServiceClient {
 
   releaseStock(request: ReleaseStockRequest): Observable<Empty>;
 
-  getInventoryMetrics(request: GetInventoryMetricsRequest): Observable<InventoryMetrics>;
-
-  getUploadPresignedUrl(request: GetUploadUrlRequest): Observable<GetUploadUrlResponse>;
-}
-
-export interface CatalogServiceController {
-  getProduct(request: GetProductRequest): Promise<Product> | Observable<Product> | Product;
-
-  listProducts(
-    request: ListProductsRequest,
-  ): Promise<ListProductsResponse> | Observable<ListProductsResponse> | ListProductsResponse;
-
-  createProduct(request: CreateProductRequest): Promise<Product> | Observable<Product> | Product;
-
-  updateProduct(request: UpdateProductRequest): Promise<Product> | Observable<Product> | Product;
-
-  archiveProduct(request: ArchiveProductRequest): Promise<Empty> | Observable<Empty> | Empty;
-
-  reserveStock(
-    request: ReserveStockRequest,
-  ): Promise<ReserveStockResponse> | Observable<ReserveStockResponse> | ReserveStockResponse;
-
-  releaseStock(request: ReleaseStockRequest): Promise<Empty> | Observable<Empty> | Empty;
-
   getInventoryMetrics(
     request: GetInventoryMetricsRequest,
-  ): Promise<InventoryMetrics> | Observable<InventoryMetrics> | InventoryMetrics;
+  ): Observable<InventoryMetrics>;
 
   getUploadPresignedUrl(
     request: GetUploadUrlRequest,
-  ): Promise<GetUploadUrlResponse> | Observable<GetUploadUrlResponse> | GetUploadUrlResponse;
+  ): Observable<GetUploadUrlResponse>;
+}
+
+export interface CatalogServiceController {
+  getProduct(
+    request: GetProductRequest,
+  ): Promise<Product> | Observable<Product> | Product;
+
+  listProducts(
+    request: ListProductsRequest,
+  ):
+    | Promise<ListProductsResponse>
+    | Observable<ListProductsResponse>
+    | ListProductsResponse;
+
+  createProduct(
+    request: CreateProductRequest,
+  ): Promise<Product> | Observable<Product> | Product;
+
+  updateProduct(
+    request: UpdateProductRequest,
+  ): Promise<Product> | Observable<Product> | Product;
+
+  archiveProduct(
+    request: ArchiveProductRequest,
+  ): Promise<Empty> | Observable<Empty> | Empty;
+
+  reserveStock(
+    request: ReserveStockRequest,
+  ):
+    | Promise<ReserveStockResponse>
+    | Observable<ReserveStockResponse>
+    | ReserveStockResponse;
+
+  releaseStock(
+    request: ReleaseStockRequest,
+  ): Promise<Empty> | Observable<Empty> | Empty;
+
+  getInventoryMetrics(
+    request: GetInventoryMetricsRequest,
+  ):
+    Promise<InventoryMetrics> | Observable<InventoryMetrics> | InventoryMetrics;
+
+  getUploadPresignedUrl(
+    request: GetUploadUrlRequest,
+  ):
+    | Promise<GetUploadUrlResponse>
+    | Observable<GetUploadUrlResponse>
+    | GetUploadUrlResponse;
 }
 
 export function CatalogServiceControllerMethods() {
   return function (constructor: Function) {
     const grpcMethods: string[] = [
-      "getProduct",
-      "listProducts",
-      "createProduct",
-      "updateProduct",
-      "archiveProduct",
-      "reserveStock",
-      "releaseStock",
-      "getInventoryMetrics",
-      "getUploadPresignedUrl",
+      'getProduct',
+      'listProducts',
+      'createProduct',
+      'updateProduct',
+      'archiveProduct',
+      'reserveStock',
+      'releaseStock',
+      'getInventoryMetrics',
+      'getUploadPresignedUrl',
     ];
     for (const method of grpcMethods) {
-      const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcMethod("CatalogService", method)(constructor.prototype[method], method, descriptor);
+      const descriptor: any = Reflect.getOwnPropertyDescriptor(
+        constructor.prototype,
+        method,
+      );
+      GrpcMethod('CatalogService', method)(
+        constructor.prototype[method],
+        method,
+        descriptor,
+      );
     }
     const grpcStreamMethods: string[] = [];
     for (const method of grpcStreamMethods) {
-      const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcStreamMethod("CatalogService", method)(constructor.prototype[method], method, descriptor);
+      const descriptor: any = Reflect.getOwnPropertyDescriptor(
+        constructor.prototype,
+        method,
+      );
+      GrpcStreamMethod('CatalogService', method)(
+        constructor.prototype[method],
+        method,
+        descriptor,
+      );
     }
   };
 }
 
-export const CATALOG_SERVICE_NAME = "CatalogService";
+export const CATALOG_SERVICE_NAME = 'CatalogService';
 
 export type CatalogServiceService = typeof CatalogServiceService;
 export const CatalogServiceService = {
   getProduct: {
-    path: "/catalog.v1.CatalogService/GetProduct" as const,
+    path: '/catalog.v1.CatalogService/GetProduct' as const,
     requestStream: false as const,
     responseStream: false as const,
-    requestSerialize: (value: GetProductRequest): Buffer => Buffer.from(GetProductRequest.encode(value).finish()),
-    requestDeserialize: (value: Buffer): GetProductRequest => GetProductRequest.decode(value),
-    responseSerialize: (value: Product): Buffer => Buffer.from(Product.encode(value).finish()),
+    requestSerialize: (value: GetProductRequest): Buffer =>
+      Buffer.from(GetProductRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): GetProductRequest =>
+      GetProductRequest.decode(value),
+    responseSerialize: (value: Product): Buffer =>
+      Buffer.from(Product.encode(value).finish()),
     responseDeserialize: (value: Buffer): Product => Product.decode(value),
   },
   listProducts: {
-    path: "/catalog.v1.CatalogService/ListProducts" as const,
+    path: '/catalog.v1.CatalogService/ListProducts' as const,
     requestStream: false as const,
     responseStream: false as const,
-    requestSerialize: (value: ListProductsRequest): Buffer => Buffer.from(ListProductsRequest.encode(value).finish()),
-    requestDeserialize: (value: Buffer): ListProductsRequest => ListProductsRequest.decode(value),
+    requestSerialize: (value: ListProductsRequest): Buffer =>
+      Buffer.from(ListProductsRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): ListProductsRequest =>
+      ListProductsRequest.decode(value),
     responseSerialize: (value: ListProductsResponse): Buffer =>
       Buffer.from(ListProductsResponse.encode(value).finish()),
-    responseDeserialize: (value: Buffer): ListProductsResponse => ListProductsResponse.decode(value),
+    responseDeserialize: (value: Buffer): ListProductsResponse =>
+      ListProductsResponse.decode(value),
   },
   createProduct: {
-    path: "/catalog.v1.CatalogService/CreateProduct" as const,
+    path: '/catalog.v1.CatalogService/CreateProduct' as const,
     requestStream: false as const,
     responseStream: false as const,
-    requestSerialize: (value: CreateProductRequest): Buffer => Buffer.from(CreateProductRequest.encode(value).finish()),
-    requestDeserialize: (value: Buffer): CreateProductRequest => CreateProductRequest.decode(value),
-    responseSerialize: (value: Product): Buffer => Buffer.from(Product.encode(value).finish()),
+    requestSerialize: (value: CreateProductRequest): Buffer =>
+      Buffer.from(CreateProductRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): CreateProductRequest =>
+      CreateProductRequest.decode(value),
+    responseSerialize: (value: Product): Buffer =>
+      Buffer.from(Product.encode(value).finish()),
     responseDeserialize: (value: Buffer): Product => Product.decode(value),
   },
   updateProduct: {
-    path: "/catalog.v1.CatalogService/UpdateProduct" as const,
+    path: '/catalog.v1.CatalogService/UpdateProduct' as const,
     requestStream: false as const,
     responseStream: false as const,
-    requestSerialize: (value: UpdateProductRequest): Buffer => Buffer.from(UpdateProductRequest.encode(value).finish()),
-    requestDeserialize: (value: Buffer): UpdateProductRequest => UpdateProductRequest.decode(value),
-    responseSerialize: (value: Product): Buffer => Buffer.from(Product.encode(value).finish()),
+    requestSerialize: (value: UpdateProductRequest): Buffer =>
+      Buffer.from(UpdateProductRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): UpdateProductRequest =>
+      UpdateProductRequest.decode(value),
+    responseSerialize: (value: Product): Buffer =>
+      Buffer.from(Product.encode(value).finish()),
     responseDeserialize: (value: Buffer): Product => Product.decode(value),
   },
   archiveProduct: {
-    path: "/catalog.v1.CatalogService/ArchiveProduct" as const,
+    path: '/catalog.v1.CatalogService/ArchiveProduct' as const,
     requestStream: false as const,
     responseStream: false as const,
     requestSerialize: (value: ArchiveProductRequest): Buffer =>
       Buffer.from(ArchiveProductRequest.encode(value).finish()),
-    requestDeserialize: (value: Buffer): ArchiveProductRequest => ArchiveProductRequest.decode(value),
-    responseSerialize: (value: Empty): Buffer => Buffer.from(Empty.encode(value).finish()),
+    requestDeserialize: (value: Buffer): ArchiveProductRequest =>
+      ArchiveProductRequest.decode(value),
+    responseSerialize: (value: Empty): Buffer =>
+      Buffer.from(Empty.encode(value).finish()),
     responseDeserialize: (value: Buffer): Empty => Empty.decode(value),
   },
   reserveStock: {
-    path: "/catalog.v1.CatalogService/ReserveStock" as const,
+    path: '/catalog.v1.CatalogService/ReserveStock' as const,
     requestStream: false as const,
     responseStream: false as const,
-    requestSerialize: (value: ReserveStockRequest): Buffer => Buffer.from(ReserveStockRequest.encode(value).finish()),
-    requestDeserialize: (value: Buffer): ReserveStockRequest => ReserveStockRequest.decode(value),
+    requestSerialize: (value: ReserveStockRequest): Buffer =>
+      Buffer.from(ReserveStockRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): ReserveStockRequest =>
+      ReserveStockRequest.decode(value),
     responseSerialize: (value: ReserveStockResponse): Buffer =>
       Buffer.from(ReserveStockResponse.encode(value).finish()),
-    responseDeserialize: (value: Buffer): ReserveStockResponse => ReserveStockResponse.decode(value),
+    responseDeserialize: (value: Buffer): ReserveStockResponse =>
+      ReserveStockResponse.decode(value),
   },
   releaseStock: {
-    path: "/catalog.v1.CatalogService/ReleaseStock" as const,
+    path: '/catalog.v1.CatalogService/ReleaseStock' as const,
     requestStream: false as const,
     responseStream: false as const,
-    requestSerialize: (value: ReleaseStockRequest): Buffer => Buffer.from(ReleaseStockRequest.encode(value).finish()),
-    requestDeserialize: (value: Buffer): ReleaseStockRequest => ReleaseStockRequest.decode(value),
-    responseSerialize: (value: Empty): Buffer => Buffer.from(Empty.encode(value).finish()),
+    requestSerialize: (value: ReleaseStockRequest): Buffer =>
+      Buffer.from(ReleaseStockRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): ReleaseStockRequest =>
+      ReleaseStockRequest.decode(value),
+    responseSerialize: (value: Empty): Buffer =>
+      Buffer.from(Empty.encode(value).finish()),
     responseDeserialize: (value: Buffer): Empty => Empty.decode(value),
   },
   getInventoryMetrics: {
-    path: "/catalog.v1.CatalogService/GetInventoryMetrics" as const,
+    path: '/catalog.v1.CatalogService/GetInventoryMetrics' as const,
     requestStream: false as const,
     responseStream: false as const,
     requestSerialize: (value: GetInventoryMetricsRequest): Buffer =>
       Buffer.from(GetInventoryMetricsRequest.encode(value).finish()),
-    requestDeserialize: (value: Buffer): GetInventoryMetricsRequest => GetInventoryMetricsRequest.decode(value),
-    responseSerialize: (value: InventoryMetrics): Buffer => Buffer.from(InventoryMetrics.encode(value).finish()),
-    responseDeserialize: (value: Buffer): InventoryMetrics => InventoryMetrics.decode(value),
+    requestDeserialize: (value: Buffer): GetInventoryMetricsRequest =>
+      GetInventoryMetricsRequest.decode(value),
+    responseSerialize: (value: InventoryMetrics): Buffer =>
+      Buffer.from(InventoryMetrics.encode(value).finish()),
+    responseDeserialize: (value: Buffer): InventoryMetrics =>
+      InventoryMetrics.decode(value),
   },
   getUploadPresignedUrl: {
-    path: "/catalog.v1.CatalogService/GetUploadPresignedUrl" as const,
+    path: '/catalog.v1.CatalogService/GetUploadPresignedUrl' as const,
     requestStream: false as const,
     responseStream: false as const,
-    requestSerialize: (value: GetUploadUrlRequest): Buffer => Buffer.from(GetUploadUrlRequest.encode(value).finish()),
-    requestDeserialize: (value: Buffer): GetUploadUrlRequest => GetUploadUrlRequest.decode(value),
+    requestSerialize: (value: GetUploadUrlRequest): Buffer =>
+      Buffer.from(GetUploadUrlRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): GetUploadUrlRequest =>
+      GetUploadUrlRequest.decode(value),
     responseSerialize: (value: GetUploadUrlResponse): Buffer =>
       Buffer.from(GetUploadUrlResponse.encode(value).finish()),
-    responseDeserialize: (value: Buffer): GetUploadUrlResponse => GetUploadUrlResponse.decode(value),
+    responseDeserialize: (value: Buffer): GetUploadUrlResponse =>
+      GetUploadUrlResponse.decode(value),
   },
 } as const;
 
@@ -1574,17 +1791,23 @@ export interface CatalogServiceServer extends UntypedServiceImplementation {
   archiveProduct: handleUnaryCall<ArchiveProductRequest, Empty>;
   reserveStock: handleUnaryCall<ReserveStockRequest, ReserveStockResponse>;
   releaseStock: handleUnaryCall<ReleaseStockRequest, Empty>;
-  getInventoryMetrics: handleUnaryCall<GetInventoryMetricsRequest, InventoryMetrics>;
-  getUploadPresignedUrl: handleUnaryCall<GetUploadUrlRequest, GetUploadUrlResponse>;
+  getInventoryMetrics: handleUnaryCall<
+    GetInventoryMetricsRequest,
+    InventoryMetrics
+  >;
+  getUploadPresignedUrl: handleUnaryCall<
+    GetUploadUrlRequest,
+    GetUploadUrlResponse
+  >;
 }
 
 function longToNumber(int64: { toString(): string }): number {
   const num = globalThis.Number(int64.toString());
   if (num > globalThis.Number.MAX_SAFE_INTEGER) {
-    throw new globalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
+    throw new globalThis.Error('Value is larger than Number.MAX_SAFE_INTEGER');
   }
   if (num < globalThis.Number.MIN_SAFE_INTEGER) {
-    throw new globalThis.Error("Value is smaller than Number.MIN_SAFE_INTEGER");
+    throw new globalThis.Error('Value is smaller than Number.MIN_SAFE_INTEGER');
   }
   return num;
 }

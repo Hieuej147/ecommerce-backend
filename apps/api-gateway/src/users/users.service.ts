@@ -29,11 +29,15 @@ export class UsersService {
       (email) => email.id === clerkUser.primaryEmailAddressId,
     );
     const displayName =
-      [clerkUser.firstName, clerkUser.lastName].filter(Boolean).join(' ').trim() ||
+      [clerkUser.firstName, clerkUser.lastName]
+        .filter(Boolean)
+        .join(' ')
+        .trim() ||
       clerkUser.username ||
       primaryEmail?.emailAddress ||
       clerkUser.id;
-    const role = clerkUser.publicMetadata.role === 'admin' ? 'admin' : 'customer';
+    const role =
+      clerkUser.publicMetadata.role === 'admin' ? 'admin' : 'customer';
 
     return this.users.upsert({
       eventId: `lazy:${clerkUser.id}:${clerkUser.updatedAt}`,

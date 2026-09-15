@@ -5,12 +5,11 @@
 // source: common.proto
 
 /* eslint-disable */
-import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
+import { BinaryReader, BinaryWriter } from '@bufbuild/protobuf/wire';
 
-export const protobufPackage = "common.v1";
+export const protobufPackage = 'common.v1';
 
-export interface Empty {
-}
+export interface Empty {}
 
 export interface PageRequest {
   pageSize: number;
@@ -38,7 +37,7 @@ export interface Address {
   countryCode: string;
 }
 
-export const COMMON_V1_PACKAGE_NAME = "common.v1";
+export const COMMON_V1_PACKAGE_NAME = 'common.v1';
 
 function createBaseEmpty(): Empty {
   return {};
@@ -50,7 +49,8 @@ export const Empty: MessageFns<Empty> = {
   },
 
   decode(input: BinaryReader | Uint8Array, length?: number): Empty {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const reader =
+      input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEmpty();
     while (reader.pos < end) {
@@ -67,22 +67,26 @@ export const Empty: MessageFns<Empty> = {
 };
 
 function createBasePageRequest(): PageRequest {
-  return { pageSize: 0, pageToken: "" };
+  return { pageSize: 0, pageToken: '' };
 }
 
 export const PageRequest: MessageFns<PageRequest> = {
-  encode(message: PageRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+  encode(
+    message: PageRequest,
+    writer: BinaryWriter = new BinaryWriter(),
+  ): BinaryWriter {
     if (message.pageSize !== 0) {
       writer.uint32(8).int32(message.pageSize);
     }
-    if (message.pageToken !== "") {
+    if (message.pageToken !== '') {
       writer.uint32(18).string(message.pageToken);
     }
     return writer;
   },
 
   decode(input: BinaryReader | Uint8Array, length?: number): PageRequest {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const reader =
+      input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBasePageRequest();
     while (reader.pos < end) {
@@ -115,12 +119,15 @@ export const PageRequest: MessageFns<PageRequest> = {
 };
 
 function createBasePageInfo(): PageInfo {
-  return { nextPageToken: "", hasNextPage: false };
+  return { nextPageToken: '', hasNextPage: false };
 }
 
 export const PageInfo: MessageFns<PageInfo> = {
-  encode(message: PageInfo, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.nextPageToken !== "") {
+  encode(
+    message: PageInfo,
+    writer: BinaryWriter = new BinaryWriter(),
+  ): BinaryWriter {
+    if (message.nextPageToken !== '') {
       writer.uint32(10).string(message.nextPageToken);
     }
     if (message.hasNextPage !== false) {
@@ -130,7 +137,8 @@ export const PageInfo: MessageFns<PageInfo> = {
   },
 
   decode(input: BinaryReader | Uint8Array, length?: number): PageInfo {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const reader =
+      input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBasePageInfo();
     while (reader.pos < end) {
@@ -163,22 +171,26 @@ export const PageInfo: MessageFns<PageInfo> = {
 };
 
 function createBaseMoney(): Money {
-  return { amountMinor: 0, currency: "" };
+  return { amountMinor: 0, currency: '' };
 }
 
 export const Money: MessageFns<Money> = {
-  encode(message: Money, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+  encode(
+    message: Money,
+    writer: BinaryWriter = new BinaryWriter(),
+  ): BinaryWriter {
     if (message.amountMinor !== 0) {
       writer.uint32(8).int64(message.amountMinor);
     }
-    if (message.currency !== "") {
+    if (message.currency !== '') {
       writer.uint32(18).string(message.currency);
     }
     return writer;
   },
 
   decode(input: BinaryReader | Uint8Array, length?: number): Money {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const reader =
+      input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMoney();
     while (reader.pos < end) {
@@ -212,48 +224,52 @@ export const Money: MessageFns<Money> = {
 
 function createBaseAddress(): Address {
   return {
-    recipientName: "",
-    phone: "",
-    line1: "",
-    line2: "",
-    city: "",
-    province: "",
-    postalCode: "",
-    countryCode: "",
+    recipientName: '',
+    phone: '',
+    line1: '',
+    line2: '',
+    city: '',
+    province: '',
+    postalCode: '',
+    countryCode: '',
   };
 }
 
 export const Address: MessageFns<Address> = {
-  encode(message: Address, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.recipientName !== "") {
+  encode(
+    message: Address,
+    writer: BinaryWriter = new BinaryWriter(),
+  ): BinaryWriter {
+    if (message.recipientName !== '') {
       writer.uint32(10).string(message.recipientName);
     }
-    if (message.phone !== "") {
+    if (message.phone !== '') {
       writer.uint32(18).string(message.phone);
     }
-    if (message.line1 !== "") {
+    if (message.line1 !== '') {
       writer.uint32(26).string(message.line1);
     }
-    if (message.line2 !== "") {
+    if (message.line2 !== '') {
       writer.uint32(34).string(message.line2);
     }
-    if (message.city !== "") {
+    if (message.city !== '') {
       writer.uint32(42).string(message.city);
     }
-    if (message.province !== "") {
+    if (message.province !== '') {
       writer.uint32(50).string(message.province);
     }
-    if (message.postalCode !== "") {
+    if (message.postalCode !== '') {
       writer.uint32(58).string(message.postalCode);
     }
-    if (message.countryCode !== "") {
+    if (message.countryCode !== '') {
       writer.uint32(66).string(message.countryCode);
     }
     return writer;
   },
 
   decode(input: BinaryReader | Uint8Array, length?: number): Address {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const reader =
+      input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseAddress();
     while (reader.pos < end) {
@@ -336,10 +352,10 @@ export const Address: MessageFns<Address> = {
 function longToNumber(int64: { toString(): string }): number {
   const num = globalThis.Number(int64.toString());
   if (num > globalThis.Number.MAX_SAFE_INTEGER) {
-    throw new globalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
+    throw new globalThis.Error('Value is larger than Number.MAX_SAFE_INTEGER');
   }
   if (num < globalThis.Number.MIN_SAFE_INTEGER) {
-    throw new globalThis.Error("Value is smaller than Number.MIN_SAFE_INTEGER");
+    throw new globalThis.Error('Value is smaller than Number.MIN_SAFE_INTEGER');
   }
   return num;
 }

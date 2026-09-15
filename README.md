@@ -276,7 +276,8 @@ pnpm run proto:generate
 pnpm run db:setup
 
 # 5. (Optional) Seed demo products with multi-angle color assets and admin user
-pnpm run db:seed:demo
+pnpm run db:seed:images   # Uploads demo images into local MinIO bucket
+pnpm run db:seed:demo     # Seeds 100 demo products with /v1/media/demo/... paths
 
 # 6. Launch all 5 microservices & API Gateway concurrently:
 pnpm run dev:all
@@ -512,10 +513,10 @@ Rather than piping multi-megabyte binary images through the API Gateway, file up
 
 #### B. Supported Storage Drivers
 
-The backend uses a modular storage abstraction (`apps/catalog/src/storage/`):
+The backend uses a centralized storage proxy module (`apps/api-gateway/src/storage/` and `apps/api-gateway/src/media/`):
 
 - **`minio`**: Default for local development. Spun up automatically via Docker Compose (`quay.io/minio/minio`).
-- **`s3`**: Enterprise production deployment with Amazon S3.
+- **`s3`**: Enterprise production deployment with Amazon S3 (100% Private, streamed via API Gateway).
 - **`r2`**: Zero-egress fee production deployment with Cloudflare R2.
 
 #### C. Storage Environment Variables
@@ -530,7 +531,7 @@ Configure these keys in `backend/.env`:
 | `STORAGE_BUCKET`           | `ecommerce-products`                       | `your-prod-bucket-name`                | `your-r2-bucket-name`                           |
 | `STORAGE_ACCESS_KEY`       | `minioadmin`                               | `<AWS_IAM_ACCESS_KEY>`                 | `<R2_TOKEN_ACCESS_KEY>`                         |
 | `STORAGE_SECRET_KEY`       | `minioadmin123`                            | `<AWS_IAM_SECRET_KEY>`                 | `<R2_TOKEN_SECRET_KEY>`                         |
-| `STORAGE_PUBLIC_URL`       | `http://localhost:9002/ecommerce-products` | `https://your-bucket.s3.amazonaws.com` | `https://media.yourdomain.com`                  |
+| `STORAGE_PUBLIC_URL`       | `http://localhost:3000/v1/media`           | `https://api.yourdomain.com/v1/media`  | `https://media.yourdomain.com`                  |
 | `STORAGE_FORCE_PATH_STYLE` | `true`                                     | `false`                                | `true`                                          |
 
 #### D. MinIO Web Console Access

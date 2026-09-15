@@ -5,13 +5,16 @@
 // source: order.proto
 
 /* eslint-disable */
-import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
-import type { handleUnaryCall, UntypedServiceImplementation } from "@grpc/grpc-js";
-import { GrpcMethod, GrpcStreamMethod } from "@nestjs/microservices";
-import { Observable } from "rxjs";
-import { Address, Money, PageInfo, PageRequest } from "./common";
+import { BinaryReader, BinaryWriter } from '@bufbuild/protobuf/wire';
+import type {
+  handleUnaryCall,
+  UntypedServiceImplementation,
+} from '@grpc/grpc-js';
+import { GrpcMethod, GrpcStreamMethod } from '@nestjs/microservices';
+import { Observable } from 'rxjs';
+import { Address, Money, PageInfo, PageRequest } from './common';
 
-export const protobufPackage = "order.v1";
+export const protobufPackage = 'order.v1';
 
 export interface Order {
   id: string;
@@ -98,31 +101,34 @@ export interface ListAdminOrdersResponse {
   pageInfo: PageInfo | undefined;
 }
 
-export const ORDER_V1_PACKAGE_NAME = "order.v1";
+export const ORDER_V1_PACKAGE_NAME = 'order.v1';
 
 function createBaseOrder(): Order {
   return {
-    id: "",
-    userId: "",
+    id: '',
+    userId: '',
     items: [],
     subtotal: undefined,
     total: undefined,
     shippingAddress: undefined,
-    status: "",
-    paymentStatus: "",
-    createdAt: "",
-    updatedAt: "",
-    customerName: "",
-    customerEmail: "",
+    status: '',
+    paymentStatus: '',
+    createdAt: '',
+    updatedAt: '',
+    customerName: '',
+    customerEmail: '',
   };
 }
 
 export const Order: MessageFns<Order> = {
-  encode(message: Order, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.id !== "") {
+  encode(
+    message: Order,
+    writer: BinaryWriter = new BinaryWriter(),
+  ): BinaryWriter {
+    if (message.id !== '') {
       writer.uint32(10).string(message.id);
     }
-    if (message.userId !== "") {
+    if (message.userId !== '') {
       writer.uint32(18).string(message.userId);
     }
     for (const v of message.items) {
@@ -137,29 +143,30 @@ export const Order: MessageFns<Order> = {
     if (message.shippingAddress !== undefined) {
       Address.encode(message.shippingAddress, writer.uint32(50).fork()).join();
     }
-    if (message.status !== "") {
+    if (message.status !== '') {
       writer.uint32(58).string(message.status);
     }
-    if (message.paymentStatus !== "") {
+    if (message.paymentStatus !== '') {
       writer.uint32(66).string(message.paymentStatus);
     }
-    if (message.createdAt !== "") {
+    if (message.createdAt !== '') {
       writer.uint32(74).string(message.createdAt);
     }
-    if (message.updatedAt !== "") {
+    if (message.updatedAt !== '') {
       writer.uint32(82).string(message.updatedAt);
     }
-    if (message.customerName !== "") {
+    if (message.customerName !== '') {
       writer.uint32(90).string(message.customerName);
     }
-    if (message.customerEmail !== "") {
+    if (message.customerEmail !== '') {
       writer.uint32(98).string(message.customerEmail);
     }
     return writer;
   },
 
   decode(input: BinaryReader | Uint8Array, length?: number): Order {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const reader =
+      input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseOrder();
     while (reader.pos < end) {
@@ -272,15 +279,24 @@ export const Order: MessageFns<Order> = {
 };
 
 function createBaseOrderItem(): OrderItem {
-  return { productId: "", productName: "", quantity: 0, unitPrice: undefined, lineTotal: undefined };
+  return {
+    productId: '',
+    productName: '',
+    quantity: 0,
+    unitPrice: undefined,
+    lineTotal: undefined,
+  };
 }
 
 export const OrderItem: MessageFns<OrderItem> = {
-  encode(message: OrderItem, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.productId !== "") {
+  encode(
+    message: OrderItem,
+    writer: BinaryWriter = new BinaryWriter(),
+  ): BinaryWriter {
+    if (message.productId !== '') {
       writer.uint32(10).string(message.productId);
     }
-    if (message.productName !== "") {
+    if (message.productName !== '') {
       writer.uint32(18).string(message.productName);
     }
     if (message.quantity !== 0) {
@@ -296,7 +312,8 @@ export const OrderItem: MessageFns<OrderItem> = {
   },
 
   decode(input: BinaryReader | Uint8Array, length?: number): OrderItem {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const reader =
+      input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseOrderItem();
     while (reader.pos < end) {
@@ -353,25 +370,32 @@ export const OrderItem: MessageFns<OrderItem> = {
 };
 
 function createBaseCreateOrderRequest(): CreateOrderRequest {
-  return { items: [], shippingAddress: undefined, idempotencyKey: "" };
+  return { items: [], shippingAddress: undefined, idempotencyKey: '' };
 }
 
 export const CreateOrderRequest: MessageFns<CreateOrderRequest> = {
-  encode(message: CreateOrderRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+  encode(
+    message: CreateOrderRequest,
+    writer: BinaryWriter = new BinaryWriter(),
+  ): BinaryWriter {
     for (const v of message.items) {
       CreateOrderItem.encode(v!, writer.uint32(10).fork()).join();
     }
     if (message.shippingAddress !== undefined) {
       Address.encode(message.shippingAddress, writer.uint32(18).fork()).join();
     }
-    if (message.idempotencyKey !== "") {
+    if (message.idempotencyKey !== '') {
       writer.uint32(26).string(message.idempotencyKey);
     }
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): CreateOrderRequest {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+  decode(
+    input: BinaryReader | Uint8Array,
+    length?: number,
+  ): CreateOrderRequest {
+    const reader =
+      input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseCreateOrderRequest();
     while (reader.pos < end) {
@@ -412,12 +436,15 @@ export const CreateOrderRequest: MessageFns<CreateOrderRequest> = {
 };
 
 function createBaseCreateOrderItem(): CreateOrderItem {
-  return { productId: "", quantity: 0 };
+  return { productId: '', quantity: 0 };
 }
 
 export const CreateOrderItem: MessageFns<CreateOrderItem> = {
-  encode(message: CreateOrderItem, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.productId !== "") {
+  encode(
+    message: CreateOrderItem,
+    writer: BinaryWriter = new BinaryWriter(),
+  ): BinaryWriter {
+    if (message.productId !== '') {
       writer.uint32(10).string(message.productId);
     }
     if (message.quantity !== 0) {
@@ -427,7 +454,8 @@ export const CreateOrderItem: MessageFns<CreateOrderItem> = {
   },
 
   decode(input: BinaryReader | Uint8Array, length?: number): CreateOrderItem {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const reader =
+      input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseCreateOrderItem();
     while (reader.pos < end) {
@@ -460,19 +488,23 @@ export const CreateOrderItem: MessageFns<CreateOrderItem> = {
 };
 
 function createBaseGetOrderRequest(): GetOrderRequest {
-  return { orderId: "" };
+  return { orderId: '' };
 }
 
 export const GetOrderRequest: MessageFns<GetOrderRequest> = {
-  encode(message: GetOrderRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.orderId !== "") {
+  encode(
+    message: GetOrderRequest,
+    writer: BinaryWriter = new BinaryWriter(),
+  ): BinaryWriter {
+    if (message.orderId !== '') {
       writer.uint32(10).string(message.orderId);
     }
     return writer;
   },
 
   decode(input: BinaryReader | Uint8Array, length?: number): GetOrderRequest {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const reader =
+      input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGetOrderRequest();
     while (reader.pos < end) {
@@ -501,15 +533,22 @@ function createBaseListMyOrdersRequest(): ListMyOrdersRequest {
 }
 
 export const ListMyOrdersRequest: MessageFns<ListMyOrdersRequest> = {
-  encode(message: ListMyOrdersRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+  encode(
+    message: ListMyOrdersRequest,
+    writer: BinaryWriter = new BinaryWriter(),
+  ): BinaryWriter {
     if (message.page !== undefined) {
       PageRequest.encode(message.page, writer.uint32(10).fork()).join();
     }
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): ListMyOrdersRequest {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+  decode(
+    input: BinaryReader | Uint8Array,
+    length?: number,
+  ): ListMyOrdersRequest {
+    const reader =
+      input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseListMyOrdersRequest();
     while (reader.pos < end) {
@@ -538,7 +577,10 @@ function createBaseListMyOrdersResponse(): ListMyOrdersResponse {
 }
 
 export const ListMyOrdersResponse: MessageFns<ListMyOrdersResponse> = {
-  encode(message: ListMyOrdersResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+  encode(
+    message: ListMyOrdersResponse,
+    writer: BinaryWriter = new BinaryWriter(),
+  ): BinaryWriter {
     for (const v of message.orders) {
       Order.encode(v!, writer.uint32(10).fork()).join();
     }
@@ -548,8 +590,12 @@ export const ListMyOrdersResponse: MessageFns<ListMyOrdersResponse> = {
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): ListMyOrdersResponse {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+  decode(
+    input: BinaryReader | Uint8Array,
+    length?: number,
+  ): ListMyOrdersResponse {
+    const reader =
+      input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseListMyOrdersResponse();
     while (reader.pos < end) {
@@ -582,19 +628,26 @@ export const ListMyOrdersResponse: MessageFns<ListMyOrdersResponse> = {
 };
 
 function createBaseCancelOrderRequest(): CancelOrderRequest {
-  return { orderId: "" };
+  return { orderId: '' };
 }
 
 export const CancelOrderRequest: MessageFns<CancelOrderRequest> = {
-  encode(message: CancelOrderRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.orderId !== "") {
+  encode(
+    message: CancelOrderRequest,
+    writer: BinaryWriter = new BinaryWriter(),
+  ): BinaryWriter {
+    if (message.orderId !== '') {
       writer.uint32(10).string(message.orderId);
     }
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): CancelOrderRequest {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+  decode(
+    input: BinaryReader | Uint8Array,
+    length?: number,
+  ): CancelOrderRequest {
+    const reader =
+      input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseCancelOrderRequest();
     while (reader.pos < end) {
@@ -619,28 +672,35 @@ export const CancelOrderRequest: MessageFns<CancelOrderRequest> = {
 };
 
 function createBaseMarkPaymentStatusRequest(): MarkPaymentStatusRequest {
-  return { orderId: "", paymentId: "", paymentStatus: "", providerEventId: "" };
+  return { orderId: '', paymentId: '', paymentStatus: '', providerEventId: '' };
 }
 
 export const MarkPaymentStatusRequest: MessageFns<MarkPaymentStatusRequest> = {
-  encode(message: MarkPaymentStatusRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.orderId !== "") {
+  encode(
+    message: MarkPaymentStatusRequest,
+    writer: BinaryWriter = new BinaryWriter(),
+  ): BinaryWriter {
+    if (message.orderId !== '') {
       writer.uint32(10).string(message.orderId);
     }
-    if (message.paymentId !== "") {
+    if (message.paymentId !== '') {
       writer.uint32(18).string(message.paymentId);
     }
-    if (message.paymentStatus !== "") {
+    if (message.paymentStatus !== '') {
       writer.uint32(26).string(message.paymentStatus);
     }
-    if (message.providerEventId !== "") {
+    if (message.providerEventId !== '') {
       writer.uint32(34).string(message.providerEventId);
     }
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): MarkPaymentStatusRequest {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+  decode(
+    input: BinaryReader | Uint8Array,
+    length?: number,
+  ): MarkPaymentStatusRequest {
+    const reader =
+      input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMarkPaymentStatusRequest();
     while (reader.pos < end) {
@@ -689,22 +749,29 @@ export const MarkPaymentStatusRequest: MessageFns<MarkPaymentStatusRequest> = {
 };
 
 function createBaseGetOrderMetricsRequest(): GetOrderMetricsRequest {
-  return { fromAt: "", toAt: "" };
+  return { fromAt: '', toAt: '' };
 }
 
 export const GetOrderMetricsRequest: MessageFns<GetOrderMetricsRequest> = {
-  encode(message: GetOrderMetricsRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.fromAt !== "") {
+  encode(
+    message: GetOrderMetricsRequest,
+    writer: BinaryWriter = new BinaryWriter(),
+  ): BinaryWriter {
+    if (message.fromAt !== '') {
       writer.uint32(10).string(message.fromAt);
     }
-    if (message.toAt !== "") {
+    if (message.toAt !== '') {
       writer.uint32(18).string(message.toAt);
     }
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): GetOrderMetricsRequest {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+  decode(
+    input: BinaryReader | Uint8Array,
+    length?: number,
+  ): GetOrderMetricsRequest {
+    const reader =
+      input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGetOrderMetricsRequest();
     while (reader.pos < end) {
@@ -737,18 +804,27 @@ export const GetOrderMetricsRequest: MessageFns<GetOrderMetricsRequest> = {
 };
 
 function createBaseOrderMetrics(): OrderMetrics {
-  return { orderCount: 0, revenueAmountMinor: 0, currency: "", paidOrderCount: 0, pendingOrderCount: 0 };
+  return {
+    orderCount: 0,
+    revenueAmountMinor: 0,
+    currency: '',
+    paidOrderCount: 0,
+    pendingOrderCount: 0,
+  };
 }
 
 export const OrderMetrics: MessageFns<OrderMetrics> = {
-  encode(message: OrderMetrics, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+  encode(
+    message: OrderMetrics,
+    writer: BinaryWriter = new BinaryWriter(),
+  ): BinaryWriter {
     if (message.orderCount !== 0) {
       writer.uint32(8).int64(message.orderCount);
     }
     if (message.revenueAmountMinor !== 0) {
       writer.uint32(16).int64(message.revenueAmountMinor);
     }
-    if (message.currency !== "") {
+    if (message.currency !== '') {
       writer.uint32(26).string(message.currency);
     }
     if (message.paidOrderCount !== 0) {
@@ -761,7 +837,8 @@ export const OrderMetrics: MessageFns<OrderMetrics> = {
   },
 
   decode(input: BinaryReader | Uint8Array, length?: number): OrderMetrics {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const reader =
+      input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseOrderMetrics();
     while (reader.pos < end) {
@@ -818,34 +895,48 @@ export const OrderMetrics: MessageFns<OrderMetrics> = {
 };
 
 function createBaseListAdminOrdersRequest(): ListAdminOrdersRequest {
-  return { page: undefined, status: "", paymentStatus: "", search: "", fromAt: "", toAt: "" };
+  return {
+    page: undefined,
+    status: '',
+    paymentStatus: '',
+    search: '',
+    fromAt: '',
+    toAt: '',
+  };
 }
 
 export const ListAdminOrdersRequest: MessageFns<ListAdminOrdersRequest> = {
-  encode(message: ListAdminOrdersRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+  encode(
+    message: ListAdminOrdersRequest,
+    writer: BinaryWriter = new BinaryWriter(),
+  ): BinaryWriter {
     if (message.page !== undefined) {
       PageRequest.encode(message.page, writer.uint32(10).fork()).join();
     }
-    if (message.status !== "") {
+    if (message.status !== '') {
       writer.uint32(18).string(message.status);
     }
-    if (message.paymentStatus !== "") {
+    if (message.paymentStatus !== '') {
       writer.uint32(26).string(message.paymentStatus);
     }
-    if (message.search !== "") {
+    if (message.search !== '') {
       writer.uint32(34).string(message.search);
     }
-    if (message.fromAt !== "") {
+    if (message.fromAt !== '') {
       writer.uint32(42).string(message.fromAt);
     }
-    if (message.toAt !== "") {
+    if (message.toAt !== '') {
       writer.uint32(50).string(message.toAt);
     }
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): ListAdminOrdersRequest {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+  decode(
+    input: BinaryReader | Uint8Array,
+    length?: number,
+  ): ListAdminOrdersRequest {
+    const reader =
+      input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseListAdminOrdersRequest();
     while (reader.pos < end) {
@@ -914,7 +1005,10 @@ function createBaseListAdminOrdersResponse(): ListAdminOrdersResponse {
 }
 
 export const ListAdminOrdersResponse: MessageFns<ListAdminOrdersResponse> = {
-  encode(message: ListAdminOrdersResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+  encode(
+    message: ListAdminOrdersResponse,
+    writer: BinaryWriter = new BinaryWriter(),
+  ): BinaryWriter {
     for (const v of message.orders) {
       Order.encode(v!, writer.uint32(10).fork()).join();
     }
@@ -924,8 +1018,12 @@ export const ListAdminOrdersResponse: MessageFns<ListAdminOrdersResponse> = {
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): ListAdminOrdersResponse {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+  decode(
+    input: BinaryReader | Uint8Array,
+    length?: number,
+  ): ListAdminOrdersResponse {
+    const reader =
+      input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseListAdminOrdersResponse();
     while (reader.pos < end) {
@@ -970,123 +1068,174 @@ export interface OrderServiceClient {
 
   getOrderMetrics(request: GetOrderMetricsRequest): Observable<OrderMetrics>;
 
-  listAdminOrders(request: ListAdminOrdersRequest): Observable<ListAdminOrdersResponse>;
+  listAdminOrders(
+    request: ListAdminOrdersRequest,
+  ): Observable<ListAdminOrdersResponse>;
 }
 
 export interface OrderServiceController {
-  createOrder(request: CreateOrderRequest): Promise<Order> | Observable<Order> | Order;
+  createOrder(
+    request: CreateOrderRequest,
+  ): Promise<Order> | Observable<Order> | Order;
 
-  getOrder(request: GetOrderRequest): Promise<Order> | Observable<Order> | Order;
+  getOrder(
+    request: GetOrderRequest,
+  ): Promise<Order> | Observable<Order> | Order;
 
   listMyOrders(
     request: ListMyOrdersRequest,
-  ): Promise<ListMyOrdersResponse> | Observable<ListMyOrdersResponse> | ListMyOrdersResponse;
+  ):
+    | Promise<ListMyOrdersResponse>
+    | Observable<ListMyOrdersResponse>
+    | ListMyOrdersResponse;
 
-  cancelOrder(request: CancelOrderRequest): Promise<Order> | Observable<Order> | Order;
+  cancelOrder(
+    request: CancelOrderRequest,
+  ): Promise<Order> | Observable<Order> | Order;
 
-  markPaymentStatus(request: MarkPaymentStatusRequest): Promise<Order> | Observable<Order> | Order;
+  markPaymentStatus(
+    request: MarkPaymentStatusRequest,
+  ): Promise<Order> | Observable<Order> | Order;
 
-  getOrderMetrics(request: GetOrderMetricsRequest): Promise<OrderMetrics> | Observable<OrderMetrics> | OrderMetrics;
+  getOrderMetrics(
+    request: GetOrderMetricsRequest,
+  ): Promise<OrderMetrics> | Observable<OrderMetrics> | OrderMetrics;
 
   listAdminOrders(
     request: ListAdminOrdersRequest,
-  ): Promise<ListAdminOrdersResponse> | Observable<ListAdminOrdersResponse> | ListAdminOrdersResponse;
+  ):
+    | Promise<ListAdminOrdersResponse>
+    | Observable<ListAdminOrdersResponse>
+    | ListAdminOrdersResponse;
 }
 
 export function OrderServiceControllerMethods() {
   return function (constructor: Function) {
     const grpcMethods: string[] = [
-      "createOrder",
-      "getOrder",
-      "listMyOrders",
-      "cancelOrder",
-      "markPaymentStatus",
-      "getOrderMetrics",
-      "listAdminOrders",
+      'createOrder',
+      'getOrder',
+      'listMyOrders',
+      'cancelOrder',
+      'markPaymentStatus',
+      'getOrderMetrics',
+      'listAdminOrders',
     ];
     for (const method of grpcMethods) {
-      const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcMethod("OrderService", method)(constructor.prototype[method], method, descriptor);
+      const descriptor: any = Reflect.getOwnPropertyDescriptor(
+        constructor.prototype,
+        method,
+      );
+      GrpcMethod('OrderService', method)(
+        constructor.prototype[method],
+        method,
+        descriptor,
+      );
     }
     const grpcStreamMethods: string[] = [];
     for (const method of grpcStreamMethods) {
-      const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcStreamMethod("OrderService", method)(constructor.prototype[method], method, descriptor);
+      const descriptor: any = Reflect.getOwnPropertyDescriptor(
+        constructor.prototype,
+        method,
+      );
+      GrpcStreamMethod('OrderService', method)(
+        constructor.prototype[method],
+        method,
+        descriptor,
+      );
     }
   };
 }
 
-export const ORDER_SERVICE_NAME = "OrderService";
+export const ORDER_SERVICE_NAME = 'OrderService';
 
 export type OrderServiceService = typeof OrderServiceService;
 export const OrderServiceService = {
   createOrder: {
-    path: "/order.v1.OrderService/CreateOrder" as const,
+    path: '/order.v1.OrderService/CreateOrder' as const,
     requestStream: false as const,
     responseStream: false as const,
-    requestSerialize: (value: CreateOrderRequest): Buffer => Buffer.from(CreateOrderRequest.encode(value).finish()),
-    requestDeserialize: (value: Buffer): CreateOrderRequest => CreateOrderRequest.decode(value),
-    responseSerialize: (value: Order): Buffer => Buffer.from(Order.encode(value).finish()),
+    requestSerialize: (value: CreateOrderRequest): Buffer =>
+      Buffer.from(CreateOrderRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): CreateOrderRequest =>
+      CreateOrderRequest.decode(value),
+    responseSerialize: (value: Order): Buffer =>
+      Buffer.from(Order.encode(value).finish()),
     responseDeserialize: (value: Buffer): Order => Order.decode(value),
   },
   getOrder: {
-    path: "/order.v1.OrderService/GetOrder" as const,
+    path: '/order.v1.OrderService/GetOrder' as const,
     requestStream: false as const,
     responseStream: false as const,
-    requestSerialize: (value: GetOrderRequest): Buffer => Buffer.from(GetOrderRequest.encode(value).finish()),
-    requestDeserialize: (value: Buffer): GetOrderRequest => GetOrderRequest.decode(value),
-    responseSerialize: (value: Order): Buffer => Buffer.from(Order.encode(value).finish()),
+    requestSerialize: (value: GetOrderRequest): Buffer =>
+      Buffer.from(GetOrderRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): GetOrderRequest =>
+      GetOrderRequest.decode(value),
+    responseSerialize: (value: Order): Buffer =>
+      Buffer.from(Order.encode(value).finish()),
     responseDeserialize: (value: Buffer): Order => Order.decode(value),
   },
   listMyOrders: {
-    path: "/order.v1.OrderService/ListMyOrders" as const,
+    path: '/order.v1.OrderService/ListMyOrders' as const,
     requestStream: false as const,
     responseStream: false as const,
-    requestSerialize: (value: ListMyOrdersRequest): Buffer => Buffer.from(ListMyOrdersRequest.encode(value).finish()),
-    requestDeserialize: (value: Buffer): ListMyOrdersRequest => ListMyOrdersRequest.decode(value),
+    requestSerialize: (value: ListMyOrdersRequest): Buffer =>
+      Buffer.from(ListMyOrdersRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): ListMyOrdersRequest =>
+      ListMyOrdersRequest.decode(value),
     responseSerialize: (value: ListMyOrdersResponse): Buffer =>
       Buffer.from(ListMyOrdersResponse.encode(value).finish()),
-    responseDeserialize: (value: Buffer): ListMyOrdersResponse => ListMyOrdersResponse.decode(value),
+    responseDeserialize: (value: Buffer): ListMyOrdersResponse =>
+      ListMyOrdersResponse.decode(value),
   },
   cancelOrder: {
-    path: "/order.v1.OrderService/CancelOrder" as const,
+    path: '/order.v1.OrderService/CancelOrder' as const,
     requestStream: false as const,
     responseStream: false as const,
-    requestSerialize: (value: CancelOrderRequest): Buffer => Buffer.from(CancelOrderRequest.encode(value).finish()),
-    requestDeserialize: (value: Buffer): CancelOrderRequest => CancelOrderRequest.decode(value),
-    responseSerialize: (value: Order): Buffer => Buffer.from(Order.encode(value).finish()),
+    requestSerialize: (value: CancelOrderRequest): Buffer =>
+      Buffer.from(CancelOrderRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): CancelOrderRequest =>
+      CancelOrderRequest.decode(value),
+    responseSerialize: (value: Order): Buffer =>
+      Buffer.from(Order.encode(value).finish()),
     responseDeserialize: (value: Buffer): Order => Order.decode(value),
   },
   markPaymentStatus: {
-    path: "/order.v1.OrderService/MarkPaymentStatus" as const,
+    path: '/order.v1.OrderService/MarkPaymentStatus' as const,
     requestStream: false as const,
     responseStream: false as const,
     requestSerialize: (value: MarkPaymentStatusRequest): Buffer =>
       Buffer.from(MarkPaymentStatusRequest.encode(value).finish()),
-    requestDeserialize: (value: Buffer): MarkPaymentStatusRequest => MarkPaymentStatusRequest.decode(value),
-    responseSerialize: (value: Order): Buffer => Buffer.from(Order.encode(value).finish()),
+    requestDeserialize: (value: Buffer): MarkPaymentStatusRequest =>
+      MarkPaymentStatusRequest.decode(value),
+    responseSerialize: (value: Order): Buffer =>
+      Buffer.from(Order.encode(value).finish()),
     responseDeserialize: (value: Buffer): Order => Order.decode(value),
   },
   getOrderMetrics: {
-    path: "/order.v1.OrderService/GetOrderMetrics" as const,
+    path: '/order.v1.OrderService/GetOrderMetrics' as const,
     requestStream: false as const,
     responseStream: false as const,
     requestSerialize: (value: GetOrderMetricsRequest): Buffer =>
       Buffer.from(GetOrderMetricsRequest.encode(value).finish()),
-    requestDeserialize: (value: Buffer): GetOrderMetricsRequest => GetOrderMetricsRequest.decode(value),
-    responseSerialize: (value: OrderMetrics): Buffer => Buffer.from(OrderMetrics.encode(value).finish()),
-    responseDeserialize: (value: Buffer): OrderMetrics => OrderMetrics.decode(value),
+    requestDeserialize: (value: Buffer): GetOrderMetricsRequest =>
+      GetOrderMetricsRequest.decode(value),
+    responseSerialize: (value: OrderMetrics): Buffer =>
+      Buffer.from(OrderMetrics.encode(value).finish()),
+    responseDeserialize: (value: Buffer): OrderMetrics =>
+      OrderMetrics.decode(value),
   },
   listAdminOrders: {
-    path: "/order.v1.OrderService/ListAdminOrders" as const,
+    path: '/order.v1.OrderService/ListAdminOrders' as const,
     requestStream: false as const,
     responseStream: false as const,
     requestSerialize: (value: ListAdminOrdersRequest): Buffer =>
       Buffer.from(ListAdminOrdersRequest.encode(value).finish()),
-    requestDeserialize: (value: Buffer): ListAdminOrdersRequest => ListAdminOrdersRequest.decode(value),
+    requestDeserialize: (value: Buffer): ListAdminOrdersRequest =>
+      ListAdminOrdersRequest.decode(value),
     responseSerialize: (value: ListAdminOrdersResponse): Buffer =>
       Buffer.from(ListAdminOrdersResponse.encode(value).finish()),
-    responseDeserialize: (value: Buffer): ListAdminOrdersResponse => ListAdminOrdersResponse.decode(value),
+    responseDeserialize: (value: Buffer): ListAdminOrdersResponse =>
+      ListAdminOrdersResponse.decode(value),
   },
 } as const;
 
@@ -1097,16 +1246,19 @@ export interface OrderServiceServer extends UntypedServiceImplementation {
   cancelOrder: handleUnaryCall<CancelOrderRequest, Order>;
   markPaymentStatus: handleUnaryCall<MarkPaymentStatusRequest, Order>;
   getOrderMetrics: handleUnaryCall<GetOrderMetricsRequest, OrderMetrics>;
-  listAdminOrders: handleUnaryCall<ListAdminOrdersRequest, ListAdminOrdersResponse>;
+  listAdminOrders: handleUnaryCall<
+    ListAdminOrdersRequest,
+    ListAdminOrdersResponse
+  >;
 }
 
 function longToNumber(int64: { toString(): string }): number {
   const num = globalThis.Number(int64.toString());
   if (num > globalThis.Number.MAX_SAFE_INTEGER) {
-    throw new globalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
+    throw new globalThis.Error('Value is larger than Number.MAX_SAFE_INTEGER');
   }
   if (num < globalThis.Number.MIN_SAFE_INTEGER) {
-    throw new globalThis.Error("Value is smaller than Number.MIN_SAFE_INTEGER");
+    throw new globalThis.Error('Value is smaller than Number.MIN_SAFE_INTEGER');
   }
   return num;
 }

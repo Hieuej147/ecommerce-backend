@@ -17,10 +17,7 @@ export class NotificationsService {
   private buildActorWhere(actor: ActorContext) {
     if (actor.role === 'admin') {
       return {
-        OR: [
-          { targetRole: 'ADMIN' },
-          { userId: actor.userId },
-        ],
+        OR: [{ targetRole: 'ADMIN' }, { userId: actor.userId }],
       };
     }
     return {
@@ -38,7 +35,9 @@ export class NotificationsService {
 
     if (query?.type) {
       if (query.type === 'orders') {
-        where.type = { in: ['ORDER_CREATED', 'ORDER_SHIPPED', 'ORDER_CANCELLED'] };
+        where.type = {
+          in: ['ORDER_CREATED', 'ORDER_SHIPPED', 'ORDER_CANCELLED'],
+        };
       } else if (query.type === 'payments') {
         where.type = { in: ['PAYMENT_SUCCESS', 'PAYMENT_FAILED'] };
       } else if (query.type !== 'all') {
@@ -66,7 +65,9 @@ export class NotificationsService {
       read: item.read,
       readAt: item.readAt ? item.readAt.toISOString() : null,
       createdAt: item.createdAt.toISOString(),
-      orderId: (item.data as any)?.orderId ? String((item.data as any).orderId) : undefined,
+      orderId: (item.data as any)?.orderId
+        ? String((item.data as any).orderId)
+        : undefined,
     }));
   }
 

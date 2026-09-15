@@ -55,7 +55,11 @@ async function createNotificationSafely(data: {
 }
 
 export const welcomeUserFunction = inngest.createFunction(
-  { id: 'welcome-user-email', retries: 3, triggers: { event: INNGEST_EVENTS.userCreated } },
+  {
+    id: 'welcome-user-email',
+    retries: 3,
+    triggers: { event: INNGEST_EVENTS.userCreated },
+  },
   async ({ event, step }) => {
     const userId = String(event.data.userId || '');
     if (userId) {
@@ -85,7 +89,11 @@ export const welcomeUserFunction = inngest.createFunction(
 );
 
 export const orderCreatedFunction = inngest.createFunction(
-  { id: 'order-created-email', retries: 3, triggers: { event: INNGEST_EVENTS.orderCreated } },
+  {
+    id: 'order-created-email',
+    retries: 3,
+    triggers: { event: INNGEST_EVENTS.orderCreated },
+  },
   async ({ event, step }) => {
     const orderId = String(event.data.orderId || '');
     const userId = String(event.data.userId || '');
@@ -99,7 +107,11 @@ export const orderCreatedFunction = inngest.createFunction(
           title: 'Đơn hàng đã được tiếp nhận',
           message: `Đơn hàng #${orderId} của bạn đã được ghi nhận vào hệ thống.`,
           href: '/orders',
-          data: { orderId, totalAmountMinor: event.data.totalAmountMinor, currency: event.data.currency },
+          data: {
+            orderId,
+            totalAmountMinor: event.data.totalAmountMinor,
+            currency: event.data.currency,
+          },
           dedupeKey: `order.created.customer:${orderId}`,
         });
       });
@@ -114,7 +126,12 @@ export const orderCreatedFunction = inngest.createFunction(
           title: 'Đơn hàng mới',
           message: `Đơn hàng #${orderId} vừa được tạo bởi ${String(event.data.customerName || event.data.customerEmail || 'khách hàng')}.`,
           href: '/orders',
-          data: { orderId, totalAmountMinor: event.data.totalAmountMinor, currency: event.data.currency, userId },
+          data: {
+            orderId,
+            totalAmountMinor: event.data.totalAmountMinor,
+            currency: event.data.currency,
+            userId,
+          },
           dedupeKey: `order.created.admin:${orderId}`,
         });
       });
@@ -133,7 +150,11 @@ export const orderCreatedFunction = inngest.createFunction(
 );
 
 export const paymentStatusFunction = inngest.createFunction(
-  { id: 'payment-status-email', retries: 3, triggers: { event: INNGEST_EVENTS.paymentStatusChanged } },
+  {
+    id: 'payment-status-email',
+    retries: 3,
+    triggers: { event: INNGEST_EVENTS.paymentStatusChanged },
+  },
   async ({ event, step }) => {
     const orderId = String(event.data.orderId || '');
     let userId = String(event.data.userId || '');
@@ -146,11 +167,19 @@ export const paymentStatusFunction = inngest.createFunction(
       try {
         const dbOrder = await prisma.order.findUnique({
           where: { id: orderId },
-          select: { userId: true, paymentStatus: true, status: true, customerEmail: true },
+          select: {
+            userId: true,
+            paymentStatus: true,
+            status: true,
+            customerEmail: true,
+          },
         });
         if (dbOrder) {
           if (!userId && dbOrder.userId) userId = dbOrder.userId;
-          if (!status) status = String(dbOrder.paymentStatus || dbOrder.status || '').toUpperCase();
+          if (!status)
+            status = String(
+              dbOrder.paymentStatus || dbOrder.status || '',
+            ).toUpperCase();
           if (!email && dbOrder.customerEmail) email = dbOrder.customerEmail;
         }
       } catch (err) {
@@ -162,7 +191,9 @@ export const paymentStatusFunction = inngest.createFunction(
     const isFailed = status === 'FAILED' || status === 'PAYMENT_FAILED';
 
     if (orderId && (isSuccess || isFailed)) {
-      const type: NotificationType = isSuccess ? 'PAYMENT_SUCCESS' : 'PAYMENT_FAILED';
+      const type: NotificationType = isSuccess
+        ? 'PAYMENT_SUCCESS'
+        : 'PAYMENT_FAILED';
       const dedupePrefix = isSuccess ? 'payment.success' : 'payment.failed';
 
       if (userId) {
@@ -171,7 +202,9 @@ export const paymentStatusFunction = inngest.createFunction(
             userId,
             targetRole: 'CUSTOMER',
             type,
-            title: isSuccess ? 'Thanh toán thành công' : 'Thanh toán không thành công',
+            title: isSuccess
+              ? 'Thanh toán thành công'
+              : 'Thanh toán không thành công',
             message: isSuccess
               ? `Xác nhận thanh toán thành công cho đơn hàng #${orderId}.`
               : `Thanh toán cho đơn hàng #${orderId} không thành công. Vui lòng kiểm tra lại.`,
@@ -187,7 +220,9 @@ export const paymentStatusFunction = inngest.createFunction(
           userId: null,
           targetRole: 'ADMIN',
           type,
-          title: isSuccess ? 'Xác nhận thanh toán' : 'Cảnh báo thanh toán thất bại',
+          title: isSuccess
+            ? 'Xác nhận thanh toán'
+            : 'Cảnh báo thanh toán thất bại',
           message: isSuccess
             ? `Đơn hàng #${orderId} đã được khách hàng thanh toán thành công.`
             : `Đơn hàng #${orderId} thanh toán không thành công.`,
@@ -213,9 +248,12 @@ export const paymentStatusFunction = inngest.createFunction(
   },
 );
 
-
 export const lowStockFunction = inngest.createFunction(
-  { id: 'low-stock-admin-alert', retries: 3, triggers: { event: INNGEST_EVENTS.productLowStock } },
+  {
+    id: 'low-stock-admin-alert',
+    retries: 3,
+    triggers: { event: INNGEST_EVENTS.productLowStock },
+  },
   async ({ event, step }) => {
     const productId = String(event.data.productId || '');
     const productName = String(event.data.productName || 'Sản phẩm');
@@ -239,7 +277,8 @@ export const lowStockFunction = inngest.createFunction(
 
     return step.run('send-low-stock-admin-alert', async () => {
       const to = process.env.ADMIN_ALERT_EMAIL;
-      if (!to) return { skipped: true, reason: 'ADMIN_ALERT_EMAIL is not configured' };
+      if (!to)
+        return { skipped: true, reason: 'ADMIN_ALERT_EMAIL is not configured' };
       return new EmailService().send({
         to,
         subject: `Low stock: ${productName}`,
@@ -251,8 +290,13 @@ export const lowStockFunction = inngest.createFunction(
 
 @Injectable()
 export class InngestEventsService implements OnModuleDestroy {
-  private async send(event: { id: string; name: string; data: Record<string, unknown> }) {
-    if (!process.env.INNGEST_EVENT_KEY && process.env.NODE_ENV === 'test') return;
+  private async send(event: {
+    id: string;
+    name: string;
+    data: Record<string, unknown>;
+  }) {
+    if (!process.env.INNGEST_EVENT_KEY && process.env.NODE_ENV === 'test')
+      return;
     try {
       await inngest.send(event);
     } catch {
@@ -263,23 +307,41 @@ export class InngestEventsService implements OnModuleDestroy {
 
   orderCreated(data: Record<string, unknown>) {
     const orderId = String(data.orderId || '');
-    return this.send({ id: `order.created:${orderId}`, name: INNGEST_EVENTS.orderCreated, data: { ...data, occurredAt: now() } });
+    return this.send({
+      id: `order.created:${orderId}`,
+      name: INNGEST_EVENTS.orderCreated,
+      data: { ...data, occurredAt: now() },
+    });
   }
 
   paymentStatusChanged(data: Record<string, unknown>) {
     const eventId = String(data.providerEventId || data.paymentId || '');
-    return this.send({ id: `payment.status.changed:${eventId}`, name: INNGEST_EVENTS.paymentStatusChanged, data: { ...data, occurredAt: now() } });
+    return this.send({
+      id: `payment.status.changed:${eventId}`,
+      name: INNGEST_EVENTS.paymentStatusChanged,
+      data: { ...data, occurredAt: now() },
+    });
   }
 
   userCreated(data: Record<string, unknown>) {
     const userId = String(data.userId || '');
-    return this.send({ id: `user.created:${userId}`, name: INNGEST_EVENTS.userCreated, data: { ...data, occurredAt: now() } });
+    return this.send({
+      id: `user.created:${userId}`,
+      name: INNGEST_EVENTS.userCreated,
+      data: { ...data, occurredAt: now() },
+    });
   }
 
   productLowStock(data: Record<string, unknown>) {
     const productId = String(data.productId || '');
-    return this.send({ id: `product.low_stock:${productId}:${String(data.stockQuantity || '')}`, name: INNGEST_EVENTS.productLowStock, data: { ...data, occurredAt: now() } });
+    return this.send({
+      id: `product.low_stock:${productId}:${String(data.stockQuantity || '')}`,
+      name: INNGEST_EVENTS.productLowStock,
+      data: { ...data, occurredAt: now() },
+    });
   }
 
-  async onModuleDestroy() { return undefined; }
+  async onModuleDestroy() {
+    return undefined;
+  }
 }

@@ -5,13 +5,16 @@
 // source: users.proto
 
 /* eslint-disable */
-import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
-import type { handleUnaryCall, UntypedServiceImplementation } from "@grpc/grpc-js";
-import { GrpcMethod, GrpcStreamMethod } from "@nestjs/microservices";
-import { Observable } from "rxjs";
-import { Empty, PageInfo, PageRequest } from "./common";
+import { BinaryReader, BinaryWriter } from '@bufbuild/protobuf/wire';
+import type {
+  handleUnaryCall,
+  UntypedServiceImplementation,
+} from '@grpc/grpc-js';
+import { GrpcMethod, GrpcStreamMethod } from '@nestjs/microservices';
+import { Observable } from 'rxjs';
+import { Empty, PageInfo, PageRequest } from './common';
 
-export const protobufPackage = "users.v1";
+export const protobufPackage = 'users.v1';
 
 export interface User {
   id: string;
@@ -63,64 +66,68 @@ export interface ListUsersResponse {
   pageInfo: PageInfo | undefined;
 }
 
-export const USERS_V1_PACKAGE_NAME = "users.v1";
+export const USERS_V1_PACKAGE_NAME = 'users.v1';
 
 function createBaseUser(): User {
   return {
-    id: "",
-    clerkId: "",
-    email: "",
-    firstName: "",
-    lastName: "",
-    displayName: "",
-    imageUrl: "",
-    role: "",
-    status: "",
-    createdAt: "",
-    updatedAt: "",
+    id: '',
+    clerkId: '',
+    email: '',
+    firstName: '',
+    lastName: '',
+    displayName: '',
+    imageUrl: '',
+    role: '',
+    status: '',
+    createdAt: '',
+    updatedAt: '',
   };
 }
 
 export const User: MessageFns<User> = {
-  encode(message: User, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.id !== "") {
+  encode(
+    message: User,
+    writer: BinaryWriter = new BinaryWriter(),
+  ): BinaryWriter {
+    if (message.id !== '') {
       writer.uint32(10).string(message.id);
     }
-    if (message.clerkId !== "") {
+    if (message.clerkId !== '') {
       writer.uint32(18).string(message.clerkId);
     }
-    if (message.email !== "") {
+    if (message.email !== '') {
       writer.uint32(26).string(message.email);
     }
-    if (message.firstName !== "") {
+    if (message.firstName !== '') {
       writer.uint32(34).string(message.firstName);
     }
-    if (message.lastName !== "") {
+    if (message.lastName !== '') {
       writer.uint32(42).string(message.lastName);
     }
-    if (message.displayName !== "") {
+    if (message.displayName !== '') {
       writer.uint32(50).string(message.displayName);
     }
-    if (message.imageUrl !== "") {
+    if (message.imageUrl !== '') {
       writer.uint32(58).string(message.imageUrl);
     }
-    if (message.role !== "") {
+    if (message.role !== '') {
       writer.uint32(66).string(message.role);
     }
-    if (message.status !== "") {
+    if (message.status !== '') {
       writer.uint32(74).string(message.status);
     }
-    if (message.createdAt !== "") {
+    if (message.createdAt !== '') {
       writer.uint32(82).string(message.createdAt);
     }
-    if (message.updatedAt !== "") {
+    if (message.updatedAt !== '') {
       writer.uint32(90).string(message.updatedAt);
     }
     return writer;
   },
 
   decode(input: BinaryReader | Uint8Array, length?: number): User {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const reader =
+      input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseUser();
     while (reader.pos < end) {
@@ -225,19 +232,26 @@ export const User: MessageFns<User> = {
 };
 
 function createBaseGetUserByClerkIdRequest(): GetUserByClerkIdRequest {
-  return { clerkId: "" };
+  return { clerkId: '' };
 }
 
 export const GetUserByClerkIdRequest: MessageFns<GetUserByClerkIdRequest> = {
-  encode(message: GetUserByClerkIdRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.clerkId !== "") {
+  encode(
+    message: GetUserByClerkIdRequest,
+    writer: BinaryWriter = new BinaryWriter(),
+  ): BinaryWriter {
+    if (message.clerkId !== '') {
       writer.uint32(10).string(message.clerkId);
     }
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): GetUserByClerkIdRequest {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+  decode(
+    input: BinaryReader | Uint8Array,
+    length?: number,
+  ): GetUserByClerkIdRequest {
+    const reader =
+      input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGetUserByClerkIdRequest();
     while (reader.pos < end) {
@@ -263,60 +277,67 @@ export const GetUserByClerkIdRequest: MessageFns<GetUserByClerkIdRequest> = {
 
 function createBaseUpsertClerkUserRequest(): UpsertClerkUserRequest {
   return {
-    eventId: "",
-    eventType: "",
-    clerkId: "",
-    email: "",
-    firstName: "",
-    lastName: "",
-    displayName: "",
-    imageUrl: "",
-    role: "",
-    payloadJson: "",
-    clerkCreatedAt: "",
+    eventId: '',
+    eventType: '',
+    clerkId: '',
+    email: '',
+    firstName: '',
+    lastName: '',
+    displayName: '',
+    imageUrl: '',
+    role: '',
+    payloadJson: '',
+    clerkCreatedAt: '',
   };
 }
 
 export const UpsertClerkUserRequest: MessageFns<UpsertClerkUserRequest> = {
-  encode(message: UpsertClerkUserRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.eventId !== "") {
+  encode(
+    message: UpsertClerkUserRequest,
+    writer: BinaryWriter = new BinaryWriter(),
+  ): BinaryWriter {
+    if (message.eventId !== '') {
       writer.uint32(10).string(message.eventId);
     }
-    if (message.eventType !== "") {
+    if (message.eventType !== '') {
       writer.uint32(18).string(message.eventType);
     }
-    if (message.clerkId !== "") {
+    if (message.clerkId !== '') {
       writer.uint32(26).string(message.clerkId);
     }
-    if (message.email !== "") {
+    if (message.email !== '') {
       writer.uint32(34).string(message.email);
     }
-    if (message.firstName !== "") {
+    if (message.firstName !== '') {
       writer.uint32(42).string(message.firstName);
     }
-    if (message.lastName !== "") {
+    if (message.lastName !== '') {
       writer.uint32(50).string(message.lastName);
     }
-    if (message.displayName !== "") {
+    if (message.displayName !== '') {
       writer.uint32(58).string(message.displayName);
     }
-    if (message.imageUrl !== "") {
+    if (message.imageUrl !== '') {
       writer.uint32(66).string(message.imageUrl);
     }
-    if (message.role !== "") {
+    if (message.role !== '') {
       writer.uint32(74).string(message.role);
     }
-    if (message.payloadJson !== "") {
+    if (message.payloadJson !== '') {
       writer.uint32(82).string(message.payloadJson);
     }
-    if (message.clerkCreatedAt !== "") {
+    if (message.clerkCreatedAt !== '') {
       writer.uint32(90).string(message.clerkCreatedAt);
     }
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): UpsertClerkUserRequest {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+  decode(
+    input: BinaryReader | Uint8Array,
+    length?: number,
+  ): UpsertClerkUserRequest {
+    const reader =
+      input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseUpsertClerkUserRequest();
     while (reader.pos < end) {
@@ -421,25 +442,32 @@ export const UpsertClerkUserRequest: MessageFns<UpsertClerkUserRequest> = {
 };
 
 function createBaseDeleteClerkUserRequest(): DeleteClerkUserRequest {
-  return { eventId: "", clerkId: "", payloadJson: "" };
+  return { eventId: '', clerkId: '', payloadJson: '' };
 }
 
 export const DeleteClerkUserRequest: MessageFns<DeleteClerkUserRequest> = {
-  encode(message: DeleteClerkUserRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.eventId !== "") {
+  encode(
+    message: DeleteClerkUserRequest,
+    writer: BinaryWriter = new BinaryWriter(),
+  ): BinaryWriter {
+    if (message.eventId !== '') {
       writer.uint32(10).string(message.eventId);
     }
-    if (message.clerkId !== "") {
+    if (message.clerkId !== '') {
       writer.uint32(18).string(message.clerkId);
     }
-    if (message.payloadJson !== "") {
+    if (message.payloadJson !== '') {
       writer.uint32(26).string(message.payloadJson);
     }
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): DeleteClerkUserRequest {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+  decode(
+    input: BinaryReader | Uint8Array,
+    length?: number,
+  ): DeleteClerkUserRequest {
+    const reader =
+      input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseDeleteClerkUserRequest();
     while (reader.pos < end) {
@@ -480,28 +508,32 @@ export const DeleteClerkUserRequest: MessageFns<DeleteClerkUserRequest> = {
 };
 
 function createBaseListUsersRequest(): ListUsersRequest {
-  return { page: undefined, search: "", role: "", status: "" };
+  return { page: undefined, search: '', role: '', status: '' };
 }
 
 export const ListUsersRequest: MessageFns<ListUsersRequest> = {
-  encode(message: ListUsersRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+  encode(
+    message: ListUsersRequest,
+    writer: BinaryWriter = new BinaryWriter(),
+  ): BinaryWriter {
     if (message.page !== undefined) {
       PageRequest.encode(message.page, writer.uint32(10).fork()).join();
     }
-    if (message.search !== "") {
+    if (message.search !== '') {
       writer.uint32(18).string(message.search);
     }
-    if (message.role !== "") {
+    if (message.role !== '') {
       writer.uint32(26).string(message.role);
     }
-    if (message.status !== "") {
+    if (message.status !== '') {
       writer.uint32(34).string(message.status);
     }
     return writer;
   },
 
   decode(input: BinaryReader | Uint8Array, length?: number): ListUsersRequest {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const reader =
+      input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseListUsersRequest();
     while (reader.pos < end) {
@@ -554,7 +586,10 @@ function createBaseListUsersResponse(): ListUsersResponse {
 }
 
 export const ListUsersResponse: MessageFns<ListUsersResponse> = {
-  encode(message: ListUsersResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+  encode(
+    message: ListUsersResponse,
+    writer: BinaryWriter = new BinaryWriter(),
+  ): BinaryWriter {
     for (const v of message.users) {
       User.encode(v!, writer.uint32(10).fork()).join();
     }
@@ -565,7 +600,8 @@ export const ListUsersResponse: MessageFns<ListUsersResponse> = {
   },
 
   decode(input: BinaryReader | Uint8Array, length?: number): ListUsersResponse {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const reader =
+      input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseListUsersResponse();
     while (reader.pos < end) {
@@ -608,72 +644,112 @@ export interface UsersServiceClient {
 }
 
 export interface UsersServiceController {
-  getUserByClerkId(request: GetUserByClerkIdRequest): Promise<User> | Observable<User> | User;
+  getUserByClerkId(
+    request: GetUserByClerkIdRequest,
+  ): Promise<User> | Observable<User> | User;
 
-  upsertClerkUser(request: UpsertClerkUserRequest): Promise<User> | Observable<User> | User;
+  upsertClerkUser(
+    request: UpsertClerkUserRequest,
+  ): Promise<User> | Observable<User> | User;
 
-  deleteClerkUser(request: DeleteClerkUserRequest): Promise<Empty> | Observable<Empty> | Empty;
+  deleteClerkUser(
+    request: DeleteClerkUserRequest,
+  ): Promise<Empty> | Observable<Empty> | Empty;
 
-  listUsers(request: ListUsersRequest): Promise<ListUsersResponse> | Observable<ListUsersResponse> | ListUsersResponse;
+  listUsers(
+    request: ListUsersRequest,
+  ):
+    | Promise<ListUsersResponse>
+    | Observable<ListUsersResponse>
+    | ListUsersResponse;
 }
 
 export function UsersServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ["getUserByClerkId", "upsertClerkUser", "deleteClerkUser", "listUsers"];
+    const grpcMethods: string[] = [
+      'getUserByClerkId',
+      'upsertClerkUser',
+      'deleteClerkUser',
+      'listUsers',
+    ];
     for (const method of grpcMethods) {
-      const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcMethod("UsersService", method)(constructor.prototype[method], method, descriptor);
+      const descriptor: any = Reflect.getOwnPropertyDescriptor(
+        constructor.prototype,
+        method,
+      );
+      GrpcMethod('UsersService', method)(
+        constructor.prototype[method],
+        method,
+        descriptor,
+      );
     }
     const grpcStreamMethods: string[] = [];
     for (const method of grpcStreamMethods) {
-      const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcStreamMethod("UsersService", method)(constructor.prototype[method], method, descriptor);
+      const descriptor: any = Reflect.getOwnPropertyDescriptor(
+        constructor.prototype,
+        method,
+      );
+      GrpcStreamMethod('UsersService', method)(
+        constructor.prototype[method],
+        method,
+        descriptor,
+      );
     }
   };
 }
 
-export const USERS_SERVICE_NAME = "UsersService";
+export const USERS_SERVICE_NAME = 'UsersService';
 
 export type UsersServiceService = typeof UsersServiceService;
 export const UsersServiceService = {
   getUserByClerkId: {
-    path: "/users.v1.UsersService/GetUserByClerkId" as const,
+    path: '/users.v1.UsersService/GetUserByClerkId' as const,
     requestStream: false as const,
     responseStream: false as const,
     requestSerialize: (value: GetUserByClerkIdRequest): Buffer =>
       Buffer.from(GetUserByClerkIdRequest.encode(value).finish()),
-    requestDeserialize: (value: Buffer): GetUserByClerkIdRequest => GetUserByClerkIdRequest.decode(value),
-    responseSerialize: (value: User): Buffer => Buffer.from(User.encode(value).finish()),
+    requestDeserialize: (value: Buffer): GetUserByClerkIdRequest =>
+      GetUserByClerkIdRequest.decode(value),
+    responseSerialize: (value: User): Buffer =>
+      Buffer.from(User.encode(value).finish()),
     responseDeserialize: (value: Buffer): User => User.decode(value),
   },
   upsertClerkUser: {
-    path: "/users.v1.UsersService/UpsertClerkUser" as const,
+    path: '/users.v1.UsersService/UpsertClerkUser' as const,
     requestStream: false as const,
     responseStream: false as const,
     requestSerialize: (value: UpsertClerkUserRequest): Buffer =>
       Buffer.from(UpsertClerkUserRequest.encode(value).finish()),
-    requestDeserialize: (value: Buffer): UpsertClerkUserRequest => UpsertClerkUserRequest.decode(value),
-    responseSerialize: (value: User): Buffer => Buffer.from(User.encode(value).finish()),
+    requestDeserialize: (value: Buffer): UpsertClerkUserRequest =>
+      UpsertClerkUserRequest.decode(value),
+    responseSerialize: (value: User): Buffer =>
+      Buffer.from(User.encode(value).finish()),
     responseDeserialize: (value: Buffer): User => User.decode(value),
   },
   deleteClerkUser: {
-    path: "/users.v1.UsersService/DeleteClerkUser" as const,
+    path: '/users.v1.UsersService/DeleteClerkUser' as const,
     requestStream: false as const,
     responseStream: false as const,
     requestSerialize: (value: DeleteClerkUserRequest): Buffer =>
       Buffer.from(DeleteClerkUserRequest.encode(value).finish()),
-    requestDeserialize: (value: Buffer): DeleteClerkUserRequest => DeleteClerkUserRequest.decode(value),
-    responseSerialize: (value: Empty): Buffer => Buffer.from(Empty.encode(value).finish()),
+    requestDeserialize: (value: Buffer): DeleteClerkUserRequest =>
+      DeleteClerkUserRequest.decode(value),
+    responseSerialize: (value: Empty): Buffer =>
+      Buffer.from(Empty.encode(value).finish()),
     responseDeserialize: (value: Buffer): Empty => Empty.decode(value),
   },
   listUsers: {
-    path: "/users.v1.UsersService/ListUsers" as const,
+    path: '/users.v1.UsersService/ListUsers' as const,
     requestStream: false as const,
     responseStream: false as const,
-    requestSerialize: (value: ListUsersRequest): Buffer => Buffer.from(ListUsersRequest.encode(value).finish()),
-    requestDeserialize: (value: Buffer): ListUsersRequest => ListUsersRequest.decode(value),
-    responseSerialize: (value: ListUsersResponse): Buffer => Buffer.from(ListUsersResponse.encode(value).finish()),
-    responseDeserialize: (value: Buffer): ListUsersResponse => ListUsersResponse.decode(value),
+    requestSerialize: (value: ListUsersRequest): Buffer =>
+      Buffer.from(ListUsersRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): ListUsersRequest =>
+      ListUsersRequest.decode(value),
+    responseSerialize: (value: ListUsersResponse): Buffer =>
+      Buffer.from(ListUsersResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer): ListUsersResponse =>
+      ListUsersResponse.decode(value),
   },
 } as const;
 

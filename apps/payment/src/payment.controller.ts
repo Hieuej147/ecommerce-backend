@@ -6,7 +6,12 @@ import { PaymentService } from './payment.service';
 @PaymentServiceControllerMethods()
 export class PaymentController {
   constructor(private readonly service: PaymentService) {}
-  createCheckoutSession(r: any, metadata?: Metadata) { return this.service.createCheckoutSession(r, String(metadata?.get('x-user-id')?.[0] ?? '')); }
+  createCheckoutSession(r: any, metadata?: Metadata) {
+    return this.service.createCheckoutSession(
+      r,
+      String(metadata?.get('x-user-id')?.[0] ?? ''),
+    );
+  }
   getPayment(r: any, metadata?: Metadata) {
     return this.service.getPayment(
       r,
@@ -14,6 +19,13 @@ export class PaymentController {
       String(metadata?.get('x-user-role')?.[0] ?? ''),
     );
   }
-  processWebhook(r: any) { return this.service.processWebhook(r); }
-  getPaymentMetrics(r: any, metadata?: Metadata) { return this.service.getPaymentMetrics(r, String(metadata?.get('x-user-role')?.[0] ?? '')); }
+  processWebhook(r: any) {
+    return this.service.processWebhook(r);
+  }
+  getPaymentMetrics(r: any, metadata?: Metadata) {
+    return this.service.getPaymentMetrics(
+      r,
+      String(metadata?.get('x-user-role')?.[0] ?? ''),
+    );
+  }
 }

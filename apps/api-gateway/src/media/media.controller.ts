@@ -11,7 +11,13 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiTags, ApiOperation, ApiConsumes, ApiBody, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiConsumes,
+  ApiBody,
+  ApiResponse,
+} from '@nestjs/swagger';
 import type { Request, Response } from 'express';
 import { randomUUID } from 'crypto';
 import { StorageService } from '../storage/storage.service';
@@ -78,10 +84,13 @@ export class MediaController {
     @Query('folder') folder = 'products',
   ) {
     if (!file) {
-      throw new BadRequestException('No file provided in form-data ("file" field is required)');
+      throw new BadRequestException(
+        'No file provided in form-data ("file" field is required)',
+      );
     }
 
-    const cleanFolder = (folder || 'products').replace(/[^a-zA-Z0-9_-]/g, '') || 'products';
+    const cleanFolder =
+      (folder || 'products').replace(/[^a-zA-Z0-9_-]/g, '') || 'products';
     const extMatch = file.originalname?.match(/\.([a-zA-Z0-9]+)$/);
     const ext = extMatch ? `.${extMatch[1].toLowerCase()}` : '.png';
     const fileKey = `${cleanFolder}/${randomUUID()}${ext}`;
@@ -102,7 +111,9 @@ export class MediaController {
   @ApiOperation({ summary: 'Stream an image file with caching headers' })
   async serveFile(@Req() req: Request, @Res() res: Response) {
     const rawKey = req.params?.fileKey;
-    const fileKey = Array.isArray(rawKey) ? rawKey.join('/') : String(rawKey || '');
+    const fileKey = Array.isArray(rawKey)
+      ? rawKey.join('/')
+      : String(rawKey || '');
 
     if (!fileKey || fileKey.includes('..')) {
       throw new BadRequestException('Invalid media file key');

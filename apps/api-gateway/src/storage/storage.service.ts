@@ -93,10 +93,16 @@ export class StorageService {
         etag: response.ETag,
       };
     } catch (error: any) {
-      if (error?.name === 'NoSuchKey' || error?.$metadata?.httpStatusCode === 404) {
+      if (
+        error?.name === 'NoSuchKey' ||
+        error?.$metadata?.httpStatusCode === 404
+      ) {
         throw new NotFoundException(`Media file not found: ${cleanKey}`);
       }
-      this.logger.error(`Failed to get stream for ${cleanKey}: ${error.message}`, error.stack);
+      this.logger.error(
+        `Failed to get stream for ${cleanKey}: ${error.message}`,
+        error.stack,
+      );
       throw error;
     }
   }

@@ -353,7 +353,18 @@ export class NotificationDto {
   @ApiPropertyOptional()
   targetRole?: string;
 
-  @ApiProperty({ enum: ['ORDER_CREATED', 'ORDER_SHIPPED', 'ORDER_CANCELLED', 'PAYMENT_SUCCESS', 'PAYMENT_FAILED', 'PRODUCT_LOW_STOCK', 'NEW_CUSTOMER', 'SYSTEM_ALERT'] })
+  @ApiProperty({
+    enum: [
+      'ORDER_CREATED',
+      'ORDER_SHIPPED',
+      'ORDER_CANCELLED',
+      'PAYMENT_SUCCESS',
+      'PAYMENT_FAILED',
+      'PRODUCT_LOW_STOCK',
+      'NEW_CUSTOMER',
+      'SYSTEM_ALERT',
+    ],
+  })
   type!: string;
 
   @ApiProperty()
@@ -385,4 +396,3 @@ export class UnreadCountDto {
   @ApiProperty()
   unreadCount!: number;
 }
-

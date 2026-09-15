@@ -1,6 +1,29 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiParam, ApiBearerAuth, ApiExcludeEndpoint } from '@nestjs/swagger';
-import { ListProductsResponseDto, ProductDto, CreateProductBodyDto, UpdateProductBodyDto } from '../swagger/dtos';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiQuery,
+  ApiParam,
+  ApiBearerAuth,
+  ApiExcludeEndpoint,
+} from '@nestjs/swagger';
+import {
+  ListProductsResponseDto,
+  ProductDto,
+  CreateProductBodyDto,
+  UpdateProductBodyDto,
+} from '../swagger/dtos';
 import { Public } from '../auth/decorators/public.decorator';
 import { AdminGuard } from '../auth/guards/admin.guard';
 import { CatalogGrpcService } from './catalog.grpc.service';
@@ -43,8 +66,21 @@ export class CatalogController {
   @ApiQuery({ name: 'search', required: false, type: String })
   @ApiQuery({ name: 'status', required: false, type: String })
   @ApiResponse({ status: 200, type: ListProductsResponseDto })
-  list(@Query() query: { pageSize?: string; pageToken?: string; search?: string; status?: string }) {
-    return this.catalog.listProducts({ pageSize: Number(query.pageSize) || 20, pageToken: query.pageToken, search: query.search, status: query.status });
+  list(
+    @Query()
+    query: {
+      pageSize?: string;
+      pageToken?: string;
+      search?: string;
+      status?: string;
+    },
+  ) {
+    return this.catalog.listProducts({
+      pageSize: Number(query.pageSize) || 20,
+      pageToken: query.pageToken,
+      search: query.search,
+      status: query.status,
+    });
   }
 
   @Public()
@@ -52,11 +88,17 @@ export class CatalogController {
   @ApiOperation({ summary: 'Get product' })
   @ApiParam({ name: 'id', type: String })
   @ApiResponse({ status: 200, type: ProductDto })
-  get(@Param('id') id: string) { return this.catalog.getProduct(id); }
+  get(@Param('id') id: string) {
+    return this.catalog.getProduct(id);
+  }
 
   @UseGuards(AdminGuard)
   @Post('upload-url')
-  @ApiOperation({ summary: 'Get a presigned S3 upload URL for product media' })
+  @ApiOperation({
+    summary:
+      'DEPRECATED: Use POST /v1/media/upload instead. Legacy upload-url endpoint',
+    deprecated: true,
+  })
   @ApiResponse({ status: 200, description: 'Presigned upload URL generated' })
   getUploadUrl(
     @Body()
@@ -73,46 +115,68 @@ export class CatalogController {
   @UseGuards(AdminGuard)
   @Post()
   async create(@Body() body: ProductBody, @CurrentActor() actor: ActorContext) {
-    const product = await this.catalog.createProduct({
-      slug: body.slug ?? '',
-      name: body.name ?? '',
-      description: body.description ?? '',
-      stockQuantity: Number(body.stockQuantity ?? 0),
-      price: {
-        amountMinor: Number(body.price?.amountMinor ?? body.priceAmountMinor ?? 0),
-        currency: body.price?.currency ?? body.currency ?? 'VND',
+    const product = (await this.catalog.createProduct(
+      {
+        slug: body.slug ?? '',
+        name: body.name ?? '',
+        description: body.description ?? '',
+        stockQuantity: Number(body.stockQuantity ?? 0),
+        price: {
+          amountMinor: Number(
+            body.price?.amountMinor ?? body.priceAmountMinor ?? 0,
+          ),
+          currency: body.price?.currency ?? body.currency ?? 'VND',
+        },
+        colors: body.colors ?? [],
+        sizes: body.sizes ?? [],
+        images: body.images ?? {},
+        sku: body.sku?.trim() || undefined,
+        categorySlug: body.categorySlug?.trim() || '',
+        reorderPoint: Number(body.reorderPoint ?? 20),
       },
-      colors: body.colors ?? [],
-      sizes: body.sizes ?? [],
-      images: body.images ?? {},
-      sku: body.sku?.trim() || undefined,
-      categorySlug: body.categorySlug?.trim() || '',
-      reorderPoint: Number(body.reorderPoint ?? 20),
-    }, createActorMetadata(actor)) as Product;
+      createActorMetadata(actor),
+    )) as Product;
     this.publishLowStock(product);
     return product;
   }
 
   @UseGuards(AdminGuard)
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() body: ProductBody, @CurrentActor() actor: ActorContext) {
-    const product = await this.catalog.updateProduct({
-      productId: id,
-      name: body.name ?? '',
-      description: body.description ?? '',
-      ...(body.stockQuantity !== undefined ? { stockQuantity: Number(body.stockQuantity) } : {}),
-      price: body.price || body.priceAmountMinor !== undefined ? {
-        amountMinor: Number(body.price?.amountMinor ?? body.priceAmountMinor),
-        currency: body.price?.currency ?? body.currency ?? 'VND',
-      } : undefined,
-      colors: body.colors || [],
-      sizes: body.sizes || [],
-      images: body.images || {},
-      sku: body.sku?.trim() || undefined,
-      categorySlug: body.categorySlug?.trim() || undefined,
-      reorderPoint: body.reorderPoint !== undefined ? Number(body.reorderPoint) : undefined,
-      status: body.status || undefined,
-    }, createActorMetadata(actor)) as Product;
+  async update(
+    @Param('id') id: string,
+    @Body() body: ProductBody,
+    @CurrentActor() actor: ActorContext,
+  ) {
+    const product = (await this.catalog.updateProduct(
+      {
+        productId: id,
+        name: body.name ?? '',
+        description: body.description ?? '',
+        ...(body.stockQuantity !== undefined
+          ? { stockQuantity: Number(body.stockQuantity) }
+          : {}),
+        price:
+          body.price || body.priceAmountMinor !== undefined
+            ? {
+                amountMinor: Number(
+                  body.price?.amountMinor ?? body.priceAmountMinor,
+                ),
+                currency: body.price?.currency ?? body.currency ?? 'VND',
+              }
+            : undefined,
+        colors: body.colors || [],
+        sizes: body.sizes || [],
+        images: body.images || {},
+        sku: body.sku?.trim() || undefined,
+        categorySlug: body.categorySlug?.trim() || undefined,
+        reorderPoint:
+          body.reorderPoint !== undefined
+            ? Number(body.reorderPoint)
+            : undefined,
+        status: body.status || undefined,
+      },
+      createActorMetadata(actor),
+    )) as Product;
     this.publishLowStock(product);
     return product;
   }
@@ -120,12 +184,19 @@ export class CatalogController {
   @UseGuards(AdminGuard)
   @Delete(':id')
   @ApiExcludeEndpoint()
-  archive(@Param('id') id: string, @CurrentActor() actor: ActorContext) { return this.catalog.archiveProduct(id, createActorMetadata(actor)); }
+  archive(@Param('id') id: string, @CurrentActor() actor: ActorContext) {
+    return this.catalog.archiveProduct(id, createActorMetadata(actor));
+  }
 
   private publishLowStock(product: Product) {
     const threshold = product.reorderPoint || 20;
     if (product.stockQuantity <= threshold) {
-      void this.inngest.productLowStock({ productId: product.id, productName: product.name, stockQuantity: product.stockQuantity, threshold });
+      void this.inngest.productLowStock({
+        productId: product.id,
+        productName: product.name,
+        stockQuantity: product.stockQuantity,
+        threshold,
+      });
     }
   }
 }
