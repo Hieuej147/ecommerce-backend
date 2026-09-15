@@ -18,7 +18,7 @@ const s3 = new S3Client({
   forcePathStyle,
 });
 
-const sourceDir = path.resolve('/mnt/disk3/E-commerce/public/products');
+const sourceDir = path.resolve(__dirname, 'assets/products');
 
 async function uploadDemoImages() {
   console.log(`Starting demo image upload to ${bucket}...`);
