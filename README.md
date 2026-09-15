@@ -100,52 +100,51 @@ This project is an enterprise-grade, full-stack **E-Commerce Microservices Platf
                   │                                  │ (Email OTP / Secret Key)│
                   │                                  └────────────┬────────────┘
                   │                                               │
-                  │ Direct Media Fetch (CDN/Public URL)           │ Presigned S3 Upload PUT
-                  ▼                                               ▼
-          ┌───────────────────────────────────────────────────────────────┐
-          │     Object Storage: MinIO (Port 9002/9001) / S3 / R2          │
-          │     Bucket: ecommerce-products (Direct-to-Client Upload)      │
-          └───────────────────────────────▲───────────────────────────────┘
-                                          │ Presigned URL Generation
-                  ┌───────────────────────┴───────────────────────┐
-                  │                                               │
-                  ▼                                               ▼
-    ┌───────────────────────────┐                   ┌───────────────────────────┐
-    │    NestJS API Gateway     │                   │      Catalog Service      │
-    │  - Port 3000 (REST/JSON)  │──gRPC (Port 5001)─│   - StorageService (S3)   │
-    │  - Presigned URL Endpoint │                   │   - Product Assets Matrix │
-    └───────────────────────────┘                   └───────────────────────────┘
-                  │
-        ┌─────────┴─────────┬───────────────────┬───────────────────┐
-        │ gRPC (5002)       │ gRPC (5003)       │ gRPC (5004)       │ HTTP (3010)
-        ▼                   ▼                   ▼                   ▼
-┌───────────────┐   ┌──────────────┐    ┌──────────────┐    ┌───────────────┐
-│ Order Service │   │Payment Serv. │    │Users Service │    │ Agent Service │
-│  (Port 5002)  │   │ (Port 5003)  │    │ (Port 5004)  │    │  (Port 3010)  │
-└───────┬───────┘   └──────┬───────┘    └──────┬───────┘    └───────┬───────┘
-        │                  │                   │                    │ HTTP
-        │                  │                   │                    ▼
-        │                  │                   │            ┌───────────────┐
-        │                  │                   │            │ Agent Python  │
-        │                  │                   │            │  (Port 8123)  │
-        │                  │                   │            │  (LangGraph)  │
-        └──────────────────┼───────────────────┘            └───────────────┘
-                           │
-                           ▼
-              ┌─────────────────────────┐
-              │  PostgreSQL (Port 5438) │
-              │   Redis (Port 6379)     │
-              └─────────────────────────┘
+                  │ 1. REST API (/api/backend)                    │ 1. REST API
+                  │ 2. Media Proxy (/v1/media/*)                  │ 2. Multipart Upload (/v1/media/upload)
+                  └───────────────────────┬───────────────────────┘
+                                          │
+                                          ▼
+                         ┌─────────────────────────────────┐
+                         │       NestJS API Gateway        │
+                         │     - Port 3000 (REST/JSON)     │
+                         │     - MediaModule Proxy Stream  │
+                         └───────┬─────────────────┬───────┘
+                                 │                 │
+                S3 GetObject     │                 │ gRPC (5001 - 5004)
+                S3 PutObject     │                 │ HTTP (3010)
+                                 ▼                 ▼
+          ┌─────────────────────────────┐   ┌─────────────────────────────┐
+          │  Private Object Storage     │   │    Backend Microservices    │
+          │  - AWS S3 (100% Private)    │   │  - Catalog Service (5001)   │
+          │  - MinIO (Local Port 9002)  │   │  - Order Service (5002)     │
+          │  (Zero Direct Client Access)│   │  - Payment Service (5003)   │
+          └─────────────────────────────┘   │  - Users Service (5004)     │
+                                            │  - Agent Service (3010)     │
+                                            └──────────────┬──────────────┘
+                                                           │
+                                                           │ HTTP (8123)
+                                                           ▼
+                                            ┌─────────────────────────────┐
+                                            │        Agent Python         │
+                                            │   - FastAPI + LangGraph     │
+                                            └──────────────┬──────────────┘
+                                                           │
+                                                           ▼
+                                            ┌─────────────────────────────┐
+                                            │    PostgreSQL (Port 5438)   │
+                                            │       Redis (Port 6379)     │
+                                            └─────────────────────────────┘
 ```
 
 ---
 
 ### 2. Tech Stack
 
-| Component                  | Technologies                                                                              |
-| :------------------------- | :---------------------------------------------------------------------------------------- |
-| **Backend Monorepo**       | NestJS 11, TypeScript, gRPC (@grpc/grpc-js), Prisma ORM, PostgreSQL, Redis, Inngest       |
-| **Object Storage & Media** | MinIO (S3-compatible), AWS SDK v3 (`@aws-sdk/client-s3`, presigned direct client uploads) |
+| Component                  | Technologies                                                                                                              |
+| :------------------------- | :------------------------------------------------------------------------------------------------------------------------ |
+| **Backend Monorepo**       | NestJS 11, TypeScript, gRPC (@grpc/grpc-js), Prisma ORM, PostgreSQL, Redis, Inngest                                       |
+| **Object Storage & Media** | MinIO (S3-compatible), AWS S3 (100% Private), AWS SDK v3 (`@aws-sdk/client-s3`, high-performance streaming proxy via API Gateway MediaModule) |
 | **AI Agent Layer**         | Python 3.12, FastAPI, LangGraph, LangChain, CopilotKit, AG-UI protocol                    |
 | **Customer Storefront**    | Next.js 16.2 (App Router, Turbopack), React 19, Tailwind CSS v4, TanStack Query           |
 | **Admin Dashboard**        | React 19, Vite, TypeScript, Tailwind CSS, Radix UI / Shadcn, TanStack Query               |
@@ -485,30 +484,33 @@ pnpm run dev:all:with-agent
 
 ### 4. Object Storage & Media Upload Pipeline (MinIO / S3 / Cloudflare R2)
 
-The platform features a high-performance **Presigned Direct Upload Architecture** for product assets (multi-angle photography, color-variant mappings):
+The platform features a secure, centralized **Streaming Media Proxy & Upload Architecture** for product assets (multi-angle photography, color-variant mappings):
 
-#### A. Presigned URL Architecture Flow
+#### A. Centralized Media Streaming & Upload Flow
 
-Rather than piping multi-megabyte binary images through the API Gateway, file uploads bypass the backend servers completely:
+All client requests flow exclusively through the API Gateway, shielding object storage from direct public exposure and eliminating the need for S3 CORS:
 
 ```
 [ Admin Dashboard Browser ]
-         │ 1. POST /products/upload-url { fileName, contentType, folder: "products" }
+         │ 1. POST /v1/media/upload (multipart/form-data with file)
+         ▼
+[ API Gateway (Port 3000) - MediaModule ]
+         │ 2. StorageService streams file directly to S3/MinIO via AWS SDK PutObject
+         ▼
+[ MinIO / S3 Storage (100% Private) ]
+         │ 3. Saved at: ecommerce-products/products/<uuid>.<ext>
          ▼
 [ API Gateway (Port 3000) ]
-         │ 2. gRPC getUploadPresignedUrl()
+         │ 4. Returns JSON: { url: "/v1/media/products/<uuid>.<ext>", fileKey: "products/<uuid>.<ext>" }
          ▼
-[ Catalog Service (Port 5001) ]
-         │ 3. AWS SDK v3 generates time-limited presigned S3 PUT URL (valid 10 mins)
+[ Admin Form Submit: POST /v1/products ]
+         │ 5. Product saved with relative image path: "/v1/media/products/<uuid>.<ext>"
+
+[ Storefront / Admin Image Render: <img src="/v1/media/products/..." /> ]
+         │ 6. Trình duyệt gửi GET /v1/media/products/<uuid>.<ext>
          ▼
-[ Admin Dashboard Browser ]
-         │ 4. Direct HTTP PUT binary stream to MinIO / S3 Storage (Zero server memory overhead)
-         ▼
-[ MinIO / S3 Storage (Port 9002) ]
-         │ 5. File stored at: ecommerce-products/products/<uuid>.<ext>
-         ▼
-[ Admin Form Submit: POST /products ]
-         │ 6. Storefront / Admin reads from publicUrl (http://localhost:9002/ecommerce-products/...)
+[ API Gateway (Port 3000) - MediaController ]
+         │ 7. Streams image bytes directly from Private S3 to client with Cache-Control headers
 ```
 
 #### B. Supported Storage Drivers
