@@ -66,7 +66,7 @@ export class CatalogController {
   @ApiQuery({ name: 'search', required: false, type: String })
   @ApiQuery({ name: 'status', required: false, type: String })
   @ApiResponse({ status: 200, type: ListProductsResponseDto })
-  list(
+  async list(
     @Query()
     query: {
       pageSize?: string;
@@ -75,12 +75,16 @@ export class CatalogController {
       status?: string;
     },
   ) {
-    return this.catalog.listProducts({
+    const res = await this.catalog.listProducts({
       pageSize: Number(query.pageSize) || 20,
       pageToken: query.pageToken,
       search: query.search,
       status: query.status,
     });
+    return {
+      products: res?.products ?? [],
+      pageInfo: res?.pageInfo ?? { hasNextPage: false, nextPageToken: '' },
+    };
   }
 
   @Public()
