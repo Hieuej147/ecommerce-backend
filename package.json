@@ -42,6 +42,7 @@
     "db:users:deploy": "prisma migrate deploy --config prisma.users.config.ts",
     "db:migrate:deploy": "prisma migrate deploy --config prisma.config.ts",
     "db:seed:demo": "node scripts/seed-demo.cjs",
+    "db:seed:images": "node scripts/seed-storage-images.cjs",
     "lint": "eslint \"apps/*/src/**/*.ts\" \"libs/*/src/**/*.ts\" \"test/**/*.ts\"",
     "lint:fix": "pnpm lint --fix",
     "test": "jest",
