@@ -8,11 +8,13 @@ import {
 } from '@nestjs/common';
 import { verifyWebhook } from '@clerk/express/webhooks';
 import type { WebhookEvent } from '@clerk/express/webhooks';
+import { ApiExcludeController } from '@nestjs/swagger';
 import { Public } from '../auth/decorators/public.decorator';
 import type { AuthenticatedRequest } from '../auth/types/authenticated-request';
 import { UsersGrpcService } from './users.grpc.service';
 import { InngestEventsService } from '../inngest/inngest.client';
 
+@ApiExcludeController()
 @Controller('webhooks/clerk')
 export class ClerkWebhookController {
   constructor(

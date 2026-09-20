@@ -31,15 +31,54 @@ async function bootstrap() {
     .filter(Boolean);
 
   app.enableCors({
-    origin: authorizedParties,
+    origin: (origin, callback) => {
+      if (!origin || authorizedParties.includes(origin) || origin.includes('localhost') || origin.includes('127.0.0.1')) {
+        callback(null, true);
+      } else {
+        callback(null, false);
+      }
+    },
     credentials: true,
   });
 
   const swaggerConfig = new DocumentBuilder()
-    .setTitle('E-Commerce API')
-    .setDescription('Microservice E-Commerce REST API')
-    .setVersion('1.0')
-    .addBearerAuth()
+    .setTitle('Microservice E-Commerce API Gateway')
+    .setDescription(
+      'REST API Documentation for the Microservice E-Commerce Platform.\n\n' +
+        '### 🔐 Authentication\n' +
+        '- Endpoints tagged with Bearer Auth require a valid Clerk Session JWT.\n' +
+        '- Pass header: `Authorization: Bearer <clerk_session_token>`.\n' +
+        '- Admin routes additionally require the Clerk user to hold `role: "admin"` in publicMetadata.\n\n' +
+        '### 💳 Checkout & Payments Workflow\n' +
+        '1. Create order via `POST /v1/orders` (status: `PENDING_PAYMENT`).\n' +
+        '2. Call `POST /v1/payments/checkout` with `orderId`, `successUrl`, `cancelUrl`.\n' +
+        '3. Redirect customer to `checkoutUrl` returned by the server (Stripe Checkout).\n' +
+        '4. Stripe processes payment and redirects back to `successUrl` or `cancelUrl`.\n' +
+        '5. Backend receives webhook from Stripe, marks order `PAID`, and broadcasts event.\n\n' +
+        '### ⚡ Idempotency\n' +
+        '- `POST /v1/orders` and `POST /v1/payments/checkout` accept an optional `Idempotency-Key` header (UUID) to prevent double-charging or duplicate order creation on network failures.',
+    )
+    .setVersion('1.0.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'Authorization',
+        description:
+          'Enter your Clerk JWT Bearer token: "Bearer <token>" or just the token',
+        in: 'header',
+      },
+      'bearer',
+    )
+    .addTag('Products', 'Public and admin product catalog browsing and inventory management')
+    .addTag('Orders', 'Order placement, customer order history, status updates, and admin metrics')
+    .addTag('Payments', 'Stripe checkout session initiation, transaction lookup, and metrics')
+    .addTag('Users', 'Current authenticated user profile and admin user management')
+    .addTag('Notifications', 'In-app notifications feed, unread counters, and mark-as-read actions')
+    .addTag('Media', 'Direct multipart image uploading and asset streaming with caching')
+    .addTag('Admin / Overview', 'Consolidated store health, low-stock alerts, and financial overview')
+    .addTag('Health', 'Gateway liveness and operational readiness checks')
     .build();
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('docs', app, document, {

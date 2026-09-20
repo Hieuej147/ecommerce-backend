@@ -8,6 +8,7 @@ import {
   paymentStatusFunction,
   welcomeUserFunction,
 } from './inngest.client';
+import { ApiExcludeController } from '@nestjs/swagger';
 import { Public } from '../auth/decorators/public.decorator';
 
 const handler = serve({
@@ -22,6 +23,7 @@ const handler = serve({
     process.env.INNGEST_SERVE_ORIGIN || 'http://localhost:3000/v1/inngest',
 });
 
+@ApiExcludeController()
 @Controller('inngest')
 export class InngestController {
   @Public()

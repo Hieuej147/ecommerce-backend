@@ -8,8 +8,10 @@ import { Public } from '../auth/decorators/public.decorator';
 import { roleFromSessionClaims } from '../auth/role-from-claims';
 import { toActorContext } from '../auth/types/actor-context';
 import type { ActorContext } from '../auth/types/actor-context';
+import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { AgentProxyService } from './agent-proxy.service';
 
+@ApiTags('Agent CopilotKit')
 @Controller('api/copilotkit')
 export class AgentProxyController {
   constructor(
@@ -19,6 +21,7 @@ export class AgentProxyController {
 
   @Public()
   @All('info')
+  @ApiOperation({ summary: 'CopilotKit Agent runtime info endpoint' })
   handleInfo(@Req() request: Request, @Res() response: Response) {
     const actor = this.resolveActorOrFallback(request);
     return this.proxy.forward(request, response, actor);
@@ -26,6 +29,7 @@ export class AgentProxyController {
 
   @Public()
   @All('health')
+  @ApiOperation({ summary: 'CopilotKit Agent runtime health check' })
   handleHealth(@Req() request: Request, @Res() response: Response) {
     const actor = this.resolveActorOrFallback(request);
     return this.proxy.forward(request, response, actor);
@@ -33,6 +37,7 @@ export class AgentProxyController {
 
   @Public()
   @All('*path')
+  @ApiOperation({ summary: 'CopilotKit Agent streaming action and chat route' })
   handle(@Req() request: Request, @Res() response: Response) {
     const actor = this.resolveActorOrFallback(request);
     return this.proxy.forward(request, response, actor);
@@ -40,6 +45,7 @@ export class AgentProxyController {
 
   @Public()
   @All()
+  @ApiOperation({ summary: 'CopilotKit Agent root proxy route' })
   handleRoot(@Req() request: Request, @Res() response: Response) {
     const actor = this.resolveActorOrFallback(request);
     return this.proxy.forward(request, response, actor);

@@ -16,13 +16,16 @@ import {
   ApiQuery,
   ApiParam,
   ApiBearerAuth,
-  ApiExcludeEndpoint,
+  ApiBody,
 } from '@nestjs/swagger';
 import {
   ListProductsResponseDto,
   ProductDto,
   CreateProductBodyDto,
   UpdateProductBodyDto,
+  PresignedUploadUrlBodyDto,
+  PresignedUploadUrlDto,
+  ErrorResponseDto,
 } from '../swagger/dtos';
 import { Public } from '../auth/decorators/public.decorator';
 import { AdminGuard } from '../auth/guards/admin.guard';
@@ -32,23 +35,6 @@ import { createActorMetadata } from '../auth/grpc-actor-metadata';
 import type { ActorContext } from '../auth/types/actor-context';
 import { InngestEventsService } from '../inngest/inngest.client';
 import type { Product } from '@app/contracts/generated/catalog';
-
-interface ProductBody {
-  slug?: string;
-  name?: string;
-  description?: string;
-  stockQuantity?: number | string;
-  priceAmountMinor?: number | string;
-  currency?: string;
-  price?: { amountMinor?: number | string; currency?: string };
-  colors?: string[];
-  sizes?: string[];
-  images?: Record<string, string>;
-  sku?: string;
-  categorySlug?: string;
-  reorderPoint?: number | string;
-  status?: string;
-}
 
 @ApiTags('Products')
 @Controller('products')
@@ -60,12 +46,44 @@ export class CatalogController {
 
   @Public()
   @Get()
-  @ApiOperation({ summary: 'List products' })
-  @ApiQuery({ name: 'pageSize', required: false, type: String })
-  @ApiQuery({ name: 'pageToken', required: false, type: String })
-  @ApiQuery({ name: 'search', required: false, type: String })
-  @ApiQuery({ name: 'status', required: false, type: String })
-  @ApiResponse({ status: 200, type: ListProductsResponseDto })
+  @ApiOperation({
+    summary: 'List products',
+    description:
+      'Public endpoint to browse and search the product catalog. Supports pagination, keyword search, and status filtering.',
+  })
+  @ApiQuery({
+    name: 'pageSize',
+    required: false,
+    type: Number,
+    description: 'Number of products per page (default: 20)',
+    example: 20,
+  })
+  @ApiQuery({
+    name: 'pageToken',
+    required: false,
+    type: String,
+    description: 'Pagination token for the next page',
+    example: '',
+  })
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    type: String,
+    description: 'Search string matching product title or description',
+    example: 'nmd',
+  })
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    type: String,
+    description: 'Filter by lifecycle status (e.g. ACTIVE, ARCHIVED, DRAFT)',
+    example: 'ACTIVE',
+  })
+  @ApiResponse({
+    status: 200,
+    type: ListProductsResponseDto,
+    description: 'Successfully retrieved products list',
+  })
   async list(
     @Query()
     query: {
@@ -89,36 +107,97 @@ export class CatalogController {
 
   @Public()
   @Get(':id')
-  @ApiOperation({ summary: 'Get product' })
-  @ApiParam({ name: 'id', type: String })
-  @ApiResponse({ status: 200, type: ProductDto })
+  @ApiOperation({
+    summary: 'Get product by ID',
+    description:
+      'Public endpoint to retrieve a single product by its unique UUID or slug, including variant colors, sizes, and images.',
+  })
+  @ApiParam({
+    name: 'id',
+    type: String,
+    description: 'Product unique identifier (UUID)',
+    example: 'prod_90fa8b21-4f32-45a8-bf2b-5e6f66300001',
+  })
+  @ApiResponse({
+    status: 200,
+    type: ProductDto,
+    description: 'Product found and returned',
+  })
+  @ApiResponse({
+    status: 404,
+    type: ErrorResponseDto,
+    description: 'Product not found',
+  })
   get(@Param('id') id: string) {
     return this.catalog.getProduct(id);
   }
 
   @UseGuards(AdminGuard)
+  @ApiBearerAuth()
   @Post('upload-url')
   @ApiOperation({
     summary:
       'DEPRECATED: Use POST /v1/media/upload instead. Legacy upload-url endpoint',
+    description:
+      'Generates a presigned S3/MinIO upload URL. Deprecated in favor of the direct multipart POST /v1/media/upload.',
     deprecated: true,
   })
-  @ApiResponse({ status: 200, description: 'Presigned upload URL generated' })
+  @ApiBody({ type: PresignedUploadUrlBodyDto })
+  @ApiResponse({
+    status: 200,
+    type: PresignedUploadUrlDto,
+    description: 'Presigned upload URL generated successfully',
+  })
+  @ApiResponse({
+    status: 401,
+    type: ErrorResponseDto,
+    description: 'Unauthorized',
+  })
+  @ApiResponse({
+    status: 403,
+    type: ErrorResponseDto,
+    description: 'Forbidden: Admin role required',
+  })
   getUploadUrl(
     @Body()
-    body: {
-      fileName: string;
-      contentType: string;
-      folder?: string;
-      productId?: string;
-    },
+    body: PresignedUploadUrlBodyDto,
   ) {
     return this.catalog.getUploadPresignedUrl(body);
   }
 
   @UseGuards(AdminGuard)
+  @ApiBearerAuth()
   @Post()
-  async create(@Body() body: ProductBody, @CurrentActor() actor: ActorContext) {
+  @ApiOperation({
+    summary: 'Create a new product',
+    description:
+      'Requires Admin role. Creates a new catalog item with stock levels, variants, images, and pricing. Automatically triggers a low-stock alert event if initial quantity is <= reorderPoint.',
+  })
+  @ApiBody({ type: CreateProductBodyDto })
+  @ApiResponse({
+    status: 201,
+    type: ProductDto,
+    description: 'Product created successfully',
+  })
+  @ApiResponse({
+    status: 400,
+    type: ErrorResponseDto,
+    description: 'Validation failed or duplicate slug',
+  })
+  @ApiResponse({
+    status: 401,
+    type: ErrorResponseDto,
+    description: 'Unauthorized: missing or invalid Bearer token',
+  })
+  @ApiResponse({
+    status: 403,
+    type: ErrorResponseDto,
+    description: 'Forbidden: Admin role required',
+  })
+  async create(
+    @Body() body: CreateProductBodyDto,
+    @CurrentActor() actor: ActorContext,
+  ) {
     const product = (await this.catalog.createProduct(
       {
         slug: body.slug ?? '',
@@ -145,10 +224,48 @@ export class CatalogController {
   }
 
   @UseGuards(AdminGuard)
+  @ApiBearerAuth()
   @Patch(':id')
+  @ApiOperation({
+    summary: 'Update an existing product',
+    description:
+      'Requires Admin role. Modifies product attributes such as name, description, inventory quantity, price, images, or publishing status.',
+  })
+  @ApiParam({
+    name: 'id',
+    type: String,
+    description: 'Product unique identifier (UUID)',
+    example: 'prod_90fa8b21-4f32-45a8-bf2b-5e6f66300001',
+  })
+  @ApiBody({ type: UpdateProductBodyDto })
+  @ApiResponse({
+    status: 200,
+    type: ProductDto,
+    description: 'Product updated successfully',
+  })
+  @ApiResponse({
+    status: 400,
+    type: ErrorResponseDto,
+    description: 'Validation failed',
+  })
+  @ApiResponse({
+    status: 401,
+    type: ErrorResponseDto,
+    description: 'Unauthorized',
+  })
+  @ApiResponse({
+    status: 403,
+    type: ErrorResponseDto,
+    description: 'Forbidden: Admin role required',
+  })
+  @ApiResponse({
+    status: 404,
+    type: ErrorResponseDto,
+    description: 'Product not found',
+  })
   async update(
     @Param('id') id: string,
-    @Body() body: ProductBody,
+    @Body() body: UpdateProductBodyDto,
     @CurrentActor() actor: ActorContext,
   ) {
     const product = (await this.catalog.updateProduct(
@@ -186,8 +303,38 @@ export class CatalogController {
   }
 
   @UseGuards(AdminGuard)
+  @ApiBearerAuth()
   @Delete(':id')
-  @ApiExcludeEndpoint()
+  @ApiOperation({
+    summary: 'Archive a product',
+    description:
+      'Requires Admin role. Soft-deletes or archives the product, hiding it from default customer listings.',
+  })
+  @ApiParam({
+    name: 'id',
+    type: String,
+    description: 'Product unique identifier (UUID)',
+    example: 'prod_90fa8b21-4f32-45a8-bf2b-5e6f66300001',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Product archived successfully',
+  })
+  @ApiResponse({
+    status: 401,
+    type: ErrorResponseDto,
+    description: 'Unauthorized',
+  })
+  @ApiResponse({
+    status: 403,
+    type: ErrorResponseDto,
+    description: 'Forbidden: Admin role required',
+  })
+  @ApiResponse({
+    status: 404,
+    type: ErrorResponseDto,
+    description: 'Product not found',
+  })
   archive(@Param('id') id: string, @CurrentActor() actor: ActorContext) {
     return this.catalog.archiveProduct(id, createActorMetadata(actor));
   }

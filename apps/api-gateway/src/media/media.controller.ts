@@ -17,11 +17,14 @@ import {
   ApiConsumes,
   ApiBody,
   ApiResponse,
+  ApiQuery,
+  ApiParam,
 } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
 import { randomUUID } from 'crypto';
 import { StorageService } from '../storage/storage.service';
 import { Public } from '../auth/decorators/public.decorator';
+import { UploadMediaResponseDto, ErrorResponseDto } from '../swagger/dtos';
 
 const ALLOWED_MIME_TYPES = new Set([
   'image/jpeg',
@@ -38,8 +41,19 @@ export class MediaController {
   constructor(private readonly storageService: StorageService) {}
 
   @Post('upload')
-  @ApiOperation({ summary: 'Upload an image file directly to storage' })
+  @ApiOperation({
+    summary: 'Upload an image file directly to storage',
+    description:
+      'Uploads an image file using multipart/form-data. Supported image types: JPEG, PNG, WEBP, GIF, SVG, AVIF (max 10MB). Returns the public media URL and storage key.',
+  })
   @ApiConsumes('multipart/form-data')
+  @ApiQuery({
+    name: 'folder',
+    required: false,
+    type: String,
+    description: 'Target storage directory (defaults to "products")',
+    example: 'products',
+  })
   @ApiBody({
     schema: {
       type: 'object',
@@ -47,20 +61,21 @@ export class MediaController {
         file: {
           type: 'string',
           format: 'binary',
+          description: 'Image file to upload (JPEG, PNG, WEBP, GIF, SVG, AVIF)',
         },
       },
+      required: ['file'],
     },
   })
   @ApiResponse({
     status: HttpStatus.CREATED,
+    type: UploadMediaResponseDto,
     description: 'Image uploaded successfully',
-    schema: {
-      type: 'object',
-      properties: {
-        url: { type: 'string', example: '/v1/media/products/uuid.png' },
-        fileKey: { type: 'string', example: 'products/uuid.png' },
-      },
-    },
+  })
+  @ApiResponse({
+    status: 400,
+    type: ErrorResponseDto,
+    description: 'No file provided or unsupported file format',
   })
   @UseInterceptors(
     FileInterceptor('file', {
@@ -107,9 +122,34 @@ export class MediaController {
       fileKey: result.fileKey,
     };
   }
+
   @Public()
   @Get('*fileKey')
-  @ApiOperation({ summary: 'Stream an image file with caching headers' })
+  @ApiOperation({
+    summary: 'Stream an image file with caching headers',
+    description:
+      'Public endpoint to fetch and stream images with 1-year immutable Cache-Control and ETag headers.',
+  })
+  @ApiParam({
+    name: 'fileKey',
+    type: String,
+    description: 'Relative storage path key of the media file',
+    example: 'products/uuid.png',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Binary image stream with appropriate Content-Type',
+  })
+  @ApiResponse({
+    status: 400,
+    type: ErrorResponseDto,
+    description: 'Invalid file key path',
+  })
+  @ApiResponse({
+    status: 404,
+    type: ErrorResponseDto,
+    description: 'Media file not found in storage',
+  })
   async serveFile(@Req() req: Request, @Res() res: Response) {
     const rawKey = req.params?.fileKey;
     const fileKey = Array.isArray(rawKey)
@@ -132,7 +172,7 @@ export class MediaController {
       res.setHeader('ETag', etag);
     }
 
-    stream.on('error', (err) => {
+    stream.on('error', (_err) => {
       if (!res.headersSent) {
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).end();
       }
